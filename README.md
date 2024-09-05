@@ -1,10 +1,10 @@
 # kcwarden - Keycloak Configuration Auditor
 
-kcwarden checks your Keycloak configuration for common misconfigurations and security vulnerabilities.
+[kcwarden](https://iteratec.github.io/kcwarden/) checks your Keycloak configuration for common misconfigurations and security vulnerabilities.
 
-## Installation
+## Installation and Usage
 
-TBD
+Please see our [documentation on the project website](https://iteratec.github.io/kcwarden/).
 
 ## Development
 
@@ -43,7 +43,3 @@ Afterward, the documentation can be built using `poetry run mkdocs build`.
 The static output is then located in the `site` directory.
 A development server that serves the documentation, watches for changes and automatically re-creates the site can be
 spun up using `poetry run mkdocs serve`.
-
-## Usage
-
-Documentation will follow.
