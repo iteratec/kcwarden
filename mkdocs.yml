@@ -1,0 +1,35 @@
+site_name: kcwarden
+site_description: An Open Source Keycloak Configuration Auditor, developed by iteratec
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - python
+
+markdown_extensions:
+  admonition: {}
+  attr_list: {}
+
+site_url: https://iteratec.github.io/kcwarden/
+
+repo_url: https://github.com/iteratec/kcwarden
+edit_uri: edit/main/docs/
+
+nav:
+  - index.md
+  - installation.md
+  - usage.md
+  - Auditors:
+      - auditors/index.md
+      - auditors/clients.md
+      - auditors/scope.md
+      - auditors/realm.md
+      - auditors/idp.md
+  - Monitors:
+    - monitors/index.md
+    - monitors/client_monitor.md
+    - monitors/group_monitor.md
+    - monitors/service_account_monitor.md
+    - monitors/protocol_mapper_monitor.md

@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "kcwarden"
+version = "0.0.1"
+description = "Keycloak auditor"
+authors = ["Max Maass <max.maass@iteratec.com>", "Tim Walter <tim.walter@iteratec.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+pyyaml = "^6.0.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+testcontainers = { extras = ["keycloak"], version = "^4.8.0" }
+python-keycloak = "^4.3.0"
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+pyre-check = "^0.9.22"
+ruff = "^0.6.3"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+kcwarden = "kcwarden.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
+]
+addopts = "-ra -q"
+
+[tool.ruff]
+src = ["kcwarden", "tests"]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E", "F", "C90", "N", "RUF", "PL"]
+ignore = [
+    "E501",  # line length
+    "PLR2004", # Magic value used in comparison
+    "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
+    "PLR0913",  # Too many arguments in function definition
+    "PLR0912",  #  Too many branches
+    "C901",  # Too complex
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"

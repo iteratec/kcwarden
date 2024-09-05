@@ -1,0 +1,40 @@
+name: Run pytest
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      PIP_PROGRESS_BAR: "off"
+      PIP_DISABLE_PIP_VERSION_CHECK: "on"
+      POETRY_NO_INTERACTION: 1
+      POETRY_VIRTUALENVS_CREATE: false
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12'] # Define Python versions here
+
+    container:
+      image: python:${{ matrix.python-version }}-alpine # Use Python Docker images
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install Poetry
+      run: |
+        pip install poetry
+
+    - name: Install Dependencies
+      run: |
+        poetry install --with dev
+
+    - name: Run Pytest
+      run: |
+        poetry run pytest
