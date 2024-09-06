@@ -1,0 +1,91 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    env:
+      PIP_PROGRESS_BAR: "off"
+      PIP_DISABLE_PIP_VERSION_CHECK: "on"
+      POETRY_NO_INTERACTION: 1
+      POETRY_VIRTUALENVS_CREATE: false
+
+    container:
+      image: python:3.12-alpine
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install Dependencies
+        run: poetry install --with dev
+
+      - name: Run Pytest
+        run: poetry run pytest
+
+      - name: Build Package
+        run: poetry build
+
+      - name: Archive Production Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            dist
+
+  publish-to-pypi:
+    needs: test-and-build
+
+    runs-on: ubuntu-latest
+
+    environment: release
+
+    permissions:
+      # IMPORTANT: this permission is mandatory for PyPI trusted publishing
+      id-token: write
+
+    steps:
+      - name: Download a single artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+
+      - name: Publish Package Distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  publish-to-ghcr:
+    needs: test-and-build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Container Image
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}"
+          file: Docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/kcwarden:latest
+            ghcr.io/${{ github.repository_owner }}/kcwarden:${{ github.sha }}
+
+      - name: Log out from GitHub Container Registry
+        run: docker logout ghcr.io
