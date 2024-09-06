@@ -15,6 +15,41 @@ and additional, Keycloak-specific checks.
 
 All auditors are run by default when running kcwarden. However, you can also limit the set of auditors using a CLI flag, and control which severity of findings you want to have reported. See [usage](../usage.md) for more details.
 
+## Coverage
+
+!!! danger
+
+    Please note that, as kcwarden is currently in beta, it **does not yet cover all aspects of Keycloak configuration and operation**.
+    There are parts of the configuration that have only very few checks associated with them, and some features have no coverage at all.
+
+At the moment, the following parts of the configuration have fairly good coverage with security checks:
+
+- OpenID Connect Clients
+- Service Accounts
+
+The following parts have some coverage, but may still have some gaps:
+
+- Realm settings
+- Scopes
+- Protocol Mappers
+
+The following areas are only lightly covered:
+
+- IDPs (only some sanity checks on OIDC IDPs)
+
+The following areas aren't covered at all:
+
+- Non-OIDC clients (e.g., SAML)
+- Non-OIDC IDPs (LDAP / SAML) 
+- User Federation
+- IDP Mappers
+- Authentication Flows
+- Required Actions
+- Anything related to the implementation of the applications working with the clients (out of scope)
+
+We would be grateful for input on which checks you would like to see - ideally with a description of what exactly to check for, what a good and an insecure configuration would look like, and what the impact of the misconfiguration would be.
+Feel free to open an issue in our GitHub and we'll be happy to add it to the code.
+
 ## Silencing Findings
 
 If you run kcwarden for the first time on a Keycloak configuration, chances are that you will receive a large number of
