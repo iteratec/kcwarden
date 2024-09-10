@@ -22,14 +22,14 @@ jobs:
       image: python:3.12-alpine
 
     steps:
+      - name: Install git
+        run: apk add git
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Install Poetry
         run: pip install poetry
-
-      - name: Install git
-        run: apk add git
 
       - name: Add Poetry plugin
         run: poetry self add "poetry-dynamic-versioning[plugin]"
