@@ -1,0 +1,40 @@
+name: Lint
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PIP_PROGRESS_BAR: "off"
+  PIP_DISABLE_PIP_VERSION_CHECK: "on"
+  POETRY_NO_INTERACTION: 1
+  POETRY_VIRTUALENVS_CREATE: false
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.12-alpine
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install Poetry
+      run: pip install poetry
+
+    - name: Install Dependencies
+      run: poetry install --with dev
+
+    - name: Run ruff check
+      run: poetry run ruff check
+
+    - name: Run ruff format check
+      run: poetry run ruff format --check .
