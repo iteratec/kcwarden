@@ -14,12 +14,6 @@ pyyaml = "^6.0.2"
 pytest = "^8.3.2"
 testcontainers = { extras = ["keycloak"], version = "^4.8.0" }
 python-keycloak = "^4.3.0"
-
-[tool.poetry.group.lint]
-optional = true
-
-[tool.poetry.group.lint.dependencies]
-pyre-check = "^0.9.22"
 ruff = "^0.6.3"
 
 [tool.poetry.group.docs]
