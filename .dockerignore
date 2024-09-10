@@ -34,7 +34,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 __pycache__/
-**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -82,7 +81,6 @@ db.sqlite3-journal
 instance/
 .webassets-cache
 .scrapy
-docs/_build/
 .pybuilder/
 target/
 .ipynb_checkpoints
@@ -117,3 +115,6 @@ cython_debug/
 .dockerignore
 .gitignore
 Docker
+docs
+_nocommit
+mkdocs.yml
