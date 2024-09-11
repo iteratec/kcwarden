@@ -1,4 +1,4 @@
-name: Lint
+name: Perform checks
 
 permissions:
   contents: read
@@ -15,10 +15,30 @@ env:
   PIP_PROGRESS_BAR: "off"
   PIP_DISABLE_PIP_VERSION_CHECK: "on"
   POETRY_NO_INTERACTION: 1
-  POETRY_VIRTUALENVS_CREATE: false
+  POETRY_VIRTUALENVS_IN_PROJECT: true
 
 jobs:
-  tests:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.11', '3.12' ] # Define Python versions here
+
+    container:
+      image: python:${{ matrix.python-version }}-alpine # Use Python Docker images
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-poetry-project
+        with:
+          install_plugin: false
+
+      - name: Run Pytest
+        run: |
+          poetry run pytest
+  lint:
     runs-on: ubuntu-latest
     container:
       image: python:3.12-alpine
