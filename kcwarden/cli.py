@@ -18,8 +18,8 @@ def add_plugin_directory_argument(parser: argparse.ArgumentParser):
 
 def get_parsers() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="Keycloak Auditor",
-        description="Audit all the things!",
+        prog="kcwarden",
+        description="Keycloak configuration auditor",
     )
 
     subparsers = parser.add_subparsers(required=True)
