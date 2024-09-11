@@ -22,7 +22,7 @@ pyyaml = "^6.0.2"
 rich = "^14.0.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.2"
+pytest = "^9.0.0"
 testcontainers = { extras = ["keycloak"], version = "^4.9.2" }
 python-keycloak = ">=5.5,<6.0"
 ruff = ">=0.11.10,<0.15.0"
@@ -45,11 +45,18 @@ build-backend = "poetry_dynamic_versioning.backend"
 [tool.poetry.scripts]
 kcwarden = "kcwarden.cli:main"
 
-[tool.pytest.ini_options]
+[tool.pytest]
 testpaths = [
     "tests"
 ]
-addopts = "-ra -q"
+addopts = [
+    "-ra",
+    "-q"
+]
+filterwarnings = [
+    'ignore:The @wait_container_is_ready:DeprecationWarning',
+    'ignore:The wait_for_logs:DeprecationWarning',
+]
 
 [tool.ruff]
 src = ["kcwarden", "tests"]
