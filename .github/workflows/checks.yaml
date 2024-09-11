@@ -56,3 +56,26 @@ jobs:
 
       - name: Run ruff format check
         run: poetry run ruff format --check .
+
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    container:
+      image: python:3.12-alpine
+      options: --privileged
+
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-poetry-project
+        with:
+          install_plugin: false
+
+      - name: Run integration tests
+        run: poetry run pytest --integration
