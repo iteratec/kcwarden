@@ -1,5 +1,6 @@
 import argparse
 import sys
+from importlib.metadata import version
 
 from kcwarden.subcommands import download, audit, configuration, review
 from kcwarden.utils.arguments import is_dir
@@ -21,6 +22,8 @@ def get_parsers() -> argparse.ArgumentParser:
         prog="kcwarden",
         description="Keycloak configuration auditor",
     )
+
+    parser.add_argument("--version", action="version", version=f"%(prog)s {version('kcwarden')}")
 
     subparsers = parser.add_subparsers(required=True)
 
