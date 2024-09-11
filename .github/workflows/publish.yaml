@@ -114,6 +114,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and Push Container Image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}"
