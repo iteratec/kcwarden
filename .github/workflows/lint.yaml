@@ -24,17 +24,15 @@ jobs:
       image: python:3.12-alpine
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Install Poetry
-      run: pip install poetry
+      - uses: ./.github/actions/setup-poetry-project
+        with:
+          install_plugin: false
 
-    - name: Install Dependencies
-      run: poetry install --with dev
+      - name: Run ruff check
+        run: poetry run ruff check
 
-    - name: Run ruff check
-      run: poetry run ruff check
-
-    - name: Run ruff format check
-      run: poetry run ruff format --check .
+      - name: Run ruff format check
+        run: poetry run ruff format --check .
