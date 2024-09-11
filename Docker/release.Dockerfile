@@ -1,6 +1,6 @@
-ARG KCWARDEN_VERSION
-
 FROM docker.io/library/python:3-alpine
+
+ARG KCWARDEN_VERSION
 
 # Update packages and switch to non-root
 RUN apk upgrade -U && adduser -D --u 65532 nonroot
