@@ -50,8 +50,3 @@ COPY --from=builder /app/dist/kcwarden*.whl .
 RUN --mount=type=cache,uid=65532,gid=65532,target=$PIP_CACHE_DIR pip install --user kcwarden*.whl && rm /app/kcwarden*.whl
 
 ENTRYPOINT ["kcwarden"]
-
-LABEL org.opencontainers.image.source="https://github.com/iteratec/kcwarden"
-LABEL org.opencontainers.image.title="kcwarden"
-LABEL org.opencontainers.image.description="Keycloak Config Auditor"
-LABEL org.opencontainers.image.licenses="Apache-2.0"

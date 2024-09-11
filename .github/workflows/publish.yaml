@@ -21,6 +21,9 @@ jobs:
     container:
       image: python:3.12-alpine
 
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
     steps:
       - name: Install git
         run: apk add git
@@ -61,6 +64,11 @@ jobs:
           path: |
             dist
 
+      - name: Store version
+        id: version
+        run: |
+          echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
+
   publish-to-pypi:
     needs: test-and-build
 
@@ -88,7 +96,9 @@ jobs:
           attestations: true
 
   publish-to-ghcr:
-    needs: test-and-build
+    needs:
+      - test-and-build
+      - publish-to-pypi
 
     runs-on: ubuntu-latest
 
@@ -99,6 +109,9 @@ jobs:
       id-token: write
 
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -113,6 +126,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
+          tags: |
+            type=pep440,pattern={{version}}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and Push Container Image
@@ -120,10 +135,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}"
-          file: Docker/Dockerfile
+          file: Docker/release.Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            KCWARDEN_VERSION=${{ needs.test-and-build.outputs.version }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1

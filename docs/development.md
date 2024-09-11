@@ -36,13 +36,13 @@ of Keycloak container image tags (see [quay.io](https://quay.io/repository/keycl
 To build a Docker image with a bundled kcwarden from the local repository, you can use:
 
 ```shell
-docker build -f Docker/Dockerfile -t kcwarden:latest .
+docker build -f Docker/dev.Dockerfile -t kcwarden:latest .
 ```
 
 or
 
 ```shell
-buildah build -f Docker/Dockerfile -t kcwarden:latest .
+buildah build -f Docker/dev.Dockerfile -t kcwarden:latest .
 ```
 
 It uses a multi-stage build to first build the application as Python wheel and afterward install this wheel in a second
