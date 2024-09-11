@@ -1,45 +1,40 @@
 # kcwarden - Keycloak Configuration Auditor
 
-[kcwarden](https://iteratec.github.io/kcwarden/) checks your Keycloak configuration for common misconfigurations and security vulnerabilities.
+![Python](https://img.shields.io/pypi/pyversions/kcwarden.svg)
+[![PyPI version](https://img.shields.io/pypi/v/kcwarden.svg)](https://pypi.python.org/pypi/kcwarden)
+[![Mkdocs](https://img.shields.io/badge/doc-mkdocs-845ed7.svg)](https://iteratec.github.io/kcwarden)
+[![GitHub discussions](https://img.shields.io/badge/discuss-online-845ef7)](https://github.com/iteratec/kcwarden/discussions)
+[![Downloads](https://pepy.tech/badge/kcwarden)](https://pepy.tech/project/kcwarden)
+[![GitHub stars](https://img.shields.io/github/stars/iteratec/kcwarden?style=flat)](https://github.com/iteratec/kcwarden/stargazers)
 
-## Installation and Usage
+[![last release status](https://github.com/iteratec/kcwarden/actions/workflows/publish.yaml/badge.svg)](https://github.com/iteratec/kcwarden/actions/workflows/publish.yaml)
 
-Please see our [documentation on the project website](https://iteratec.github.io/kcwarden/).
+**[kcwarden](https://iteratec.github.io/kcwarden/) checks your Keycloak configuration for common misconfigurations and
+security vulnerabilities.**
 
-## Development
+## 🚀 Getting started
 
-### Docker Image
+Install it using Python:
 
-To build a Docker image with a bundled kcwarden, you can use:
+````shell
+pip install kcwarden
+````
 
-```shell
-docker build -f Docker/Dockerfile -t kcwarden:0.0.1 .
-```
+For details and other methods, see our [documentation](https://iteratec.github.io/kcwarden/installation/).
 
-or
+## ▶️ Usage
 
-```shell
-buildah build -f Docker/Dockerfile -t kcwarden:0.0.1 .
-```
+Download your Keycloak's config:
 
-It uses a multi-stage build to first build the application as Python wheel and afterwards install this wheel in a second
-image.
+````shell
+kcwarden download --realm $REALM --user admin --output config.json $KEYCLOAK_BASE_URL
+````
 
-### Tests
+and run the checks against it:
 
-The unit tests can be run with `poetry run pytest`.
+````shell
+kcwarden audit config.json
+````
 
-The integration tests that actually start Keycloak containers using Docker can be executed
-with `poetry run pytest --integration`.
-The Keycloak versions for which the tests are executed can be found in [`conftest.py`](./tests/integration/conftest.py).
-It can be overridden by setting the environment variable `INTEGRATION_TEST_KEYCLOAK_VERSIONS` to a space-separated list
-of Keycloak container image tags (see [quay.io](https://quay.io/repository/keycloak/keycloak?tab=tags)).
+For more information, see the [documentation on the project website](https://iteratec.github.io/kcwarden/).
 
-### Build the Docs
-
-The documentation is created using [MkDocs](https://www.mkdocs.org/) and lives in the [`docs`](./docs) directory.
-The dependencies for _MkDocs_ can be installed using this command: `poetry install --with docs`.
-Afterward, the documentation can be built using `poetry run mkdocs build`.
-The static output is then located in the `site` directory.
-A development server that serves the documentation, watches for changes and automatically re-creates the site can be
-spun up using `poetry run mkdocs serve`.
