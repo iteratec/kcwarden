@@ -1,0 +1,41 @@
+name: Setup Poetry Project
+description: "Set ups Poetry and install the project's dependencies"
+
+inputs:
+  install_plugin:
+    description: "Whether the Poetry dynamic versioning plugin should be installed"
+    required: true
+    default: "true"
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Poetry
+      env:
+        PIP_PROGRESS_BAR: "off"
+        PIP_DISABLE_PIP_VERSION_CHECK: "on"
+      shell: sh
+      run: |
+        export POETRY_HOME=$HOME/poetry
+        python -m venv $POETRY_HOME
+        $POETRY_HOME/bin/pip install poetry==1.8.3
+        $POETRY_HOME/bin/poetry --version
+        echo "$HOME/poetry/bin" >> $GITHUB_PATH
+
+    - name: Add Poetry plugin
+      env:
+        PIP_PROGRESS_BAR: "off"
+        PIP_DISABLE_PIP_VERSION_CHECK: "on"
+        POETRY_NO_INTERACTION: 1
+        POETRY_VIRTUALENVS_IN_PROJECT: true
+      shell: sh
+      if: ${{ inputs.install_plugin == 'true' }}
+      run: poetry self add "poetry-dynamic-versioning[plugin]"
+
+    - name: Install Dependencies
+      env:
+        POETRY_NO_INTERACTION: 1
+        POETRY_VIRTUALENVS_IN_PROJECT: true
+      shell: sh
+      run: poetry install --with dev
