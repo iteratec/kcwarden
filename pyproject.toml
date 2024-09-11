@@ -4,6 +4,16 @@ version = "0.0.0"
 description = "Keycloak auditor"
 authors = ["Max Maass <max.maass@iteratec.com>", "Tim Walter <tim.walter@iteratec.com>"]
 readme = "README.md"
+license = "Apache-2.0"
+homepage = "https://iteratec.github.io/kcwarden/"
+repository = "https://github.com/iteratec/kcwarden"
+documentation = "https://iteratec.github.io/kcwarden/"
+keywords = ["keycloak", "security-scanner", "oauth2", "oidc"]
+classifiers = ["License :: OSI Approved :: Apache Software License", "Topic :: Security", "Topic :: Software Development :: Testing", "Operating System :: OS Independent"]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/iteratec/kcwarden/issues"
+"Sponsor" = "https://www.iteratec.com/"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -47,12 +57,12 @@ indent-width = 4
 [tool.ruff.lint]
 select = ["E", "F", "C90", "N", "RUF", "PL"]
 ignore = [
-    "E501",  # line length
+    "E501", # line length
     "PLR2004", # Magic value used in comparison
-    "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
-    "PLR0913",  # Too many arguments in function definition
-    "PLR0912",  #  Too many branches
-    "C901",  # Too complex
+    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+    "PLR0913", # Too many arguments in function definition
+    "PLR0912", #  Too many branches
+    "C901", # Too complex
 ]
 
 [tool.ruff.format]
