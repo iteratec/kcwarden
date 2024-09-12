@@ -64,6 +64,8 @@ jobs:
       docker:
         image: docker:dind
         options: --privileged
+        ports:
+          - 2375:2375
 
     steps:
       - uses: actions/setup-python@v5
