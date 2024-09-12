@@ -1,0 +1,86 @@
+name: Perform checks
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PIP_PROGRESS_BAR: "off"
+  PIP_DISABLE_PIP_VERSION_CHECK: "on"
+  POETRY_NO_INTERACTION: 1
+  POETRY_VIRTUALENVS_IN_PROJECT: true
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.11', '3.12' ] # Define Python versions here
+
+    container:
+      image: python:${{ matrix.python-version }}-alpine # Use Python Docker images
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-poetry-project
+        with:
+          install_plugin: false
+
+      - name: Run Pytest
+        run: |
+          poetry run pytest
+  lint:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.12-alpine
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-poetry-project
+        with:
+          install_plugin: false
+
+      - name: Run ruff check
+        run: poetry run ruff check
+
+      - name: Run ruff format check
+        run: poetry run ruff format --check .
+
+  integration-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      TESTCONTAINER_DOCKER_NETWORK: kcwarden-integration-test-network
+
+    steps:
+      - name: Create Docker network for running Testcontainers
+        run: docker network create ${{ env.TESTCONTAINER_DOCKER_NETWORK }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-poetry-project
+        with:
+          install_plugin: false
+
+      - name: Debug
+        run: |
+          env
+
+      - name: Run integration tests
+        run: poetry run pytest --integration
