@@ -19,6 +19,7 @@ def keycloak(request):
     Currently, we use the latest version, the base version of Red Hat Build of Keycloak and
     the base version of Red Hat Single Sign-On.
     """
-    logging.getLogger("testcontainers.core.waiting_utils").setLevel(logging.WARNING)
+    logging.getLogger("testcontainers").setLevel(logging.DEBUG)
+    logging.getLogger("testcontainers.core.waiting_utils").setLevel(logging.DEBUG)
     with KeycloakContainer(image=f"quay.io/keycloak/keycloak:{request.param}") as kc:
         yield kc.get_client()
