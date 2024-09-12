@@ -71,5 +71,12 @@ jobs:
         with:
           install_plugin: false
 
+      - name: Debug
+        run: |
+          env
+          ls -lah /var/run/docker*
+          docker --version
+          docker ps -a
+
       - name: Run integration tests
         run: poetry run pytest --integration
