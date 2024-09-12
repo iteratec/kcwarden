@@ -59,6 +59,12 @@ jobs:
 
   integration-tests:
     runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
+
     steps:
       - uses: actions/setup-python@v5
         with:
@@ -75,8 +81,6 @@ jobs:
         run: |
           env
           ls -lah /var/run/docker*
-          docker --version
-          docker ps -a
 
       - name: Run integration tests
         run: poetry run pytest --integration
