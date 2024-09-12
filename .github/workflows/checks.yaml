@@ -7,9 +7,23 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/*.yaml'
+      - '.github/CODEOWNERS'
+      - '.github/pull_request_template.md'
+      - 'docs/**/*.md'
+      - 'mkdocs.yml'
+      - 'README.md'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '.github/ISSUE_TEMPLATE/*.yaml'
+      - '.github/CODEOWNERS'
+      - '.github/pull_request_template.md'
+      - 'docs/**/*.md'
+      - 'mkdocs.yml'
+      - 'README.md'
 
 env:
   PIP_PROGRESS_BAR: "off"
