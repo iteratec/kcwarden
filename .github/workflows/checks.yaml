@@ -80,7 +80,6 @@ jobs:
       - name: Debug
         run: |
           env
-          ls -lah /var/run/docker*
 
       - name: Run integration tests
         run: poetry run pytest --integration
