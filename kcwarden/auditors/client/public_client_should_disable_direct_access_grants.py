@@ -12,10 +12,11 @@ class PublicClientShouldDisableDirectAccessGrants(Auditor):
         # We are interested in clients that are:
         # - OIDC clients
         # - Are public clients
-        return (self.is_not_ignored(client) 
-                and not client.is_realm_specific_client()
-                and client.is_oidc_client() 
-                and client.is_public()
+        return (
+            self.is_not_ignored(client)
+            and not client.is_realm_specific_client()
+            and client.is_oidc_client()
+            and client.is_public()
         )
 
     def client_uses_direct_access_grants(self, client) -> bool:

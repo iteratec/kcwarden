@@ -511,9 +511,7 @@ class Client(Dataclass):
         # management permissions. These clients behave differently from other
         # clients, so we need to exclude them from some of our standard checks.
         return (
-            self.get_realm().get_name() == "master"
-            and self.get_name().endswith("-realm")
-            and "protocol" not in self._d
+            self.get_realm().get_name() == "master" and self.get_name().endswith("-realm") and "protocol" not in self._d
         )
 
     def get_protocol(self) -> str:
@@ -530,8 +528,6 @@ class Client(Dataclass):
             # This case should never happen, so instead of blindly returning something,
             # we'd like to know about it. Raise an exception.
             raise RuntimeError("'protocol' field of Client {} is not set, aborting".format(self.get_name()))
-
-
 
     def is_oidc_client(self) -> bool:
         return self.get_protocol() == "openid-connect"
