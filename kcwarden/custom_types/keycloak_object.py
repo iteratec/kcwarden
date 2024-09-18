@@ -505,13 +505,29 @@ class Client(Dataclass):
         return "service-account-" + self.get_client_id().lower()
 
     # More Specific Properties
+    def is_realm_specific_client(self) -> bool:
+        # Each realm in Keycloak will get a realm-specific client created in the
+        # master realm. This is used to hold realm-specific roles, like the user
+        # management permissions. These clients behave differently from other
+        # clients, so we need to exclude them from some of our standard checks.
+        return (
+            self.get_realm().get_name() == "master" and self.get_name().endswith("-realm") and "protocol" not in self._d
+        )
+
     def get_protocol(self) -> str:
         # Every client should have the "protocol" field set, but the "master-realm"
         # client in the "master" realm for some reason does not include this field.
         # This code works around that by returning openid-connect in that case.
-        if self.get_name() == "master-realm" and self.get_realm().get_name() == "master":
-            return "openid-connect"
-        return self._d["protocol"]
+        try:
+            return self._d["protocol"]
+        except KeyError:
+            # If the client is a realm-specific client, it for some reason does not
+            # have a "protocol" set. Return openid-connect anyway.
+            if self.is_realm_specific_client():
+                return "openid-connect"
+            # This case should never happen, so instead of blindly returning something,
+            # we'd like to know about it. Raise an exception.
+            raise RuntimeError("'protocol' field of Client {} is not set, aborting".format(self.get_name()))
 
     def is_oidc_client(self) -> bool:
         return self.get_protocol() == "openid-connect"
@@ -568,7 +584,6 @@ class Client(Dataclass):
             "broker",
             "realm-management",
             "security-admin-console",
-            "master-realm",
         ]
 
     def allows_user_authentication(self) -> bool:

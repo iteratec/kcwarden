@@ -58,16 +58,19 @@ class TestClientWithFullScopeAllowed:
         client1.has_full_scope_allowed.return_value = True
         client1.get_default_client_scopes.return_value = ["email"]
         client1.get_optional_client_scopes.return_value = ["profile"]
+        client1.is_realm_specific_client.return_value = False
 
         client2 = Mock()
         client2.has_full_scope_allowed.return_value = False
         client2.get_default_client_scopes.return_value = ["email", "profile"]
         client2.get_optional_client_scopes.return_value = ["address"]
+        client2.is_realm_specific_client.return_value = False
 
         client3 = Mock()
         client3.has_full_scope_allowed.return_value = True
         client3.get_default_client_scopes.return_value = ["offline_access"]
         client3.get_optional_client_scopes.return_value = []
+        client3.is_realm_specific_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client1, client2, client3]
         results = list(auditor.audit())

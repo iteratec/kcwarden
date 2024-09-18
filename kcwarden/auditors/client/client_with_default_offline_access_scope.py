@@ -12,7 +12,7 @@ class ClientWithDefaultOfflineAccessScope(Auditor):
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        return self.is_not_ignored(client)
+        return self.is_not_ignored(client) and not client.is_realm_specific_client()
 
     def client_can_generate_offline_tokens(self, client) -> bool:
         # Check if the "offline_access" scope is in the default scopes

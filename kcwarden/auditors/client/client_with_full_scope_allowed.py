@@ -9,7 +9,11 @@ class ClientWithFullScopeAllowed(Auditor):
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        return self.is_not_ignored(client) and client.allows_user_authentication()
+        return (
+            self.is_not_ignored(client)
+            and client.allows_user_authentication()
+            and not client.is_realm_specific_client()
+        )
 
     def client_has_full_scope_allowed(self, client) -> bool:
         return client.has_full_scope_allowed()
