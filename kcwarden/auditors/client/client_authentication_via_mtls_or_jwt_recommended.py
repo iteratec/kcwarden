@@ -12,7 +12,10 @@ class ClientAuthenticationViaMTLSOrJWTRecommended(Auditor):
         # We are interested in clients that are:
         # - OIDC Clients
         # - Confidential Clients
-        return self.is_not_ignored(client) and client.is_oidc_client() and not client.is_public()
+        return (self.is_not_ignored(client) 
+                and not client.is_realm_specific_client() 
+                and client.is_oidc_client() 
+                and not client.is_public())
 
     def client_does_not_use_mtls_or_jwt_auth(self, client) -> bool:
         # If the clientAuthenticatorType is client-secret, basic client secret authentication is used.

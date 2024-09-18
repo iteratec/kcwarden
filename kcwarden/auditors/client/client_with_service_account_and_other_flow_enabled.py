@@ -15,6 +15,7 @@ class ClientWithServiceAccountAndOtherFlowEnabled(Auditor):
         # - Has service account
         return (
             self.is_not_ignored(client)
+            and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (not client.is_public())
             and client.has_service_account_enabled()

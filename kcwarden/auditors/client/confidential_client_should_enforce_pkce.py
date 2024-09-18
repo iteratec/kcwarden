@@ -16,6 +16,7 @@ class ConfidentialClientShouldEnforcePKCE(Auditor):
         return (
             self.is_not_ignored(client)
             and client.is_oidc_client()
+            and not client.is_realm_specific_client()
             and (not client.is_public())
             and client.has_standard_flow_enabled()
         )

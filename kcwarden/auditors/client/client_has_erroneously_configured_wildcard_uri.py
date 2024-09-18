@@ -16,6 +16,7 @@ class ClientHasErroneouslyConfiguredWildcardURI(Auditor):
         # - At least one flow that uses the redirect_uri active
         return (
             self.is_not_ignored(client)
+            and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )

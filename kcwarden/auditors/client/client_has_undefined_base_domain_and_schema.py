@@ -17,6 +17,7 @@ class ClientHasUndefinedBaseDomainAndSchema(Auditor):
         # TODO Are there more flows that use redirect_uri?
         return (
             self.is_not_ignored(client)
+            and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )
