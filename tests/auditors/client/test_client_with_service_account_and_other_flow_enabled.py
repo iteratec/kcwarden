@@ -90,6 +90,7 @@ class TestClientWithServiceAccountAndOtherFlowEnabled:
         client1.has_device_authorization_grant_flow_enabled.return_value = True
         client1.has_standard_flow_enabled.return_value = True
         client1.allows_user_authentication.return_value = True
+        client1.is_realm_specific_client.return_value = False
 
         client2 = Mock()
         client2.is_oidc_client.return_value = True
@@ -99,7 +100,8 @@ class TestClientWithServiceAccountAndOtherFlowEnabled:
         client2.has_implicit_flow_enabled.return_value = False
         client2.has_device_authorization_grant_flow_enabled.return_value = False
         client2.has_standard_flow_enabled.return_value = False
-        client1.allows_user_authentication.return_value = False
+        client2.allows_user_authentication.return_value = False
+        client2.is_realm_specific_client.return_value = False
 
         client3 = Mock()
         client3.is_oidc_client.return_value = True
@@ -110,6 +112,7 @@ class TestClientWithServiceAccountAndOtherFlowEnabled:
         client3.has_standard_flow_enabled.return_value = True
         client3.has_device_authorization_grant_flow_enabled.return_value = False
         client3.allows_user_authentication.return_value = True
+        client3.is_realm_specific_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client1, client2, client3]
         results = list(auditor.audit())
