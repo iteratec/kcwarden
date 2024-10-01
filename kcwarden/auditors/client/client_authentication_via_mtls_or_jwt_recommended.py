@@ -17,6 +17,11 @@ class ClientAuthenticationViaMTLSOrJWTRecommended(Auditor):
             and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and not client.is_public()
+            # Ignore broker and realm-management - they show up as having the standard
+            # flow enabled, but don't actually have it, according to the UI. They are
+            # also lacking redirect URIs and other relevant settings. See issue #27 on
+            # GitHub.
+            and client.get_name() not in ["broker", "realm-management"]
         )
 
     def client_does_not_use_mtls_or_jwt_auth(self, client) -> bool:
