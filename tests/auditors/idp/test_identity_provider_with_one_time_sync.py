@@ -70,11 +70,7 @@ class TestIdentityProviderWithOneTimeSync:
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         # Add the IDP to the ignore list
-        auditor._CONFIG = {
-            config_keys.AUDITOR_CONFIG: {
-                auditor.get_classname(): ["ignored_idp"]
-            }
-        }
+        auditor._CONFIG = {config_keys.AUDITOR_CONFIG: {auditor.get_classname(): ["ignored_idp"]}}
 
         results = list(auditor.audit())
         assert len(results) == 0  # No findings due to ignore list
