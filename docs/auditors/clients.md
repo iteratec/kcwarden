@@ -180,14 +180,11 @@ Keycloak's documentation.
 
 ## ClientWithDefaultOfflineAccessScope
 
-TODO Check if this is correct, as offline tokens also require refresh tokens to be enabled in the client. => Check
-implementation and description, make them correct and consistent.
-
 This auditor warns against clients that include the `offline_access` scope in their default client scopes within
-Keycloak. The `offline_access` scope grants the use of offline tokens, which are an extended and more potent form of
-refresh tokens. Offline tokens maintain user login sessions for extended periods, often lasting several months, and are
-typically utilized by native applications (e.g., mobile apps) or for server-to-server connections that require access to
-a user's account in the user's absence.
+Keycloak, and that have refresh tokens enabled. The `offline_access` scope grants the use of offline tokens, which are
+an extended and more potent form of refresh tokens. Offline tokens maintain user login sessions for extended periods, 
+often lasting several months, and are typically utilized by native applications (e.g., mobile apps) or for 
+server-to-server connections that require access to a user's account in the user's absence.
 
 While offline tokens are beneficial for certain use cases, their inclusion as a default scope for clients that do not
 require such extended access poses a significant security risk. If an offline token is compromised, it could allow an
@@ -196,27 +193,24 @@ session expiration mechanisms.
 
 Clients should be carefully reviewed to ensure that the use of offline tokens is genuinely necessary for their
 operation. If not required, it is advisable to remove the `offline_access` scope from the default client scopes, disable
-refresh tokens for the client, or adjust the configuration to mitigate the potential security risks associated with
+refresh tokens for the client, and/or adjust the configuration to mitigate the potential security risks associated with
 long-lived access tokens. This auditor aims to highlight clients with potentially unnecessary default offline access to
 prompt a security review and adjustment of their configuration.
 
 ## ClientWithOptionalOfflineAccessScope
 
-TODO Check if this is correct, as offline tokens also require refresh tokens to be enabled in the client. => Check
-implementation and description, make them correct and consistent.
-
-This auditor alerts on Keycloak clients that have the `offline_access` scope set as an optional client scope. The
-`offline_access` scope grants applications the ability to use offline tokens, which are enhanced versions of refresh
-tokens with significantly longer lifespans. These tokens are especially useful for applications requiring prolonged
-access to a user's account without active user participation, such as mobile applications or server-to-server
-communications.
+This auditor alerts on Keycloak clients that have the `offline_access` scope set as an optional client scope, and that 
+have refresh tokens enabled. The `offline_access` scope grants applications the ability to use offline tokens, which 
+are enhanced versions of refresh tokens with significantly longer lifespans. These tokens are especially useful for 
+applications requiring prolonged access to a user's account without active user participation, such as mobile 
+pplications or server-to-server communications.
 
 However, the inclusion of the `offline_access` scope, even as an optional one, raises security concerns for clients that
 do not necessitate such extended access capabilities. The potential exposure of offline tokens poses a risk of long-term
 unauthorized access to user accounts if these tokens are compromised.
 
-Clients leveraging the `offline_access` scope should undergo a thorough review to ascertain the necessity of this
-capability for their functionality. If the use of offline tokens is not imperative, it's recommended to either remove
+Clients leveraging the `offline_access` scope should undergo a thorough review to ensure the necessity of this
+capability for their functionality. If the use of offline tokens is not required, it's recommended to either remove
 this scope from the list of optional scopes, disable refresh tokens to prevent the issuance of offline tokens, or adjust
 the client's configuration to ensure that the use of offline tokens aligns with the security requirements and
 operational needs. This warning aims to prompt a reevaluation of the need for offline access, advocating for tighter
