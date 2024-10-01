@@ -9,6 +9,16 @@ Keycloak can be configured to delegate user authentication to an upstream Identi
 
     These auditors are currently fairly bare-bones, as we haven't yet had time to read up on what specific problems may lurk in the different possible setups. If you have expertise in this area, please reach out or contribute your own auditors.
 
+## IdentityProviderWithSignatureVerificationDisabled
+
+This auditor warns about Identity Providers configured not to check the signatures of the upstream IDP.
+Not checking the signatures of the tokens the IDP provides is dangerous, as the tokens are no longer cryptographically protected against tampering.
+This may lead to an account takeover or other attacks.
+We strongly recommend to set up signature checks.
+
+The auditor supports OIDC, Keycloak OIDC, and SAML IDPs.
+Provider-specific IDPs (like GitHub, GitLab, etc.) do not have an option to disable signature verification and should thus be safe by default.
+
 ## OIDCIdentityProviderWithoutPKCE
 
 This auditor warns about OIDC Identity Providers configured within a realm that do not have the Proof Key for Code
