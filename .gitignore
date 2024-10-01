@@ -172,3 +172,6 @@ vendor/
 semgrep-rules
 _nocommit
 out
+
+# Mac OS
+.DS_Store
