@@ -9,10 +9,9 @@ class OIDCIdentityProviderWithoutPKCE(Auditor):
     REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.1.1"
 
     def should_consider_idp(self, idp) -> bool:
-        # TODO Support the ignore list from the config here
         # We are interested in identity providers that are:
         # - using either the "oidc" or the "keycloak-oidc" provider (the others don't allow configuring the setting)
-        return idp.get_provider_id() in ["oidc", "keycloak-oidc"]
+        return idp.get_provider_id() in ["oidc", "keycloak-oidc"] and self.is_not_ignored(idp)
 
     def idp_does_not_enforce_pkce(self, cfg) -> bool:
         # TODO Refactor with .get once unit tests exist
