@@ -13,7 +13,7 @@ class OIDCIdentityProviderWithSignatureVerificationDisabled(Auditor):
 
     def idp_does_not_verify_signatures(self, config):
         return config.get("validateSignature") == "false"
-    
+
     def audit(self):
         for idp in self._DB.get_all_identity_providers():
             # Skip IDPs that were explicitly ignored, or that aren't OIDC IDPs

@@ -1,7 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.idp.oidc_identity_provider_with_signature_verification_disabled import OIDCIdentityProviderWithSignatureVerificationDisabled
+from kcwarden.auditors.idp.oidc_identity_provider_with_signature_verification_disabled import (
+    OIDCIdentityProviderWithSignatureVerificationDisabled,
+)
 from kcwarden.custom_types import config_keys
 
 
@@ -52,7 +54,7 @@ class TestOIDCIdentityProviderWithSignatureVerificationDisabled:
 
         results = list(auditor.audit())
         assert len(results) == 1
-        
+
     def test_audit_function_multiple_idps(self, auditor):
         # Create separate mock IDPs with distinct settings
         idp1 = Mock()
