@@ -9,16 +9,15 @@
 
 [![last release status](https://github.com/iteratec/kcwarden/actions/workflows/publish.yaml/badge.svg)](https://github.com/iteratec/kcwarden/actions/workflows/publish.yaml)
 
-**[kcwarden](https://iteratec.github.io/kcwarden/) checks your Keycloak configuration for common misconfigurations and
-security vulnerabilities.**
+**[kcwarden](https://iteratec.github.io/kcwarden/) checks your Keycloak configuration for common misconfigurations and security vulnerabilities.**
 
 ## 🚀 Getting started
 
 Install it using Python:
 
-````shell
+```shell
 pip install kcwarden
-````
+```
 
 For details and other methods, see our [documentation](https://iteratec.github.io/kcwarden/installation/).
 
@@ -26,15 +25,14 @@ For details and other methods, see our [documentation](https://iteratec.github.i
 
 Download your Keycloak's config:
 
-````shell
+```shell
 kcwarden download --realm $REALM --user admin --output config.json $KEYCLOAK_BASE_URL
-````
+```
 
 and run the checks against it:
 
-````shell
+```shell
 kcwarden audit config.json
-````
+```
 
 For more information, see the [documentation on the project website](https://iteratec.github.io/kcwarden/).
-
