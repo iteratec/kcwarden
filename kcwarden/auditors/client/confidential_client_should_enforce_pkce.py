@@ -19,6 +19,11 @@ class ConfidentialClientShouldEnforcePKCE(Auditor):
             and not client.is_realm_specific_client()
             and (not client.is_public())
             and client.has_standard_flow_enabled()
+            # Ignore broker and realm-management - they show up as having the standard
+            # flow enabled, but don't actually have it, according to the UI. They are
+            # also lacking redirect URIs and other relevant settings. See issue #27 on
+            # GitHub.
+            and client.get_name() not in ["broker", "realm-management"]
         )
 
     def client_does_not_enforce_pkce(self, client) -> bool:
