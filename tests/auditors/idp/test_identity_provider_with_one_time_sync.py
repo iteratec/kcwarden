@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from kcwarden.auditors.idp.identity_provider_with_one_time_sync import IdentityProviderWithOneTimeSync
+from kcwarden.custom_types import config_keys
 
 
 class TestIdentityProviderWithOneTimeSync:
@@ -59,3 +60,21 @@ class TestIdentityProviderWithOneTimeSync:
         auditor._DB.get_all_identity_providers.return_value = [idp1, idp2, idp3]
         results = list(auditor.audit())
         assert len(results) == 2  # Expect findings from idp1 and idp3, but not from idp2
+
+    def test_ignore_list_functionality(self, auditor, mock_idp):
+        # Setup IDP without force sync mode and with mappers
+        # Setup IDP without correct PKCE configuration
+        mock_idp.get_sync_mode.return_value = "INHERIT"
+        mock_idp.get_alias.return_value = "ignored_idp"
+        mock_idp.get_name.return_value = mock_idp.get_alias.return_value
+        auditor._DB.get_all_identity_providers.return_value = [mock_idp]
+
+        # Add the IDP to the ignore list
+        auditor._CONFIG = {
+            config_keys.AUDITOR_CONFIG: {
+                auditor.get_classname(): ["ignored_idp"]
+            }
+        }
+
+        results = list(auditor.audit())
+        assert len(results) == 0  # No findings due to ignore list
