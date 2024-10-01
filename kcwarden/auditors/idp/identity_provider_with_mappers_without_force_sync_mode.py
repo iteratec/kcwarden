@@ -19,6 +19,9 @@ class IdentityProviderWithMappersWithoutForceSyncMode(Auditor):
 
     def audit(self):
         for idp in self._DB.get_all_identity_providers():
+            # Skip IDPs that were explicitly ignored
+            if not self.should_consider_idp(idp):
+                continue
             # We are looking for IDPs that do not use the "Force" sync mode
             if self.idp_uses_sync_mode_force(idp):
                 continue
