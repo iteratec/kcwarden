@@ -73,7 +73,7 @@ def add_audit_parser(subparsers):
     parser_audit.add_argument(
         "-s",
         "--min-severity",
-        help="The minimum severity of findings that should be reported. Can be one of INFO, WARNING, ERROR, CRITICAL.",
+        help="The minimum severity of findings that should be reported. Can be one of INFO, LOW, MEDIUM, HIGH, CRITICAL.",
         type=str,
     )
     add_plugin_directory_argument(parser_audit)
