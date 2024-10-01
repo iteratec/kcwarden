@@ -30,7 +30,7 @@ There are several optional parameters to customize the execution:
 |-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `--format`                  | The output format of the findings. Can be plain text (`txt`), `csv` or `json`.                                                                          |
 | `--output`                  | The path to the output file. If not provided, the output will be printed on stdout.                                                                     |
-| `--min-severity`            | The minimum severity of findings that should be reported. Can be one of INFO, WARNING, ERROR, CRITICAL.                                                 |
+| `--min-severity`            | The minimum severity of findings that should be reported. Can be one of INFO, LOW, MEDIUM, HIGH, CRITICAL.                                                 |
 | `--auditors`                | Specify the exact auditors to run, separated by space (others will be ignored).                                                                         |
 | `--config`                  | Provide a config file with auditor-specific exclusions and parameters. Generate a template using [generate-config-template](#generate-config-template). |
 | `--ignore-disabled-clients` | When set, will not audit disabled OIDC clients.                                                                                                         |
