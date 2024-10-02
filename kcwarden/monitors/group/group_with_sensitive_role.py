@@ -1,5 +1,5 @@
-from kcwarden.custom_types.result import Severity
 from kcwarden.api import Monitor
+from kcwarden.custom_types.result import Severity
 from kcwarden.database import helper
 
 
@@ -56,6 +56,3 @@ class GroupWithSensitiveRole(Monitor):
                                     "effective_client_roles": group.get_effective_client_roles(),
                                 },
                             )
-
-
-AUDITORS = [GroupWithSensitiveRole]

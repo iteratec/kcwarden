@@ -1,6 +1,6 @@
-from kcwarden.custom_types.keycloak_object import Client, ProtocolMapper
-from kcwarden.custom_types.result import Severity
 from kcwarden.api import Monitor
+from kcwarden.custom_types.keycloak_object import ProtocolMapper, Client
+from kcwarden.custom_types.result import Severity
 from kcwarden.database import helper
 
 
@@ -119,6 +119,3 @@ class ProtocolMapperWithConfig(Monitor):
                                     client, mapper, "optional_scope_defined_mapper", scope_name
                                 ),
                             )
-
-
-AUDITORS = [ProtocolMapperWithConfig]

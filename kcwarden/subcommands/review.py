@@ -8,7 +8,7 @@ from kcwarden.custom_types.database import Database
 from kcwarden.custom_types.keycloak_object import RealmRole, ClientRole
 from kcwarden.database.in_memory_db import InMemoryDatabase
 from kcwarden.database.importer import load_realm_dump
-from kcwarden.monitors.service_account_monitor import ServiceAccountWithSensitiveRole
+from kcwarden.monitors.service_account.service_account_with_sensitive_role import ServiceAccountWithSensitiveRole
 
 DATABASE: Database = InMemoryDatabase()
 

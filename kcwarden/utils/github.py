@@ -1,8 +1,11 @@
+import logging
+
 import requests
 
-from kcwarden.utils.plugins import logger
 
 GITHUB_API_PATH_LATEST_KEYCLOAK_RELEASE = "https://api.github.com/repos/keycloak/keycloak/releases/latest"
+
+logger = logging.getLogger(__name__)
 
 
 def get_latest_keycloak_version() -> str | None:
