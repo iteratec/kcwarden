@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 
 from kcwarden.custom_types.keycloak_object import (
     Client,
@@ -48,27 +49,27 @@ class Database(ABC):
 
     ### Full list getters
     @abstractmethod
-    def get_all_realms(self) -> list[Realm]:
+    def get_all_realms(self) -> Iterable[Realm]:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_all_clients(self) -> list[Client]:
+    def get_all_clients(self) -> Iterable[Client]:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_all_scopes(self) -> list[ClientScope]:
+    def get_all_scopes(self) -> Iterable[ClientScope]:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_all_service_accounts(self) -> list[ServiceAccount]:
+    def get_all_service_accounts(self) -> Iterable[ServiceAccount]:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_all_groups(self) -> list[Group]:
+    def get_all_groups(self) -> Iterable[Group]:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_all_realm_roles(self) -> list[RealmRole]:
+    def get_all_realm_roles(self) -> Iterable[RealmRole]:
         raise NotImplementedError()
 
     @abstractmethod
@@ -76,7 +77,7 @@ class Database(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_all_identity_providers(self) -> list[IdentityProvider]:
+    def get_all_identity_providers(self) -> Iterable[IdentityProvider]:
         raise NotImplementedError()
 
     ### Specific getters

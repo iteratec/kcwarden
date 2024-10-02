@@ -6,10 +6,8 @@ from kcwarden.auditors.realm.realm_email_verification_disabled import RealmEmail
 
 class TestRealmEmailVerificationDisabled:
     @pytest.fixture
-    def auditor(self, database, default_config):
-        auditor_instance = RealmEmailVerificationDisabled(database, default_config)
-        auditor_instance._DB = Mock()
-        return auditor_instance
+    def auditor(self, mock_database, default_config):
+        return RealmEmailVerificationDisabled(mock_database, default_config)
 
     def test_should_consider_realm(self, mock_realm, auditor):
         assert auditor.should_consider_realm(mock_realm) is True  # Always consider unless specifically ignored

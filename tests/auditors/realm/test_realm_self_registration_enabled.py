@@ -6,10 +6,8 @@ from kcwarden.auditors.realm.realm_self_registration_enabled import RealmSelfReg
 
 class TestRealmSelfRegistrationEnabled:
     @pytest.fixture
-    def auditor(self, database, default_config):
-        auditor_instance = RealmSelfRegistrationEnabled(database, default_config)
-        auditor_instance._DB = Mock()
-        return auditor_instance
+    def auditor(self, mock_database, default_config):
+        return RealmSelfRegistrationEnabled(mock_database, default_config)
 
     def test_should_consider_realm(self, mock_realm, auditor):
         assert auditor.should_consider_realm(mock_realm) is True  # Always consider unless specifically ignored

@@ -1,3 +1,4 @@
+from kcwarden.auditors.realm.keycloak_version_should_be_up_to_date import KeycloakVersionShouldBeUpToDate
 from kcwarden.auditors.realm.realm_email_verification_disabled import RealmEmailVerificationDisabled
 from kcwarden.auditors.realm.realm_self_registration_enabled import RealmSelfRegistrationEnabled
 from kcwarden.auditors.realm.refresh_token_reuse_count_should_be_zero import RefreshTokenReuseCountShouldBeZero
@@ -11,4 +12,5 @@ AUDITORS = [
     RefreshTokenReuseCountShouldBeZero,
     RealmSelfRegistrationEnabled,
     RealmEmailVerificationDisabled,
+    KeycloakVersionShouldBeUpToDate,
 ]

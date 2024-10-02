@@ -3,7 +3,8 @@ title: Realm
 ---
 
 # Realm Misconfigurations
-These auditors check the realm-wide settings, like token lifetimes and global security features. 
+
+These auditors check the realm-wide settings, like token lifetimes and global security features.
 
 ## RefreshTokensShouldBeRevokedAfterUse
 
@@ -61,3 +62,17 @@ It may also compromise the integrity of user data, especially in applications wh
 
 Realms detected with email verification turned off are highlighted for administrators to reassess this configuration choice.
 Depending on the application's requirements and the level of trust needed in user-provided email addresses, enabling email verification may be advisable to enhance security and ensure the credibility of user accounts.
+
+## KeycloakVersionShouldBeUpToDate
+
+!!! warning
+
+    This auditor only checks for an exact match with the latest version. For a list of the actual vulnerabilities, use a vulnerabilty scanner like _trivy_.
+
+This auditor examines if the used Keycloak version is up to date.
+Only the latest version of the Keycloak retrieves security fixes, and thus it is crucial to keep up with the latest version.
+kcwarden performs only a basic check for an exact match between the version of the analyzed Keycloak and the latest release.
+For this check, it fetches the latest version from the GitHub releases of Keycloak.
+
+If a RedHat version of Keycloak is used, it might have received backports.
+In this case, the severity is lowered and the long description includes a corresponding hint.

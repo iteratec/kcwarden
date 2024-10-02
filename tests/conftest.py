@@ -1,7 +1,10 @@
+from unittest import mock
 from unittest.mock import Mock
 
 import pytest
 
+from kcwarden.custom_types.database import Database
+from kcwarden.custom_types.keycloak_object import Realm
 from kcwarden.database.in_memory_db import InMemoryDatabase
 from kcwarden.custom_types.config_keys import AUDITOR_CONFIG
 
@@ -106,6 +109,11 @@ def database():
     return InMemoryDatabase()
 
 
+@pytest.fixture
+def mock_database():
+    return mock.create_autospec(spec=Database, instance=True)
+
+
 # Mocked data objects
 @pytest.fixture
 def mock_idp():
@@ -115,7 +123,7 @@ def mock_idp():
 
 @pytest.fixture
 def mock_realm():
-    realm = Mock()
+    realm = mock.create_autospec(spec=Realm, instance=True)
     realm.get_name.return_value = "mock-realm"
     return realm
 

@@ -58,6 +58,9 @@ class Realm(Dataclass):
     def has_declarative_user_profiles_enabled(self) -> bool:
         return self._d["attributes"].get("userProfileEnabled", "false") == "true"
 
+    def get_keycloak_version(self) -> str:
+        return self._d["keycloakVersion"]
+
 
 class RealmRole(Dataclass):
     """
