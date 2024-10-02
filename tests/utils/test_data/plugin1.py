@@ -14,7 +14,9 @@ def non_plugin():
 
 class Plugin1(Auditor):
     def audit(self) -> Generator[Result, None, None]:
-        yield self.generate_finding(self._DB.get_all_realms()[0], {}, "IMPORTANT", override_severity=Severity.Critical)
+        yield self.generate_finding(
+            next(iter(self._DB.get_all_realms())), {}, "IMPORTANT", override_severity=Severity.Critical
+        )
 
     @classmethod
     def get_custom_config_template(cls) -> list[dict] | None:

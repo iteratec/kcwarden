@@ -1,9 +1,15 @@
 import argparse
+import logging
+import os
 import sys
 from importlib.metadata import version
 
 from kcwarden.subcommands import download, audit, configuration, review
 from kcwarden.utils.arguments import is_dir
+
+logger = logging.getLogger(__name__)
+
+LOG_FORMAT = "[%(asctime)s %(levelname)-s %(name)s] %(message)s"
 
 
 def add_plugin_directory_argument(parser: argparse.ArgumentParser):
@@ -160,6 +166,12 @@ def add_review_parser(subparsers):
 
 
 def main(args: list[str] | None = None) -> int | None:
+    logging.basicConfig(
+        level=logging.DEBUG if os.environ.get("DEBUG", "false").lower() == "true" else logging.INFO, format=LOG_FORMAT
+    )
+
+    logger.debug("Started")
+
     # Parse CLI args
     args_ns = get_parsers().parse_args(args)
     # Execute the subcommand

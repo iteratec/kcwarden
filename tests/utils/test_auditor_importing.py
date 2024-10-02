@@ -2,17 +2,29 @@ from pathlib import Path
 from typing import Type
 
 from kcwarden.api import Monitor, Auditor
-from kcwarden.utils.plugins import get_auditors
+from kcwarden.utils.auditor_importing import get_auditors_from_directory, get_auditors_from_package
 
 
-def test_get_auditors():
+def test_get_auditors_from_directory():
     test_data_path = Path(__file__).parent / "test_data"
-    result = get_auditors(test_data_path)
-    assert len(result) == 4
+    result = get_auditors_from_directory(test_data_path)
+    verify_results(result)
+
+
+def test_get_auditors_from_package():
+    from tests.utils import test_data
+
+    result = get_auditors_from_package(test_data)
+    verify_results(result)
+
+
+def verify_results(result):
+    assert len(result) == 5
     assert_class_exits_in_list("Plugin1", result)
     assert_class_exits_in_list("Plugin2", result)
     assert_class_exits_in_list("Plugin3", result)
     assert_class_exits_in_list("Plugin4", result)
+    assert_class_exits_in_list("Plugin5", result)
     for clz in result:
         assert issubclass(clz, Auditor)
         if clz.__name__ == "Plugin4":
