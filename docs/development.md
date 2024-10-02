@@ -16,8 +16,7 @@ It also requires that you have git installed on your system.
 ## Linting and Formatting
 
 `ruff` is used as linter and code formatter.
-It can be executed using `poetry run ruff . --fix` for linting with automatic fixes and `poetry run ruff format .` for
-formatting.
+It can be executed using `poetry run ruff . --fix` for linting with automatic fixes and `poetry run ruff format .` for formatting.
 
 The pipeline only succeeds if the code is formatted and there are no linting issues.
 
@@ -25,11 +24,9 @@ The pipeline only succeeds if the code is formatted and there are no linting iss
 
 The unit tests can be run with `poetry run pytest`.
 
-The integration tests that actually start Keycloak containers using Docker can be executed
-with `poetry run pytest --integration`.
+The integration tests that actually start Keycloak containers using Docker can be executed with `poetry run pytest --integration`.
 The Keycloak versions for which the tests are executed can be found in [`conftest.py`](./tests/integration/conftest.py).
-It can be overridden by setting the environment variable `INTEGRATION_TEST_KEYCLOAK_VERSIONS` to a space-separated list
-of Keycloak container image tags (see [quay.io](https://quay.io/repository/keycloak/keycloak?tab=tags)).
+It can be overridden by setting the environment variable `INTEGRATION_TEST_KEYCLOAK_VERSIONS` to a space-separated list of Keycloak container image tags (see [quay.io](https://quay.io/repository/keycloak/keycloak?tab=tags)).
 
 ## Docker Image
 
@@ -45,16 +42,13 @@ or
 buildah build -f Docker/dev.Dockerfile -t kcwarden:latest .
 ```
 
-It uses a multi-stage build to first build the application as Python wheel and afterward install this wheel in a second
-image.
+It uses a multi-stage build to first build the application as Python wheel and afterward install this wheel in a second image.
 
 ## Release
 
-kcwarden is released as Python package on [PyPI](https://pypi.org/project/kcwarden/) and as Docker image
-on [ghcr.io](https://github.com/iteratec/kcwarden/pkgs/container/kcwarden).
+kcwarden is released as Python package on [PyPI](https://pypi.org/project/kcwarden/) and as Docker image on [ghcr.io](https://github.com/iteratec/kcwarden/pkgs/container/kcwarden).
 
-For publishing these artifacts, a release is created on GitHub and then a GitHub workflow creates and publishes the
-packages.
+For publishing these artifacts, a release is created on GitHub and then a GitHub workflow creates and publishes the packages.
 
 ## Build the Docs
 
@@ -62,5 +56,4 @@ The documentation is created using [MkDocs](https://www.mkdocs.org/) and lives i
 The dependencies for _MkDocs_ can be installed using this command: `poetry install --with docs`.
 Afterward, the documentation can be built using `poetry run mkdocs build`.
 The static output is then located in the `site` directory.
-A development server that serves the documentation, watches for changes and automatically re-creates the site can be
-spun up using `poetry run mkdocs serve`.
+A development server that serves the documentation, watches for changes and automatically re-creates the site can be spun up using `poetry run mkdocs serve`.

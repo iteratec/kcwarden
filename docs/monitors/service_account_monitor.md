@@ -3,12 +3,14 @@ title: Service Accounts
 ---
 
 # Service Account Monitors
+
 Service accounts are often used to authenticate machine-to-machine communication using Keycloak.
 Thus, they are often set up with fairly powerful roles and can generate highly privileged tokens.
 Service Account Monitors allow you to keep an eye on their configuration, to detect overprivileged or misconfigured service accounts.
 Please be sure that you have read our [general introduction to Monitors](index.md) to understand the context of this feature.
 
 ## ServiceAccountWithSensitiveRole
+
 In a large deployment with many roles and service accounts, configuration drift can be a real concern.
 Service accounts may have roles assigned to them that should have been removed months ago, or that were assigned in error.
 For certain roles, this can pose a threat to the security of the system.
@@ -48,7 +50,7 @@ If you are aware of other ways to assign roles to service accounts, let us know 
 ## ServiceAccountWithGroup
 
 Service accounts are represented as a special type of user in Keycloak.
-This user can be assigned roles, but also also be added to groups and inherit roles and other settings that way.
+This user can be assigned roles, but also be added to groups and inherit roles and other settings that way.
 Thus, it can be useful to monitor the group assignments of service accounts as well.
 
 ```yaml

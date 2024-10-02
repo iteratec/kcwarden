@@ -4,7 +4,8 @@ title: Clients
 
 # Client Monitors
 
-You can use client monitors to keep an eye on the configuration of specific OIDC clients. Please be sure that you have read our [general introduction to Monitors](index.md) to understand the context of this feature.
+You can use client monitors to keep an eye on the configuration of specific OIDC clients.
+Please be sure that you have read our [general introduction to Monitors](index.md) to understand the context of this feature.
 
 
 ## ClientWithSensitiveRole
@@ -37,7 +38,7 @@ monitors:
 The field `role` and `allowed` fields support the Python RegEx syntax, so you can match all roles beginning with `org_` by writing `^org_.*` as the role name you want to monitor, and similarly use wildcards in your allowlists.
 If you want to match a realm role (i.e., a role defined on the level of the Keycloak realm), put "realm" as the role-client.
 If you are using a client role (i.e., a role defined on the level of an individual client, like the built-in realm-management roles), put the name of the client that defines the role in the field.
-The role-client field does not support regular expressions and is case-sensitive.
+The `role-client` field does not support regular expressions and is case-sensitive.
 
 !!! info
 
@@ -57,7 +58,7 @@ In general, to generate an access token containing a specific scope, one of the 
 
     Additionally, in order for the scope name to appear in the token, the scope must have the option "include in token scope" enabled - however, this auditor does not enforce this setting, as you may want to monitor scope assignments for other reasons than their inclusion into the access token (e.g., because they are used to include additional mappers or other features), and enforcing this limitation would lead to false negatives.
 
-In order to monitor a specific scope, you can add the following to your config file:
+To monitor a specific scope, you can add the following to your config file:
 
 ```yaml
 monitors:

@@ -13,8 +13,7 @@ It can be acquired using the Keycloak administration interface or using the `dow
 kcwarden download --realm $REALM --user $USER --output $KEYCLOAK_CONFIG_FILE $KEYCLOAK_BASE_URL
 ```
 
-Additionally, you might specify a separate realm for login, e.g., the `master` realm, using the `--auth-realm`
-parameter.
+Additionally, you might specify a separate realm for login, e.g., the `master` realm, using the `--auth-realm` parameter.
 
 ## Running the Audit
 
@@ -30,7 +29,7 @@ There are several optional parameters to customize the execution:
 |-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `--format`                  | The output format of the findings. Can be plain text (`txt`), `csv` or `json`.                                                                          |
 | `--output`                  | The path to the output file. If not provided, the output will be printed on stdout.                                                                     |
-| `--min-severity`            | The minimum severity of findings that should be reported. Can be one of INFO, LOW, MEDIUM, HIGH, CRITICAL.                                                 |
+| `--min-severity`            | The minimum severity of findings that should be reported. Can be one of INFO, LOW, MEDIUM, HIGH, CRITICAL.                                              |
 | `--auditors`                | Specify the exact auditors to run, separated by space (others will be ignored).                                                                         |
 | `--config`                  | Provide a config file with auditor-specific exclusions and parameters. Generate a template using [generate-config-template](#generate-config-template). |
 | `--ignore-disabled-clients` | When set, will not audit disabled OIDC clients.                                                                                                         |
@@ -52,8 +51,7 @@ If `--output` is not specified, it is printed to stdout.
 
     This feature is not part of the main scope of _kcwarden_ and thus only partly maintained.
 
-There is an additional command `review` that outputs roles and its usages on services accounts and groups as matrix for
-human analysis.
+There is an additional command `review` that outputs roles and its usages on services accounts and groups as matrix for human analysis.
 
 ```shell
 kcwarden review $KEYCLOAK_CONFIG_FILE

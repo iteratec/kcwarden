@@ -3,6 +3,7 @@ title: Mappers
 ---
 
 # Protocol Mapper Monitors
+
 You can use protocol mapper monitors to keep an eye on the configuration of specific protocol mappers. Please be sure that you have read our [general introduction to Monitors](index.md) to understand the context of this feature.
 
 ## ProtocolMapperWithConfig
@@ -44,7 +45,7 @@ One of them may look like this:
 }
 ```
 
-This is a mapper that takes the "user_id" field from the user attributes and writes it to the access token in the `user_id` key (specified by the `claim.name` key of the configuration).
+This is a mapper that takes the `user_id` field from the user attributes and writes it to the access token in the `user_id` key (specified by the `claim.name` key of the configuration).
 For the sake of demonstration, let's say you want to ensure that only a user attribute mapper can write to that key, and no other mapper type can do so.
 The resulting monitor would look like this:
 
@@ -60,7 +61,8 @@ monitors:
     note: The user_id claim should only be writable from a user attribute mapper
 ```
 
-To further ensure the correctness of that field in the access tokens, you could also write a second detection that ensures that usermodel-attribute-mappers can only write to the field from the user_id user attribute, and cannot use any other attributes.
+To further ensure the correctness of that field in the access tokens, you could also write a second monitor.
+This second monitor ensures that usermodel-attribute-mappers can only write to the field from the `user_id` user attribute, and cannot use any other attributes.
 Add the following right below the last line of the previous configuration:
 
 ```yaml
@@ -75,7 +77,7 @@ Add the following right below the last line of the previous configuration:
 
 As seen in the two examples, both the `protocol-mapper-type` and any value below `matched-config` support regular expressions, so you can use negative lookahead to check for violations of your rules.
 You can perform matching on arbitrary keys in the `config` part of the JSON object.
-If a key specified in `matched-config` is not found, the entire protocol mapper is treated as not matching - however, since the config keys should be consistent across different instances of the same protocol mapper type, this should rarely be an issue in practice.
+If a key specified in `matched-config` is not found, the entire protocol mapper is treated as not matching—however, since the config keys should be consistent across different instances of the same protocol mapper type, this should rarely be an issue in practice.
 
 !!! info
 

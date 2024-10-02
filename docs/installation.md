@@ -14,8 +14,7 @@ You can install _kcwarden_ from PyPI:
 pip install kcwarden
 ```
 
-You might want to use [pipx](https://github.com/pypa/pipx) to automatically encapsulate the dependencies of _kcwarden_
-in a virtual environment.
+You might want to use [pipx](https://github.com/pypa/pipx) to automatically encapsulate the dependencies of _kcwarden_ in a virtual environment.
 
 ## Docker
 
