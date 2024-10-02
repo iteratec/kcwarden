@@ -6,10 +6,8 @@ from kcwarden.auditors.realm.refresh_token_reuse_count_should_be_zero import Ref
 
 class TestRefreshTokenReuseCountShouldBeZero:
     @pytest.fixture
-    def auditor(self, database, default_config):
-        auditor_instance = RefreshTokenReuseCountShouldBeZero(database, default_config)
-        auditor_instance._DB = Mock()
-        return auditor_instance
+    def auditor(self, mock_database, default_config):
+        return RefreshTokenReuseCountShouldBeZero(mock_database, default_config)
 
     def test_should_consider_realm(self, mock_realm, auditor):
         assert auditor.should_consider_realm(mock_realm) is True  # Always consider unless specifically ignored

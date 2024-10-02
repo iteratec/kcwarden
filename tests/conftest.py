@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from kcwarden.custom_types.database import Database
 from kcwarden.custom_types.keycloak_object import Realm
 from kcwarden.database.in_memory_db import InMemoryDatabase
 from kcwarden.custom_types.config_keys import AUDITOR_CONFIG
@@ -106,6 +107,11 @@ def realm_json():
 @pytest.fixture
 def database():
     return InMemoryDatabase()
+
+
+@pytest.fixture
+def mock_database():
+    return mock.create_autospec(spec=Database, instance=True)
 
 
 # Mocked data objects

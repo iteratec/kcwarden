@@ -1,15 +1,14 @@
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 from kcwarden.auditors.realm.refresh_tokens_should_be_revoked_after_use import RefreshTokensShouldBeRevokedAfterUse
 
 
 class TestRefreshTokensShouldBeRevokedAfterUse:
     @pytest.fixture
-    def auditor(self, database, default_config):
-        auditor_instance = RefreshTokensShouldBeRevokedAfterUse(database, default_config)
-        auditor_instance._DB = Mock()
-        return auditor_instance
+    def auditor(self, mock_database, default_config):
+        return RefreshTokensShouldBeRevokedAfterUse(mock_database, default_config)
 
     def test_should_consider_realm(self, mock_realm, auditor):
         assert auditor.should_consider_realm(mock_realm) is True  # Always consider unless specifically ignored

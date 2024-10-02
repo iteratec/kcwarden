@@ -3,7 +3,6 @@ from unittest import mock
 import pytest
 
 from kcwarden.auditors.realm.keycloak_version_should_be_up_to_date import KeycloakVersionShouldBeUpToDate
-from kcwarden.custom_types.database import Database
 from kcwarden.custom_types.keycloak_object import Realm
 from kcwarden.custom_types.result import Severity
 
@@ -16,10 +15,8 @@ KEYCLOAK_VERSION_PATCH_TARGET = (
 
 class TestKeycloakVersionShouldBeUpToDate:
     @pytest.fixture
-    def auditor(self, database, default_config):
-        auditor_instance = KeycloakVersionShouldBeUpToDate(database, default_config)
-        auditor_instance._DB = mock.create_autospec(spec=Database, instance=True)
-        return auditor_instance
+    def auditor(self, mock_database, default_config):
+        return KeycloakVersionShouldBeUpToDate(mock_database, default_config)
 
     def test_audit__given_the_latest_keycloak_version(self, auditor, mock_realm: Realm):
         with mock.patch(KEYCLOAK_VERSION_PATCH_TARGET) as keycloak_version_mock:
