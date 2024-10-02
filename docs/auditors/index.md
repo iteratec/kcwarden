@@ -7,9 +7,7 @@ title: Introduction
 kcwarden comes with a number of pre-built detection rules that can detect common Keycloak misconfigurations.
 We call these _auditors_, and each auditor checks for one specific problem.
 There are auditors for OAuth clients, scopes, upstream Identity Provider (IDP) configurations, and realm settings. 
-The auditors are based on a combination of
-the [OAuth 2.0 Security Best Current Practices RFC Draft (Version 24)](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-24),
-and additional, Keycloak-specific checks.
+The auditors are based on a combination of the [OAuth 2.0 Security Best Current Practices RFC Draft (Version 24)](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-24), and additional, Keycloak-specific checks.
 
 ## Running Auditors
 
@@ -47,21 +45,21 @@ The following areas aren't covered at all:
 - Required Actions
 - Anything related to the implementation of the applications working with the clients (out of scope)
 
-We would be grateful for input on which checks you would like to see - ideally with a description of what exactly to check for, what a good and an insecure configuration would look like, and what the impact of the misconfiguration would be.
-Feel free to open an issue in our GitHub and we'll be happy to add it to the code.
+We would be grateful for input on which checks you would like to see—ideally with a description of what exactly to check for, what a good and an insecure configuration would look like, and what the impact of the misconfiguration would be.
+Feel free to open an issue in our GitHub, and we'll be happy to add it to the code.
 
 ## Silencing Findings
 
 If you run kcwarden for the first time on a Keycloak configuration, chances are that you will receive a large number of
 findings.
-kcwarden tends to err on the side of reporting too much instead of too little, so there are likely to be some findings
-that you don't want to act on because you have good reasons to configure the system in this way, even though it may not
-be 100% compliant with official recommendations.
+kcwarden tends to err on the side of reporting too much instead of too little.
+Thus, there are likely to be some findings that you don't want to act on because you have good reasons to configure the system in this way, even though it may not be 100% compliant with official recommendations.
 In these cases, you can ignore specific findings or entire auditors to prevent kcwarden from reporting them again.
 
 ### Ignoring a Specific Finding
 
-To ignore a specific finding, you can [create a config file](../usage.md#generate-config-template) and add the specific entity that was flagged to the allowlist. For example, if you have a client `mobile_app` that is used by a native mobile application that requires the use of offline access tokens, you can silence the warning about the use of these tokens for this specific client with the following configuration entry:
+To ignore a specific finding, you can [create a config file](../usage.md#generate-config-template) and add the specific entity that was flagged to the allowlist.
+For example, if you have a client `mobile_app` that is used by a native mobile application that requires the use of offline access tokens, you can silence the warning about the use of these tokens for this specific client with the following configuration entry:
 
 ```yaml
 auditors:

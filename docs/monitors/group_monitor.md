@@ -3,7 +3,7 @@ title: Group
 ---
 
 # Group Monitor
-You can use grouo monitors to detect if groups have incorrect configurations.
+You can use group monitors to detect if groups have incorrect configurations.
 Please be sure that you have read our [general introduction to Monitors](index.md) to understand the context of this feature.
 
 ## GroupWithSensitiveRole
