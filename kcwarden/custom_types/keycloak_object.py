@@ -4,7 +4,9 @@ from urllib.parse import urlparse
 
 
 class Dataclass(ABC):
-    CLASSNAME = "REPLACE_ME"
+    def __init__(self, raw_data: dict):
+        self._d = raw_data
+        super().__init__()
 
     @abstractmethod
     def get_name(self) -> str:
@@ -15,7 +17,7 @@ class Dataclass(ABC):
         raise NotImplementedError()
 
     def get_type(self) -> str:
-        return self.CLASSNAME
+        return self.__class__.__name__
 
     def __str__(self) -> str:
         return f"<{self.get_type()}: {self.get_name()} in Realm {self.get_realm().get_name()}>"
@@ -23,17 +25,10 @@ class Dataclass(ABC):
 
 class Realm(Dataclass):
     """
-    Aktuell enthält _d einmal den kompletten Dump, da es kein definiertes Feld
-    in dem dump gibt, das die Realm-Eigenschaften kapselt. Daher wird hier kein
-    Beispiel-Datensatz hinterlegt.
+    Currently _d contains the complete dump once, because there is no defined field
+    in the dump that encapsulates the realm properties.
+    Therefore, no example data set is stored here.
     """
-
-    CLASSNAME = "Realm"
-    _d = {}
-
-    def __init__(self, raw_json: dict) -> None:
-        # Create a deepcopy, just in case
-        self._d = deepcopy(raw_json)
 
     def get_name(self) -> str:
         return self._d["realm"]
@@ -92,19 +87,15 @@ class RealmRole(Dataclass):
         },
     """
 
-    CLASSNAME = "RealmRole"
-    REALM: Realm
-    _d = {}
-
-    def __init__(self, raw_json: dict, realm: Realm):
-        self._d = raw_json
-        self.REALM = realm
+    def __init__(self, raw_data: dict, realm: Realm):
+        super().__init__(raw_data)
+        self._realm: Realm = realm
 
     def get_name(self) -> str:
         return self._d["name"]
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def is_client_role(self) -> bool:
         assert self._d["clientRole"] is False, "Client role has been parsed as realm role, wtf?!"
@@ -151,21 +142,16 @@ class ClientRole(Dataclass):
 
     """
 
-    CLASSNAME = "ClientRole"
-    REALM: Realm
-    _d = {}
-    _client: str
-
-    def __init__(self, raw_json: dict, realm: Realm, client: str):
-        self._d = raw_json
-        self.REALM = realm
-        self._client = client
+    def __init__(self, raw_data: dict, realm: Realm, client: str):
+        super().__init__(raw_data)
+        self._realm: Realm = realm
+        self._client: str = client
 
     def get_name(self) -> str:
         return self._d["name"]
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def is_client_role(self) -> bool:
         assert self._d["clientRole"] is True, "Realm role has been parsed as client role, wtf?!"
@@ -208,19 +194,15 @@ class ProtocolMapper(Dataclass):
 
     """
 
-    CLASSNAME = "ProtocolMapper"
-    REALM: Realm
-    _d = {}
-
-    def __init__(self, raw_json: dict, realm: Realm):
-        self._d = raw_json
-        self.REALM = realm
+    def __init__(self, raw_data: dict, realm: Realm):
+        super().__init__(raw_data)
+        self._realm: Realm = realm
 
     def get_name(self) -> str:
         return self._d["name"]
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def get_protocol(self) -> str:
         return self._d["protocol"]
@@ -330,32 +312,28 @@ class ClientScope(Dataclass):
         },
     """
 
-    CLASSNAME = "ClientScope"
-    REALM: Realm
-    _d = {}
+    def __init__(self, raw_data: dict, scope_mapping: list, client_scope_mapping: dict, realm: Realm):
+        super().__init__(raw_data)
+        raw_data["roles"] = {"realm": [], "client": {}}
 
-    def __init__(self, client_scope: dict, scope_mapping: list, client_scope_mapping: dict, realm: Realm):
-        client_scope["roles"] = {"realm": [], "client": {}}
-
-        scope_name = client_scope["name"]
+        scope_name = raw_data["name"]
         for scope_map in scope_mapping:
             if scope_map.get("clientScope", None) == scope_name:
-                client_scope["roles"]["realm"] = scope_map["roles"]
+                raw_data["roles"]["realm"] = scope_map["roles"]
                 break
 
         for role_client in client_scope_mapping:
             for mapping_scope in client_scope_mapping[role_client]:
                 if mapping_scope.get("clientScope", None) == scope_name:
-                    client_scope["roles"]["client"][role_client] = mapping_scope["roles"]
+                    raw_data["roles"]["client"][role_client] = mapping_scope["roles"]
 
-        self._d = client_scope
-        self.REALM = realm
+        self._realm: Realm = realm
 
     def get_name(self) -> str:
         return self._d["name"]
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def get_realm_roles(self) -> list[str]:
         return self._d["roles"]["realm"]
@@ -365,7 +343,7 @@ class ClientScope(Dataclass):
 
     def get_protocol_mappers(self) -> list[ProtocolMapper]:
         protocol_mappers = self._d.get("protocolMappers", [])
-        return [ProtocolMapper(data, self.REALM) for data in protocol_mappers]
+        return [ProtocolMapper(data, self._realm) for data in protocol_mappers]
 
 
 class Client(Dataclass):
@@ -426,26 +404,22 @@ class Client(Dataclass):
         }
     """
 
-    CLASSNAME = "Client"
-    REALM: Realm
-    _d = {}
+    def __init__(self, raw_data: dict, scope_mappings: list, client_scope_mappings: dict, realm: Realm):
+        raw_data["directly_assigned_roles"] = {"realm": [], "client": {}}
 
-    def __init__(self, client: dict, scope_mappings: list, client_scope_mappings: dict, realm: Realm):
-        client["directly_assigned_roles"] = {"realm": [], "client": {}}
-
-        client_name = client["clientId"]
+        client_name = raw_data["clientId"]
         for scope_map in scope_mappings:
             if scope_map.get("client", None) == client_name:
-                client["directly_assigned_roles"]["realm"] = scope_map["roles"]
+                raw_data["directly_assigned_roles"]["realm"] = scope_map["roles"]
                 break
 
         for role_client in client_scope_mappings:
             for mapping_scope in client_scope_mappings[role_client]:
                 if mapping_scope.get("client", None) == client_name:
-                    client["directly_assigned_roles"]["client"][role_client] = mapping_scope["roles"]
+                    raw_data["directly_assigned_roles"]["client"][role_client] = mapping_scope["roles"]
 
-        self._d = client
-        self.REALM = realm
+        super().__init__(raw_data)
+        self._realm: Realm = realm
 
     def get_client_id(self) -> str:
         return self._d["clientId"]
@@ -454,7 +428,7 @@ class Client(Dataclass):
         return self.get_client_id()
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     # Basic Properties
     def is_public(self) -> bool:
@@ -540,7 +514,7 @@ class Client(Dataclass):
 
     def get_protocol_mappers(self) -> list[ProtocolMapper]:
         protocol_mappers = self._d.get("protocolMappers", [])
-        return [ProtocolMapper(data, self.REALM) for data in protocol_mappers]
+        return [ProtocolMapper(data, self._realm) for data in protocol_mappers]
 
     def get_client_authenticator_type(self) -> str | None:
         if self.is_public():
@@ -642,27 +616,22 @@ class Group(Dataclass):
     the whole inheritance tree needs to be traversed.
     """
 
-    CLASSNAME = "Group"
-    REALM: Realm
-    PARENT: "Group | None" = None
-    _d = {}
-
-    def __init__(self, raw_json: dict, realm: Realm, parent_group: "Group | None" = None):
-        self._d = raw_json
-        self.REALM = realm
-        self.PARENT = parent_group
+    def __init__(self, raw_data: dict, realm: Realm, parent_group: "Group | None" = None):
+        super().__init__(raw_data)
+        self._realm: Realm = realm
+        self._parent: "Group | None" = parent_group
 
     def get_name(self) -> str:
         return self._d["name"]
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def get_path(self) -> str:
         return self._d["path"]
 
     def get_parent(self) -> "Group | None":
-        return self.PARENT
+        return self._parent
 
     def get_attributes(self) -> dict[str, str]:
         return self._d["attributes"]
@@ -675,18 +644,18 @@ class Group(Dataclass):
 
     def get_effective_realm_roles(self) -> list[str]:
         # If no parent exists, the effective realm roles are the roles of this group only.
-        if self.PARENT is None:
+        if self._parent is None:
             return self.get_realm_roles()
 
         # Otherwise, incorporate the parent's roles
         my_realm_roles = set(self._d["realmRoles"])
-        my_realm_roles.update(self.PARENT.get_effective_realm_roles())
+        my_realm_roles.update(self._parent.get_effective_realm_roles())
         return list(my_realm_roles)
 
     def get_effective_client_roles(self) -> dict[str, list[str]]:
-        if self.PARENT is None:
+        if self._parent is None:
             return deepcopy(self._d["clientRoles"])
-        parent_client_roles = self.PARENT.get_effective_client_roles()
+        parent_client_roles = self._parent.get_effective_client_roles()
         my_client_roles = self.get_client_roles()
         for client in my_client_roles.keys():
             if client in parent_client_roles:
@@ -699,7 +668,7 @@ class Group(Dataclass):
         return self._d["subGroups"] != []
 
     def get_subgroups(self) -> "list[Group]":
-        return [Group(subgroup, self.REALM, self) for subgroup in self._d["subGroups"]]
+        return [Group(subgroup, self._realm, self) for subgroup in self._d["subGroups"]]
 
 
 class ServiceAccount(Dataclass):
@@ -732,13 +701,9 @@ class ServiceAccount(Dataclass):
 
     """
 
-    CLASSNAME = "ServiceAccount"
-    REALM: Realm
-    _d = {}
-
-    def __init__(self, raw_json: dict, realm: Realm):
-        self._d = raw_json
-        self.REALM = realm
+    def __init__(self, raw_data: dict, realm: Realm):
+        super().__init__(raw_data)
+        self._realm: Realm = realm
 
     def get_username(self) -> str:
         return self._d["username"]
@@ -747,7 +712,7 @@ class ServiceAccount(Dataclass):
         return self.get_username()
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def get_client_id(self) -> str:
         return self._d["serviceAccountClientId"]
@@ -798,19 +763,15 @@ class IdentityProviderMapper(Dataclass):
 
     """
 
-    CLASSNAME = "IdentityProviderMapper"
-    REALM: Realm
-    _d = {}
-
-    def __init__(self, raw_json: dict, realm: Realm):
-        self._d = raw_json
-        self.REALM = realm
+    def __init__(self, raw_data: dict, realm: Realm):
+        super().__init__(raw_data)
+        self._realm: Realm = realm
 
     def get_name(self) -> str:
         return self._d["name"]
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def get_identity_provider_alias(self) -> str:
         return self._d["identityProviderAlias"]
@@ -876,18 +837,14 @@ class IdentityProvider(Dataclass):
         }
     """
 
-    CLASSNAME = "IdentityProvider"
-    REALM: Realm
-    _d = {}
-
-    def __init__(self, raw_json: dict, realm: Realm, identity_provider_mappers: list[dict]):
-        self._d = raw_json
-        self.REALM = realm
+    def __init__(self, raw_data: dict, realm: Realm, identity_provider_mappers: list[dict]):
+        super().__init__(raw_data)
+        self._realm = realm
         # Import all IdentityProviderMappers from the realm that reference this Identity Provider
         self._d["idpMappings"] = [
             IdentityProviderMapper(idpmap, realm)
             for idpmap in identity_provider_mappers
-            if idpmap["identityProviderAlias"] == raw_json["alias"]
+            if idpmap["identityProviderAlias"] == raw_data["alias"]
         ]
 
     def get_alias(self) -> str:
@@ -897,7 +854,7 @@ class IdentityProvider(Dataclass):
         return self.get_alias()
 
     def get_realm(self) -> Realm:
-        return self.REALM
+        return self._realm
 
     def get_provider_id(self) -> str:
         return self._d["providerId"]
