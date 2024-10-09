@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.11', '3.12' ] # Define Python versions here
+        python-version: [ '3.11', '3.12', '3.13' ] # Define Python versions here
 
     container:
       image: python:${{ matrix.python-version }}-alpine # Use Python Docker images
