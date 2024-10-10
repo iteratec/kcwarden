@@ -36,3 +36,7 @@ kcwarden audit config.json
 ```
 
 For more information, see the [documentation on the project website](https://iteratec.github.io/kcwarden/).
+
+## Sponsors
+
+<a href="https://www.iteratec.com/"><img alt="Logo iteratec" src="./docs/assets/iteratec.svg" width="300"></a>

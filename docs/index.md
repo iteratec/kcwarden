@@ -10,3 +10,7 @@ Its focus is on security and correctness issues.
 
 [Installation](installation.md){: .btn .btn-primary role=button }
 [Usage](usage.md){: .btn .btn-primary role=button }
+
+## Sponsors
+
+[![Logo iteratec](assets/iteratec.svg){ style="max-width: 15rem;" }](https://www.iteratec.com/)
