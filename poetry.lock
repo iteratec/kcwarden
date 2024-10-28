@@ -699,13 +699,13 @@ six = ">=1.5"
 
 [[package]]
 name = "python-keycloak"
-version = "4.6.2"
+version = "4.6.3"
 description = "python-keycloak is a Python package providing access to the Keycloak API."
 optional = false
-python-versions = "<4.0,>=3.8"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "python_keycloak-4.6.2-py3-none-any.whl", hash = "sha256:2fcf77f858da4062578f02843e74482e45256df4f885ec8046783272ca882832"},
-    {file = "python_keycloak-4.6.2.tar.gz", hash = "sha256:184462526fc512546b9b5d2c584b0cdf7539f9ba2854a5b08b7727458c2569f9"},
+    {file = "python_keycloak-4.6.3-py3-none-any.whl", hash = "sha256:eef1bd19b372414fb800bbec2679c6e2427a6829cfb1fb3fa0500fc90ec5cdaf"},
+    {file = "python_keycloak-4.6.3.tar.gz", hash = "sha256:c1195e392af9e732ba302ffa110f51a9edc5a849e61b70295d07bcc3ad9a7768"},
 ]
 
 [package.dependencies]
