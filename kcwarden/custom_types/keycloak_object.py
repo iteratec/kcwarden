@@ -322,8 +322,8 @@ class ClientScope(Dataclass):
                 raw_data["roles"]["realm"] = scope_map["roles"]
                 break
 
-        for role_client in client_scope_mapping:
-            for mapping_scope in client_scope_mapping[role_client]:
+        for role_client, mapping_scopes in client_scope_mapping.items():
+            for mapping_scope in mapping_scopes:
                 if mapping_scope.get("clientScope", None) == scope_name:
                     raw_data["roles"]["client"][role_client] = mapping_scope["roles"]
 
@@ -413,8 +413,8 @@ class Client(Dataclass):
                 raw_data["directly_assigned_roles"]["realm"] = scope_map["roles"]
                 break
 
-        for role_client in client_scope_mappings:
-            for mapping_scope in client_scope_mappings[role_client]:
+        for role_client, mapping_scopes in client_scope_mappings.items():
+            for mapping_scope in mapping_scopes:
                 if mapping_scope.get("client", None) == client_name:
                     raw_data["directly_assigned_roles"]["client"][role_client] = mapping_scope["roles"]
 
