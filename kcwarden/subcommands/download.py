@@ -32,10 +32,12 @@ def get_password(user):
         return os.environ["KCWARDEN_KEYCLOAK_PASSWORD"]
     return getpass("Please enter the password for user {}: ".format(user))
 
+
 def get_client_secret():
     if "KCWARDEN_CLIENT_SECRET" in os.environ:
         return os.environ["KCWARDEN_CLIENT_SECRET"]
     return ""
+
 
 def get_totp():
     return input("Please enter the TOTP code: ")
@@ -92,7 +94,7 @@ def download_config(args: argparse.Namespace):
     realm = args.realm
     output_file = args.output
     client_secret = args.client_secret
-    
+
     if client_secret is None:
         client_secret = get_client_secret()
 
