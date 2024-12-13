@@ -74,6 +74,19 @@ class Auditor(ABC):
         assert isinstance(ignore_dict, dict)
         return ignore_dict.get(self.get_classname(), [])
 
+    # Check if the provided object is a Client.
+    # If so, check if the client is disabled and if the settings say that
+    # inactive clients should be ignored.
+    def is_ignored_disabled_client(self, keycloak_object: Dataclass) -> bool:
+        if isinstance(keycloak_object, Client):
+            # If it is enabled, it should always be considered
+            if keycloak_object.is_enabled():
+                return False
+            # Otherwise, it should be considered if "ignore disabled clients" is not set
+            return self.get_config(config_keys.IGNORE_DISABLED_CLIENTS)
+        # If it is not a client, return False either way
+        return False
+
     # More generic ignores (also calls specific ignore list from config)
     def is_not_ignored(self, keycloak_object: Dataclass) -> bool:
         # Check if the provided object should be considered, based on the audit configuration.
@@ -81,13 +94,10 @@ class Auditor(ABC):
         if helper.matches_list_of_regexes(keycloak_object.get_name(), self._get_ignore_list()):
             return False
 
-        # Checks for clients:
-        if isinstance(keycloak_object, Client):
-            # If it is enabled, it should always be considered
-            if keycloak_object.is_enabled():
-                return True
-            # Otherwise, it should be considered if "ignore disabled clients" is not set
-            return not self.get_config(config_keys.IGNORE_DISABLED_CLIENTS)
+        # Checks if it is a client that should be ignored because it is disabled
+        if self.is_ignored_disabled_client(keycloak_object):
+            return False
+        
         # Anything that doesn't have specific ignore rules associated with it is always considered.
         return True
 
