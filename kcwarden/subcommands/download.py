@@ -1,7 +1,6 @@
 import contextlib
 
 import requests
-from requests.auth import HTTPBasicAuth
 import argparse
 from getpass import getpass
 import os
