@@ -10,10 +10,22 @@ You need a realm export as input to the latter commands.
 It can be acquired using the Keycloak administration interface or using the `download` command:
 
 ```shell
-kcwarden download --realm $REALM --user $USER --output $KEYCLOAK_CONFIG_FILE $KEYCLOAK_BASE_URL
+kcwarden download --realm $REALM --auth-method password --user $USER --output $KEYCLOAK_CONFIG_FILE $KEYCLOAK_BASE_URL
 ```
 
 Additionally, you might specify a separate realm for login, e.g., the `master` realm, using the `--auth-realm` parameter.
+The password will be promoted interactively, or loaded from the environment variable `$KCWARDEN_KEYCLOAK_PASSWORD` if set.
+
+
+
+If you want to run `kcwarden` as part of a pipeline, we recommend using service account authentication instead. Create a confidential client with a service account, and assign the `manage-realm`, `manage-clients` and `manage-users` roles for the relevant realm to it. Then, use kcwarden like this:
+
+```bash
+kcwarden download --auth-method client --client-id kcwarden-client --client-secret $YOUR_CLIENT_SECRET
+# (add additional parameters as needed)
+```
+
+You can also omit the `--client-secret` parameter, in which case it will be loaded from the `$KCWARDEN_CLIENT_SECRET` environment variable.
 
 ## Running the Audit
 
