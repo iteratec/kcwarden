@@ -1,5 +1,6 @@
 from kcwarden.api import Monitor
 from kcwarden.custom_types.result import Severity
+from kcwarden.custom_types.keycloak_object import Client, ServiceAccount
 from kcwarden.database import helper
 
 
@@ -24,6 +25,11 @@ class ServiceAccountWithSensitiveRole(Monitor):
         "role": "role name or regular expression",
         "role-client": "Client name (set to 'realm' for realm roles). No regular expression support",
     }
+
+    def _should_consider_service_account(self, serviceaccount: ServiceAccount, allowed_service_accounts: list[str]) -> bool:
+        if not helper.matches_list_of_regexes(serviceaccount.get_name(), allowed_service_accounts):
+            client: Client = self._DB.get_client(serviceaccount.get_client_id())
+            return not self.is_ignored_disabled_client(client)
 
     def audit(self):
         custom_config = self.get_custom_config()
@@ -50,7 +56,7 @@ class ServiceAccountWithSensitiveRole(Monitor):
                 # Next, we need to find all service accounts that have at least one of these roles
                 for considered_role in final_roles:
                     for serviceaccount in helper.get_service_accounts_with_role(self._DB, considered_role):
-                        if not helper.matches_list_of_regexes(serviceaccount.get_name(), allowed_service_accounts):
+                        if self._should_consider_service_account(serviceaccount, allowed_service_accounts):
                             yield self.generate_finding_with_severity_from_config(
                                 serviceaccount,
                                 monitor_definition,
@@ -66,7 +72,7 @@ class ServiceAccountWithSensitiveRole(Monitor):
                 # And all service accounts that are in at least one of these groups
                 for considered_group in groups:
                     for serviceaccount in helper.get_service_accounts_in_group(self._DB, considered_group):
-                        if not helper.matches_list_of_regexes(serviceaccount.get_name(), allowed_service_accounts):
+                        if self._should_consider_service_account(serviceaccount, allowed_service_accounts):
                             yield self.generate_finding_with_severity_from_config(
                                 serviceaccount,
                                 monitor_definition,
