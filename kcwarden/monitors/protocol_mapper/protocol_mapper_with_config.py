@@ -71,7 +71,7 @@ class ProtocolMapperWithConfig(Monitor):
                 helper.get_effective_roles_for_service_account(self._DB, saccount)
             )
         return additional_details
-    
+
     def _should_consider_client(self, client: Client) -> bool:
         # Ignore clients that are disabled, if the global setting says so
         return not self.is_ignored_disabled_client(client)

@@ -97,7 +97,7 @@ class Auditor(ABC):
         # Checks if it is a client that should be ignored because it is disabled
         if self.is_ignored_disabled_client(keycloak_object):
             return False
-        
+
         # Anything that doesn't have specific ignore rules associated with it is always considered.
         return True
 

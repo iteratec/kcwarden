@@ -26,7 +26,9 @@ class ServiceAccountWithSensitiveRole(Monitor):
         "role-client": "Client name (set to 'realm' for realm roles). No regular expression support",
     }
 
-    def _should_consider_service_account(self, serviceaccount: ServiceAccount, allowed_service_accounts: list[str]) -> bool:
+    def _should_consider_service_account(
+        self, serviceaccount: ServiceAccount, allowed_service_accounts: list[str]
+    ) -> bool:
         if not helper.matches_list_of_regexes(serviceaccount.get_name(), allowed_service_accounts):
             client: Client = self._DB.get_client(serviceaccount.get_client_id())
             return not self.is_ignored_disabled_client(client)
