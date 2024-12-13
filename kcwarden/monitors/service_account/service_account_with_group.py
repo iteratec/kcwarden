@@ -1,5 +1,6 @@
 from kcwarden.api import Monitor
 from kcwarden.custom_types.result import Severity
+from kcwarden.custom_types.keycloak_object import ServiceAccount, Client
 from kcwarden.database import helper
 
 
@@ -21,6 +22,10 @@ class ServiceAccountWithGroup(Monitor):
     HAS_CUSTOM_CONFIG = True
     CUSTOM_CONFIG_TEMPLATE = {"group": "/group path or regular expression", "allow_no_group": True}
 
+    def _should_consider_service_account(self, service_account: ServiceAccount):
+        client: Client = self._DB.get_client(service_account.get_client_id())
+        return not self.is_ignored_disabled_client(client)
+
     def audit(self):
         custom_config = self.get_custom_config()
         for monitor_definition in custom_config:
@@ -34,6 +39,8 @@ class ServiceAccountWithGroup(Monitor):
                 continue
 
             for saccount in self._DB.get_all_service_accounts():
+                if not self._should_consider_service_account(saccount):
+                    continue
                 assigned_groups = saccount.get_groups()
 
                 if not allow_no_group and assigned_groups == []:
