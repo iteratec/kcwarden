@@ -28,26 +28,52 @@ def authorized_get(url, token):
 
 ### Authentication-related functions
 def get_password(user):
-    if "KEYCLOAK_PASSWORD" in os.environ:
-        return os.environ["KEYCLOAK_PASSWORD"]
+    if "KCWARDEN_KEYCLOAK_PASSWORD" in os.environ:
+        return os.environ["KCWARDEN_KEYCLOAK_PASSWORD"]
     return getpass("Please enter the password for user {}: ".format(user))
 
+def get_client_secret():
+    if "KCWARDEN_CLIENT_SECRET" in os.environ:
+        return os.environ["KCWARDEN_CLIENT_SECRET"]
+    return ""
 
 def get_totp():
     return input("Please enter the TOTP code: ")
 
 
-def get_session(base_url, user, totp_required, auth_realm):
+def get_token_password_grant(base_url, auth_realm, user, totp_required, client_id="admin-cli", client_secret="pass"):
     password = get_password(user)
 
-    auth_data = {"username": user, "password": password, "grant_type": "password"}
+    auth_data = {
+        "username": user,
+        "password": password,
+        "grant_type": "password",
+        "client_id": client_id,
+        "client_secret": client_secret,
+    }
 
     if totp_required:
         auth_data["totp"] = get_totp()
 
     token_url = KC_TOKEN_AUTH.format(base_url, auth_realm)
 
-    req = requests.post(token_url, auth=HTTPBasicAuth("admin-cli", "pass"), data=auth_data)
+    req = requests.post(token_url, data=auth_data)
+    try:
+        req.json()
+    except requests.RequestException:
+        assert False, "Could not parse JSON. Response was: {}".format(req.content)
+    assert "access_token" in req.json(), "Did not receive an access token in response. Response was: {}".format(
+        req.json()
+    )
+    return req.json()["access_token"]
+
+
+def get_token_client_credential_grant(base_url, auth_realm, client_id, client_secret):
+    token_url = KC_TOKEN_AUTH.format(base_url, auth_realm)
+
+    req = requests.post(
+        token_url, data={"grant_type": "client_credentials", "client_id": client_id, "client_secret": client_secret}
+    )
     try:
         req.json()
     except requests.RequestException:
@@ -65,9 +91,22 @@ def download_config(args: argparse.Namespace):
 
     realm = args.realm
     output_file = args.output
+    client_secret = args.client_secret
+    
+    if client_secret is None:
+        client_secret = get_client_secret()
 
-    session_token = get_session(base_url, args.user, args.totp, args.auth_realm)
+    if args.auth_method == "password":
+        session_token = get_token_password_grant(
+            base_url, args.auth_realm, args.user, args.totp, args.client_id, client_secret
+        )
+    elif args.auth_method == "client":
+        session_token = get_token_client_credential_grant(base_url, args.auth_realm, args.client_id, client_secret)
+    else:
+        print("Unexpected auth_method provided - please file a bug report, this should be impossible")
+        return 1
 
+    print(session_token)
     export = requests.post(
         KC_EXPORT_URL.format(base_url, realm), headers={"Authorization": f"Bearer {session_token}"}
     ).json()

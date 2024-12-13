@@ -113,8 +113,7 @@ def add_download_parser(subparsers):
     parser_download = subparsers.add_parser(
         "download",
         aliases=["d"],
-        help="Download the Keycloak realm configuration.\n\n"
-        "The password will be requested interactively or read from the KEYCLOAK_PASSWORD env variable.",
+        help="Download the Keycloak realm configuration.",
     )
     parser_download.set_defaults(func=download.download_config)
     parser_download.add_argument(
@@ -133,18 +132,40 @@ def add_download_parser(subparsers):
         default="master",
         required=False,
     )
+
+    # Authentication method choice
+    parser_download.add_argument(
+        "-m",
+        "--auth-method",
+        choices=["password", "client"],
+        required=True,
+        help="Choose the authentication method: password or client (client-credential grant / service account)",
+    )
+
+    # User authentication options
     parser_download.add_argument(
         "-u",
         "--user",
-        help="The user used for authentication",
-        required=True,
+        help="The username used for user authentication. The password will be interactively prompted or read from the KCWARDEN_KEYCLOAK_PASSWORD env variable.",
     )
     parser_download.add_argument(
         "-t",
         "--totp",
-        help="Indicates that a TOTP code is required for authentication",
+        help="Indicates that a TOTP code is required for authentication. The value will be interactively prompted",
         action="store_true",
     )
+
+    # Client credentials (can be used for both user and service account auth)
+    parser_download.add_argument(
+        "--client-id",
+        default="admin-cli",
+        help="The client ID for authentication. Defaults to admin-cli for password authentication.",
+    )
+    parser_download.add_argument(
+        "--client-secret",
+        help="The client secret for authentication, if required. Optional for password authentication, required for service account authentication. Can be omitted, in which case it will be read from the KCWARDEN_CLIENT_SECRET env variable.",
+    )
+
     parser_download.add_argument(
         "-o",
         "--output",
