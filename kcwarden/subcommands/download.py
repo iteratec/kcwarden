@@ -33,9 +33,7 @@ def get_password(user):
 
 
 def get_client_secret():
-    if "KCWARDEN_CLIENT_SECRET" in os.environ:
-        return os.environ["KCWARDEN_CLIENT_SECRET"]
-    return ""
+    return os.environ.get("KCWARDEN_CLIENT_SECRET", "")
 
 
 def get_totp():
@@ -60,13 +58,12 @@ def get_token_password_grant(base_url, auth_realm, user, totp_required, client_i
 
     req = requests.post(token_url, data=auth_data)
     try:
-        req.json()
+        json_response = req.json()
     except requests.RequestException:
-        assert False, "Could not parse JSON. Response was: {}".format(req.content)
-    assert "access_token" in req.json(), "Did not receive an access token in response. Response was: {}".format(
-        req.json()
-    )
-    return req.json()["access_token"]
+        raise ValueError(f"Could not parse JSON. Response was: {req.content}")
+    if "access_token" not in json_response:
+        raise ValueError(f"Did not receive an access token in response. Response was: {json_response}")
+    return json_response["access_token"]
 
 
 def get_token_client_credential_grant(base_url, auth_realm, client_id, client_secret):
@@ -76,13 +73,12 @@ def get_token_client_credential_grant(base_url, auth_realm, client_id, client_se
         token_url, data={"grant_type": "client_credentials", "client_id": client_id, "client_secret": client_secret}
     )
     try:
-        req.json()
+        json_response = req.json()
     except requests.RequestException:
-        assert False, "Could not parse JSON. Response was: {}".format(req.content)
-    assert "access_token" in req.json(), "Did not receive an access token in response. Response was: {}".format(
-        req.json()
-    )
-    return req.json()["access_token"]
+        raise ValueError(f"Could not parse JSON. Response was: {req.content}")
+    if "access_token" not in json_response:
+        raise ValueError(f"Did not receive an access token in response. Response was: {json_response}")
+    return json_response["access_token"]
 
 
 ### Main Loop
