@@ -79,7 +79,7 @@ class TestServiceAccountWithSensitiveRole:
                 "service-account-service-account-client-with-service-account-in-sensitive-subgroup",
                 "service-account-client-with-service-account-in-recursive-sensitive-group",
                 "service-account-client-with-service-account-in-subgroup-of-sensitive-composite-group",
-                "service-account-client-with-service-account-in-sensitive-group"
+                "service-account-client-with-service-account-in-sensitive-group",
             ]
 
     def test_ignore_specific_entity(self, example_db):
@@ -106,8 +106,8 @@ class TestServiceAccountWithSensitiveRole:
                 "service-account-service-account-client-with-service-account-in-sensitive-subgroup",
                 "service-account-client-with-service-account-in-recursive-sensitive-group",
                 "service-account-client-with-service-account-in-subgroup-of-sensitive-composite-group",
-                "service-account-client-with-service-account-in-sensitive-group"
-            ],  result.to_dict()["entity"]
+                "service-account-client-with-service-account-in-sensitive-group",
+            ], result.to_dict()["entity"]
 
     def test_ignore_by_regex(self, example_db):
         # fmt: off
@@ -131,7 +131,7 @@ class TestServiceAccountWithSensitiveRole:
                 "service-account-service-account-client-with-service-account-in-sensitive-subgroup",
                 "service-account-client-with-service-account-in-recursive-sensitive-group",
                 "service-account-client-with-service-account-in-subgroup-of-sensitive-composite-group",
-                "service-account-client-with-service-account-in-sensitive-group"
+                "service-account-client-with-service-account-in-sensitive-group",
             ]
 
     def test_match_role_by_regex(self, example_db):
