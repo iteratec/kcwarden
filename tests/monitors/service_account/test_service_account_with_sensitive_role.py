@@ -70,7 +70,7 @@ class TestServiceAccountWithSensitiveRole:
         # fmt: on
         monitor = ServiceAccountWithSensitiveRole(example_db, config)
         results = [result for result in monitor.audit()]
-        assert len(results) == 5
+        assert len(results) == 7
         for result in results:
             assert result.to_dict()["entity"] in [
                 "service-account-client-with-service-account-with-sensitive-role",
@@ -78,6 +78,8 @@ class TestServiceAccountWithSensitiveRole:
                 "service-account-client-with-service-account-with-recursive-sensitive-role",
                 "service-account-service-account-client-with-service-account-in-sensitive-subgroup",
                 "service-account-client-with-service-account-in-recursive-sensitive-group",
+                "service-account-client-with-service-account-in-subgroup-of-sensitive-composite-group",
+                "service-account-client-with-service-account-in-sensitive-group"
             ]
 
     def test_ignore_specific_entity(self, example_db):
@@ -96,14 +98,16 @@ class TestServiceAccountWithSensitiveRole:
         # fmt: on
         monitor = ServiceAccountWithSensitiveRole(example_db, config)
         results = [result for result in monitor.audit()]
-        assert len(results) == 4
+        assert len(results) == 6
         for result in results:
             assert result.to_dict()["entity"] in [
                 "service-account-client-with-service-account-with-sensitive-composite-role",
                 "service-account-client-with-service-account-with-recursive-sensitive-role",
                 "service-account-service-account-client-with-service-account-in-sensitive-subgroup",
                 "service-account-client-with-service-account-in-recursive-sensitive-group",
-            ]
+                "service-account-client-with-service-account-in-subgroup-of-sensitive-composite-group",
+                "service-account-client-with-service-account-in-sensitive-group"
+            ],  result.to_dict()["entity"]
 
     def test_ignore_by_regex(self, example_db):
         # fmt: off
@@ -121,11 +125,13 @@ class TestServiceAccountWithSensitiveRole:
         # fmt: on
         monitor = ServiceAccountWithSensitiveRole(example_db, config)
         results = [result for result in monitor.audit()]
-        assert len(results) == 2
+        assert len(results) == 4
         for result in results:
             assert result.to_dict()["entity"] in [
                 "service-account-service-account-client-with-service-account-in-sensitive-subgroup",
                 "service-account-client-with-service-account-in-recursive-sensitive-group",
+                "service-account-client-with-service-account-in-subgroup-of-sensitive-composite-group",
+                "service-account-client-with-service-account-in-sensitive-group"
             ]
 
     def test_match_role_by_regex(self, example_db):
@@ -144,14 +150,14 @@ class TestServiceAccountWithSensitiveRole:
         # fmt: on
         monitor = ServiceAccountWithSensitiveRole(example_db, config)
         results = [result for result in monitor.audit()]
-        assert len(results) == 13
+        assert len(results) == 16
 
     @pytest.mark.parametrize(
         "ignore_disabled_clients, expected_number",
         [
-            (True, 4),  # When ignoring disabled clients, we expect to find 4
-            (False, 5),  # When explicitly not ignoring them, we expect 5
-            (None, 5),  # When the value is not set, do not ignore by default
+            (True, 6),  # When ignoring disabled clients, we expect to find 4
+            (False, 7),  # When explicitly not ignoring them, we expect 5
+            (None, 7),  # When the value is not set, do not ignore by default
         ],
     )
     def test_ignore_disabled_client(self, example_db, ignore_disabled_clients, expected_number):
