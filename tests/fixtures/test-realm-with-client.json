@@ -719,7 +719,7 @@
         "normal_role"
       ],
       "notBefore": 0,
-      "groups": []
+      "groups": ["/benign-group"]
     },
     {
       "id": "6e13ac77-5aec-436c-b4c2-25d3c1e38230",
