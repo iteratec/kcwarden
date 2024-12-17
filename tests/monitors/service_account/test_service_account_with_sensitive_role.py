@@ -104,7 +104,7 @@ class TestServiceAccountWithSensitiveRole:
                 "service-account-service-account-client-with-service-account-in-sensitive-subgroup",
                 "service-account-client-with-service-account-in-recursive-sensitive-group",
             ]
-    
+
     def test_ignore_by_regex(self, example_db):
         # fmt: off
         config = {
@@ -147,11 +147,12 @@ class TestServiceAccountWithSensitiveRole:
         assert len(results) == 13
 
     @pytest.mark.parametrize(
-            "ignore_disabled_clients, expected_number", [
-                (True, 4),  # When ignoring disabled clients, we expect to find 4
-                (False, 5), # When explicitly not ignoring them, we expect 5
-                (None, 5)   # When the value is not set, do not ignore by default
-            ]
+        "ignore_disabled_clients, expected_number",
+        [
+            (True, 4),  # When ignoring disabled clients, we expect to find 4
+            (False, 5),  # When explicitly not ignoring them, we expect 5
+            (None, 5),  # When the value is not set, do not ignore by default
+        ],
     )
     def test_ignore_disabled_client(self, example_db, ignore_disabled_clients, expected_number):
         # Ignore a specific entity
