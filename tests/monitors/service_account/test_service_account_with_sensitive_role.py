@@ -15,7 +15,7 @@ class TestServiceAccountWithSensitiveRole:
     @pytest.fixture
     def mock_service_account(self):
         service_account = Mock()
-        service_account.get_name.return_value = "test-service-account"
+        service_account.get_username.return_value = "test-service-account"
         service_account.get_client_id.return_value = "test-client-id"
         service_account.get_realm_roles.return_value = ["test-realm-role"]
         service_account.get_client_roles.return_value = {"test-client": ["test-client-role"]}
@@ -27,7 +27,7 @@ class TestServiceAccountWithSensitiveRole:
         allowed_service_accounts = ["allowed-.*"]
         assert monitor._should_consider_service_account(mock_service_account, allowed_service_accounts) is True
 
-        mock_service_account.get_name.return_value = "allowed-service-account"
+        mock_service_account.get_username.return_value = "allowed-service-account"
         assert monitor._should_consider_service_account(mock_service_account, allowed_service_accounts) is False
 
     @pytest.mark.parametrize(
