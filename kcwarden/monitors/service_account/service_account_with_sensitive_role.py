@@ -32,6 +32,7 @@ class ServiceAccountWithSensitiveRole(Monitor):
         if not helper.matches_list_of_regexes(serviceaccount.get_name(), allowed_service_accounts):
             client: Client = self._DB.get_client(serviceaccount.get_client_id())
             return not self.is_ignored_disabled_client(client)
+        return False
 
     def audit(self):
         custom_config = self.get_custom_config()
