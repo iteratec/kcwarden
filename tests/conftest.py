@@ -2,11 +2,13 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
+import os
 
 from kcwarden.custom_types.database import Database
-from kcwarden.custom_types.keycloak_object import Realm
+from kcwarden.custom_types.keycloak_object import Realm, Client
 from kcwarden.database.in_memory_db import InMemoryDatabase
 from kcwarden.custom_types.config_keys import AUDITOR_CONFIG
+from kcwarden.database.importer import load_realm_dump
 
 # Adapted from
 # https://docs.pytest.org/en/latest/example/simple.html#control-skipping-of-tests-according-to-command-line-option
@@ -136,7 +138,7 @@ def mock_scope():
 
 @pytest.fixture
 def mock_client(mock_realm):
-    client = Mock()
+    client = Mock(spec=Client)
     client.get_name.return_value = "mock-test-client"
     client.is_enabled.return_value = True
     client.get_realm.return_value = mock_realm
@@ -180,3 +182,16 @@ def mock_client_role(mock_role):
 def mock_composite_role(mock_role):
     mock_role.is_composite_role.return_value = True
     return mock_role
+
+
+# Loader for example realm dump
+@pytest.fixture
+def example_db():
+    # Load example realm file from disk
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    test_json_path = os.path.normpath(os.path.join(current_dir, "fixtures", "test-realm-with-client.json"))
+
+    # Create database and import realm into it
+    db = InMemoryDatabase()
+    load_realm_dump(test_json_path, db)
+    return db
