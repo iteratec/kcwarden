@@ -90,7 +90,7 @@ class TestServiceAccountWithGroup:
         monitor = ServiceAccountWithGroup(example_db, config)
         results = [result for result in monitor.audit()]
         assert len(results) == 5
-    
+
     def test_allow_list_string(self, example_db):
         # fmt: off
         # I'd like to keep this readable
@@ -129,12 +129,6 @@ class TestServiceAccountWithGroup:
         results = [result for result in monitor.audit()]
         assert len(results) == 0
 
-
-
-
-
-
-
     def test_multiple_monitor_definitions(self, example_db):
         config = {
             "monitors": {
@@ -148,7 +142,7 @@ class TestServiceAccountWithGroup:
                         "allowed": [],
                         "group": "/benign-group",
                         "allow_no_group": True,
-                    }
+                    },
                 ]
             }
         }
