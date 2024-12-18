@@ -122,7 +122,7 @@ def database():
 
 @pytest.fixture
 def mock_database():
-    return mock.create_autospec(spec=Database, instance=True)
+    return mock.create_autospec(spec=InMemoryDatabase, instance=True)
 
 
 # Mocked data objects
@@ -140,11 +140,19 @@ def mock_realm():
 
 
 @pytest.fixture
-def mock_scope():
-    scope = Mock(spec=ClientScope)
-    scope.get_protocol_mappers.return_value = []
-    scope.get_name.return_value = "sensitive-scope"
-    return scope
+def mock_scope(create_mock_scope):
+    return create_mock_scope(name="sensitive-scope")
+
+
+@pytest.fixture
+def create_mock_scope():
+    def _create_mock_scope(name="sensitive-scope", protocol_mappers=[]):
+        scope = Mock(spec=ClientScope)
+        scope.get_name.return_value = name
+        scope.get_protocol_mappers.return_value = protocol_mappers
+        return scope
+    
+    return _create_mock_scope
 
 
 @pytest.fixture
@@ -186,13 +194,8 @@ def mock_service_account():
 
 
 @pytest.fixture
-def mock_role():
-    role = Mock()
-    role.is_client_role.return_value = False
-    role.is_composite_role.return_value = False
-    role.get_composite_roles.return_value = {}
-    role.get_client_name.return_value = "realm"
-    return role
+def mock_role(create_mock_role):
+    return create_mock_role(role_name="mock-role", client="realm")
 
 
 @pytest.fixture
@@ -243,12 +246,18 @@ def mock_composite_role(mock_role):
 
 
 @pytest.fixture
-def mock_protocol_mapper():
-    mapper = Mock(spec=ProtocolMapper)
-    mapper.get_protocol_mapper.return_value = "oidc-usermodel-attribute-mapper"
-    mapper.get_config.return_value = {"userinfo.token.claim": "true", "user.attribute": "email"}
-    return mapper
+def mock_protocol_mapper(create_mock_protocol_mapper):
+    return create_mock_protocol_mapper(mapper_type="oidc-usermodel-attribute-mapper", config={"userinfo.token.claim": "true", "user.attribute": "email"})
 
+@pytest.fixture
+def create_mock_protocol_mapper():
+    def _create_mock_protocol_mapper(mapper_type="oidc-usermodel-attribute-mapper", config={"userinfo.token.claim": "true", "user.attribute": "email"}):
+        mapper = Mock(spec=ProtocolMapper)
+        mapper.get_protocol_mapper.return_value = mapper_type
+        mapper.get_config.return_value = config
+        return mapper
+    
+    return _create_mock_protocol_mapper
 
 @pytest.fixture
 def mock_group(mock_realm):
