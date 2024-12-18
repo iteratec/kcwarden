@@ -5,7 +5,16 @@ import pytest
 import os
 
 from kcwarden.custom_types.database import Database
-from kcwarden.custom_types.keycloak_object import Realm, Client
+from kcwarden.custom_types.keycloak_object import (
+    Realm,
+    Client,
+    RealmRole,
+    ClientRole,
+    ProtocolMapper,
+    ClientScope,
+    Group,
+    ServiceAccount,
+)
 from kcwarden.database.in_memory_db import InMemoryDatabase
 from kcwarden.custom_types.config_keys import AUDITOR_CONFIG
 from kcwarden.database.importer import load_realm_dump
@@ -132,7 +141,9 @@ def mock_realm():
 
 @pytest.fixture
 def mock_scope():
-    scope = Mock()
+    scope = Mock(spec=ClientScope)
+    scope.get_protocol_mappers.return_value = []
+    scope.get_name.return_value = "sensitive-scope"
     return scope
 
 
@@ -164,6 +175,17 @@ def confidential_client(mock_client):
 
 
 @pytest.fixture
+def mock_service_account():
+    service_account = Mock(spec=ServiceAccount)
+    service_account.get_username.return_value = "test-service-account"
+    service_account.get_client_id.return_value = "test-client-id"
+    service_account.get_realm_roles.return_value = ["test-realm-role"]
+    service_account.get_client_roles.return_value = {"test-client": ["test-client-role"]}
+    service_account.get_groups.return_value = ["test-group"]
+    return service_account
+
+
+@pytest.fixture
 def mock_role():
     role = Mock()
     role.is_client_role.return_value = False
@@ -171,6 +193,40 @@ def mock_role():
     role.get_composite_roles.return_value = {}
     role.get_client_name.return_value = "realm"
     return role
+
+
+@pytest.fixture
+def create_mock_role(mock_realm):
+    # Fixture factory pattern, so we can create more than one role in our tests
+    def _create_mock_role(role_name, client="realm", composite=[]):
+        if client == "realm":
+            role = Mock(spec=RealmRole)
+            role.is_client_role.return_value = False
+        else:
+            role = Mock(spec=ClientRole)
+            role.is_client_role.return_value = True
+            role.get_client_name.return_value = client
+        if len(composite) > 0:
+            role.is_composite_role.return_value = True
+            comp_map = {}
+            for c_role in composite:
+                if c_role.is_client_role():
+                    if c_role.get_client_name() not in comp_map:
+                        comp_map[c_role.get_client_name()] = []
+                    comp_map[c_role.get_client_name()].append(c_role.get_name())
+                else:
+                    if "realm" not in comp_map:
+                        comp_map["realm"] = []
+                    comp_map["realm"].append(c_role.get_name())
+            role.get_composite_roles.return_value = comp_map
+        else:
+            role.is_composite_role.return_value = False
+            role.get_composite_roles.return_value = {}
+        role.get_name.return_value = role_name
+        role.get_realm.return_value = mock_realm
+        return role
+
+    return _create_mock_role
 
 
 @pytest.fixture
@@ -184,6 +240,27 @@ def mock_client_role(mock_role):
 def mock_composite_role(mock_role):
     mock_role.is_composite_role.return_value = True
     return mock_role
+
+
+@pytest.fixture
+def mock_protocol_mapper():
+    mapper = Mock(spec=ProtocolMapper)
+    mapper.get_protocol_mapper.return_value = "oidc-usermodel-attribute-mapper"
+    mapper.get_config.return_value = {"userinfo.token.claim": "true", "user.attribute": "email"}
+    return mapper
+
+
+@pytest.fixture
+def mock_group(mock_realm):
+    group = Mock(spec=Group)
+    group.get_path.return_value = "/test-group"
+    group.get_name.return_value = "test-group"
+    group.get_realm_roles.return_value = []
+    group.get_client_roles.return_value = {}
+    group.get_effective_realm_roles.return_value = []
+    group.get_effective_client_roles.return_value = {}
+    group.get_realm.return_value = mock_realm
+    return group
 
 
 # Loader for example realm dump

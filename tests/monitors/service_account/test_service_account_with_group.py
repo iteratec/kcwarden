@@ -12,14 +12,6 @@ class TestServiceAccountWithGroup:
         monitor_instance._DB = Mock()
         return monitor_instance
 
-    @pytest.fixture
-    def mock_service_account(self):
-        service_account = Mock()
-        service_account.get_username.return_value = "test-service-account"
-        service_account.get_client_id.return_value = "test-client-id"
-        service_account.get_groups.return_value = ["test-group"]
-        return service_account
-
     # Unit tests using Mocks
     def test_should_consider_service_account(self, monitor, mock_service_account):
         allowed_service_accounts = ["allowed-.*"]

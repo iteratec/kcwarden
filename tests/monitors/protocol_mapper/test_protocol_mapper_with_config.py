@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock
 
 from kcwarden.monitors.protocol_mapper.protocol_mapper_with_config import ProtocolMapperWithConfig
-from kcwarden.custom_types.keycloak_object import ProtocolMapper, ClientScope
+from kcwarden.custom_types.keycloak_object import ClientScope
 from kcwarden.custom_types import config_keys
 
 
@@ -12,19 +12,6 @@ class TestProtocolMapperWithConfig:
         monitor_instance = ProtocolMapperWithConfig(database, default_config)
         monitor_instance._DB = Mock()
         return monitor_instance
-
-    @pytest.fixture
-    def mock_protocol_mapper(self):
-        mapper = Mock(spec=ProtocolMapper)
-        mapper.get_protocol_mapper.return_value = "oidc-usermodel-attribute-mapper"
-        mapper.get_config.return_value = {"userinfo.token.claim": "true", "user.attribute": "email"}
-        return mapper
-
-    @pytest.fixture
-    def mock_scope(self):
-        scope = Mock(spec=ClientScope)
-        scope.get_protocol_mappers.return_value = []
-        return scope
 
     def test_protocol_mapper_matches_config(self, monitor, mock_protocol_mapper):
         # Test case where both type and config match
