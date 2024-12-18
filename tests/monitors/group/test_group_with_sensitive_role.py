@@ -2,58 +2,12 @@ import pytest
 from unittest.mock import Mock
 
 from kcwarden.monitors.group.group_with_sensitive_role import GroupWithSensitiveRole
-from kcwarden.custom_types.keycloak_object import RealmRole, ClientRole
 
 
 class TestGroupWithSensitiveRole:
     @pytest.fixture
     def monitor(self, database, default_config):
         return GroupWithSensitiveRole(database, default_config)
-
-    @pytest.fixture
-    def mock_group(self, mock_realm):
-        group = Mock()
-        group.get_path.return_value = "/test-group"
-        group.get_name.return_value = "test-group"
-        group.get_realm_roles.return_value = []
-        group.get_client_roles.return_value = {}
-        group.get_effective_realm_roles.return_value = []
-        group.get_effective_client_roles.return_value = {}
-        group.get_realm.return_value = mock_realm
-        return group
-
-    @pytest.fixture
-    def create_mock_role(self, mock_realm):
-        # Fixture factory pattern, so we can create more than one role in our tests
-        def _create_mock_role(role_name, client="realm", composite=[]):
-            if client == "realm":
-                role = Mock(spec=RealmRole)
-                role.is_client_role.return_value = False
-            else:
-                role = Mock(spec=ClientRole)
-                role.is_client_role.return_value = True
-                role.get_client_name.return_value = client
-            if len(composite) > 0:
-                role.is_composite_role.return_value = True
-                comp_map = {}
-                for c_role in composite:
-                    if c_role.is_client_role():
-                        if c_role.get_client_name() not in comp_map:
-                            comp_map[c_role.get_client_name()] = []
-                        comp_map[c_role.get_client_name()].append(c_role.get_name())
-                    else:
-                        if "realm" not in comp_map:
-                            comp_map["realm"] = []
-                        comp_map["realm"].append(c_role.get_name())
-                role.get_composite_roles.return_value = comp_map
-            else:
-                role.is_composite_role.return_value = False
-                role.get_composite_roles.return_value = {}
-            role.get_name.return_value = role_name
-            role.get_realm.return_value = mock_realm
-            return role
-
-        return _create_mock_role
 
     def test_audit(self, monitor, mock_group, mock_database, create_mock_role):
         mock_role = create_mock_role("sensitive-role")

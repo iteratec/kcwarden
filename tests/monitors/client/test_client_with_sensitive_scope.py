@@ -12,21 +12,15 @@ class TestClientWithSensitiveScope:
         monitor_instance = ClientWithSensitiveScope(mock_database, default_config)
         return monitor_instance
 
-    @pytest.fixture
-    def scope(self):
-        scope = Mock(spec=ClientScope)
-        scope.get_name.return_value = "sensitive-scope"
-        return scope
-
-    def test_audit_default_scope(self, monitor, scope, mock_client):
-        mock_client.get_default_client_scopes.return_value = [scope.get_name()]
+    def test_audit_default_scope(self, monitor, mock_scope, mock_client):
+        mock_client.get_default_client_scopes.return_value = [mock_scope.get_name()]
         monitor._DB.get_all_clients.return_value = [mock_client]
         # fmt: off
         monitor._CONFIG = {
             config_keys.MONITOR_CONFIG: {
                 "ClientWithSensitiveScope": [
                     {
-                        "scope": scope.get_name(),
+                        "scope": mock_scope.get_name(),
                         "allowed": []
                     }
                 ]
@@ -38,15 +32,15 @@ class TestClientWithSensitiveScope:
         assert len(results) == 1
         assert results[0].to_dict()["entity"] == mock_client.get_name()
 
-    def test_audit_optional_scope(self, monitor, scope, mock_client):
-        mock_client.get_optional_client_scopes.return_value = [scope.get_name()]
+    def test_audit_optional_scope(self, monitor, mock_scope, mock_client):
+        mock_client.get_optional_client_scopes.return_value = [mock_scope.get_name()]
         monitor._DB.get_all_clients.return_value = [mock_client]
         # fmt: off
         monitor._CONFIG = {
             config_keys.MONITOR_CONFIG: {
                 "ClientWithSensitiveScope": [
                     {
-                        "scope": scope.get_name(),
+                        "scope": mock_scope.get_name(),
                         "allowed": []
                     }
                 ]
@@ -58,8 +52,8 @@ class TestClientWithSensitiveScope:
         assert len(results) == 1
         assert results[0].to_dict()["entity"] == mock_client.get_name()
 
-    def test_audit_regex_match(self, monitor, scope, mock_client):
-        mock_client.get_optional_client_scopes.return_value = [scope.get_name()]
+    def test_audit_regex_match(self, monitor, mock_scope, mock_client):
+        mock_client.get_optional_client_scopes.return_value = [mock_scope.get_name()]
         monitor._DB.get_all_clients.return_value = [mock_client]
         # fmt: off
         monitor._CONFIG = {
@@ -78,8 +72,8 @@ class TestClientWithSensitiveScope:
         assert len(results) == 1
         assert results[0].to_dict()["entity"] == mock_client.get_name()
 
-    def test_audit_allowlist(self, monitor, scope, mock_client):
-        mock_client.get_optional_client_scopes.return_value = [scope.get_name()]
+    def test_audit_allowlist(self, monitor, mock_scope, mock_client):
+        mock_client.get_optional_client_scopes.return_value = [mock_scope.get_name()]
         monitor._DB.get_all_clients.return_value = [mock_client]
         # fmt: off
         monitor._CONFIG = {
@@ -97,8 +91,8 @@ class TestClientWithSensitiveScope:
         results = list(monitor.audit())
         assert len(results) == 0
 
-    def test_audit_allowlist_regex(self, monitor, scope, mock_client):
-        mock_client.get_optional_client_scopes.return_value = [scope.get_name()]
+    def test_audit_allowlist_regex(self, monitor, mock_scope, mock_client):
+        mock_client.get_optional_client_scopes.return_value = [mock_scope.get_name()]
         monitor._DB.get_all_clients.return_value = [mock_client]
         # fmt: off
         monitor._CONFIG = {
@@ -125,7 +119,7 @@ class TestClientWithSensitiveScope:
         ],
     )
     def test_ignore_disabled_client_when_asked(
-        self, monitor, mock_client, ignore_disabled_clients, client_enabled, expected_result, scope
+        self, monitor, mock_client, ignore_disabled_clients, client_enabled, expected_result, mock_scope
     ):
         # fmt: off
         monitor._CONFIG = {
@@ -142,7 +136,7 @@ class TestClientWithSensitiveScope:
         }
         # fmt: on
         mock_client.is_enabled.return_value = client_enabled
-        mock_client.get_optional_client_scopes.return_value = [scope.get_name()]
+        mock_client.get_optional_client_scopes.return_value = [mock_scope.get_name()]
         monitor._DB.get_all_clients.return_value = [mock_client]
 
         results = list(monitor.audit())
