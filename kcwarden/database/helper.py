@@ -107,7 +107,6 @@ def regex_matches_list_entry(pattern_string: str, string_list: list[str]) -> boo
 def retrieve_roles_from_db_with_regex(
     db: Database, role_client: str, role_name: str
 ) -> list[RealmRole] | list[ClientRole]:
-    # TODO rewrite with regex support
     if role_client is None or role_client.lower() == "realm":
         return [role for role in db.get_all_realm_roles() if matches_as_string_or_regex(role.get_name(), role_name)]
     return [

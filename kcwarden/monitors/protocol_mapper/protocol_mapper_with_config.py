@@ -72,6 +72,10 @@ class ProtocolMapperWithConfig(Monitor):
             )
         return additional_details
 
+    def _should_consider_client(self, client: Client) -> bool:
+        # Ignore clients that are disabled, if the global setting says so
+        return not self.is_ignored_disabled_client(client)
+
     def audit(self):
         custom_config = self.get_custom_config()
         for monitor_definition in custom_config:
@@ -86,6 +90,8 @@ class ProtocolMapperWithConfig(Monitor):
 
             for client in self._DB.get_all_clients():
                 if helper.matches_list_of_regexes(client.get_name(), allowed_clients):
+                    continue
+                if not self._should_consider_client(client):
                     continue
                 # First, find all directly defined ProtocolMappers
                 for mapper in client.get_protocol_mappers():

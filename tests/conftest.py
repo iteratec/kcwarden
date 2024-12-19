@@ -2,11 +2,21 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
+import os
 
-from kcwarden.custom_types.database import Database
-from kcwarden.custom_types.keycloak_object import Realm
+from kcwarden.custom_types.keycloak_object import (
+    Realm,
+    Client,
+    RealmRole,
+    ClientRole,
+    ProtocolMapper,
+    ClientScope,
+    Group,
+    ServiceAccount,
+)
 from kcwarden.database.in_memory_db import InMemoryDatabase
 from kcwarden.custom_types.config_keys import AUDITOR_CONFIG
+from kcwarden.database.importer import load_realm_dump
 
 # Adapted from
 # https://docs.pytest.org/en/latest/example/simple.html#control-skipping-of-tests-according-to-command-line-option
@@ -111,7 +121,7 @@ def database():
 
 @pytest.fixture
 def mock_database():
-    return mock.create_autospec(spec=Database, instance=True)
+    return mock.create_autospec(spec=InMemoryDatabase, instance=True)
 
 
 # Mocked data objects
@@ -129,14 +139,26 @@ def mock_realm():
 
 
 @pytest.fixture
-def mock_scope():
-    scope = Mock()
-    return scope
+def mock_scope(create_mock_scope):
+    return create_mock_scope(name="sensitive-scope")
+
+
+@pytest.fixture
+def create_mock_scope():
+    def _create_mock_scope(name="sensitive-scope", protocol_mappers=[], realm_roles=[], client_roles={}):
+        scope = Mock(spec=ClientScope)
+        scope.get_name.return_value = name
+        scope.get_protocol_mappers.return_value = protocol_mappers
+        scope.get_realm_roles.return_value = realm_roles
+        scope.get_client_roles.return_value = client_roles
+        return scope
+
+    return _create_mock_scope
 
 
 @pytest.fixture
 def mock_client(mock_realm):
-    client = Mock()
+    client = Mock(spec=Client)
     client.get_name.return_value = "mock-test-client"
     client.is_enabled.return_value = True
     client.get_realm.return_value = mock_realm
@@ -144,6 +166,11 @@ def mock_client(mock_realm):
     client.get_optional_client_scopes.return_value = []
     client.is_oidc_client.return_value = True
     client.is_realm_specific_client.return_value = False
+    client.get_protocol_mappers.return_value = []
+    client.has_service_account_enabled.return_value = False
+    client.has_full_scope_allowed.return_value = False
+    client.get_directly_assigned_realm_roles.return_value = []
+    client.get_directly_assigned_client_roles.return_value = {}
     return client
 
 
@@ -160,13 +187,53 @@ def confidential_client(mock_client):
 
 
 @pytest.fixture
-def mock_role():
-    role = Mock()
-    role.is_client_role.return_value = False
-    role.is_composite_role.return_value = False
-    role.get_composite_roles.return_value = {}
-    role.get_client_name.return_value = "realm"
-    return role
+def mock_service_account():
+    service_account = Mock(spec=ServiceAccount)
+    service_account.get_username.return_value = "test-service-account"
+    service_account.get_client_id.return_value = "test-client-id"
+    service_account.get_realm_roles.return_value = ["test-realm-role"]
+    service_account.get_client_roles.return_value = {"test-client": ["test-client-role"]}
+    service_account.get_groups.return_value = ["test-group"]
+    return service_account
+
+
+@pytest.fixture
+def mock_role(create_mock_role):
+    return create_mock_role(role_name="mock-role", client="realm")
+
+
+@pytest.fixture
+def create_mock_role(mock_realm):
+    # Fixture factory pattern, so we can create more than one role in our tests
+    def _create_mock_role(role_name, client="realm", composite=[]):
+        if client == "realm":
+            role = Mock(spec=RealmRole)
+            role.is_client_role.return_value = False
+        else:
+            role = Mock(spec=ClientRole)
+            role.is_client_role.return_value = True
+            role.get_client_name.return_value = client
+        if len(composite) > 0:
+            role.is_composite_role.return_value = True
+            comp_map = {}
+            for c_role in composite:
+                if c_role.is_client_role():
+                    if c_role.get_client_name() not in comp_map:
+                        comp_map[c_role.get_client_name()] = []
+                    comp_map[c_role.get_client_name()].append(c_role.get_name())
+                else:
+                    if "realm" not in comp_map:
+                        comp_map["realm"] = []
+                    comp_map["realm"].append(c_role.get_name())
+            role.get_composite_roles.return_value = comp_map
+        else:
+            role.is_composite_role.return_value = False
+            role.get_composite_roles.return_value = {}
+        role.get_name.return_value = role_name
+        role.get_realm.return_value = mock_realm
+        return role
+
+    return _create_mock_role
 
 
 @pytest.fixture
@@ -180,3 +247,51 @@ def mock_client_role(mock_role):
 def mock_composite_role(mock_role):
     mock_role.is_composite_role.return_value = True
     return mock_role
+
+
+@pytest.fixture
+def mock_protocol_mapper(create_mock_protocol_mapper):
+    return create_mock_protocol_mapper(
+        mapper_type="oidc-usermodel-attribute-mapper",
+        config={"userinfo.token.claim": "true", "user.attribute": "email"},
+    )
+
+
+@pytest.fixture
+def create_mock_protocol_mapper():
+    def _create_mock_protocol_mapper(
+        mapper_type="oidc-usermodel-attribute-mapper",
+        config={"userinfo.token.claim": "true", "user.attribute": "email"},
+    ):
+        mapper = Mock(spec=ProtocolMapper)
+        mapper.get_protocol_mapper.return_value = mapper_type
+        mapper.get_config.return_value = config
+        return mapper
+
+    return _create_mock_protocol_mapper
+
+
+@pytest.fixture
+def mock_group(mock_realm):
+    group = Mock(spec=Group)
+    group.get_path.return_value = "/test-group"
+    group.get_name.return_value = "test-group"
+    group.get_realm_roles.return_value = []
+    group.get_client_roles.return_value = {}
+    group.get_effective_realm_roles.return_value = []
+    group.get_effective_client_roles.return_value = {}
+    group.get_realm.return_value = mock_realm
+    return group
+
+
+# Loader for example realm dump
+@pytest.fixture
+def example_db():
+    # Load example realm file from disk
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    test_json_path = os.path.normpath(os.path.join(current_dir, "fixtures", "test-realm-with-client.json"))
+
+    # Create database and import realm into it
+    db = InMemoryDatabase()
+    load_realm_dump(test_json_path, db)
+    return db
