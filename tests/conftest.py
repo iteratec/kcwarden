@@ -146,12 +146,14 @@ def mock_scope(create_mock_scope):
 
 @pytest.fixture
 def create_mock_scope():
-    def _create_mock_scope(name="sensitive-scope", protocol_mappers=[]):
+    def _create_mock_scope(name="sensitive-scope", protocol_mappers=[], realm_roles=[], client_roles={}):
         scope = Mock(spec=ClientScope)
         scope.get_name.return_value = name
         scope.get_protocol_mappers.return_value = protocol_mappers
+        scope.get_realm_roles.return_value = realm_roles
+        scope.get_client_roles.return_value = client_roles
         return scope
-    
+
     return _create_mock_scope
 
 
@@ -167,6 +169,9 @@ def mock_client(mock_realm):
     client.is_realm_specific_client.return_value = False
     client.get_protocol_mappers.return_value = []
     client.has_service_account_enabled.return_value = False
+    client.has_full_scope_allowed.return_value = False
+    client.get_directly_assigned_realm_roles.return_value = []
+    client.get_directly_assigned_client_roles.return_value = {}
     return client
 
 
@@ -247,17 +252,25 @@ def mock_composite_role(mock_role):
 
 @pytest.fixture
 def mock_protocol_mapper(create_mock_protocol_mapper):
-    return create_mock_protocol_mapper(mapper_type="oidc-usermodel-attribute-mapper", config={"userinfo.token.claim": "true", "user.attribute": "email"})
+    return create_mock_protocol_mapper(
+        mapper_type="oidc-usermodel-attribute-mapper",
+        config={"userinfo.token.claim": "true", "user.attribute": "email"},
+    )
+
 
 @pytest.fixture
 def create_mock_protocol_mapper():
-    def _create_mock_protocol_mapper(mapper_type="oidc-usermodel-attribute-mapper", config={"userinfo.token.claim": "true", "user.attribute": "email"}):
+    def _create_mock_protocol_mapper(
+        mapper_type="oidc-usermodel-attribute-mapper",
+        config={"userinfo.token.claim": "true", "user.attribute": "email"},
+    ):
         mapper = Mock(spec=ProtocolMapper)
         mapper.get_protocol_mapper.return_value = mapper_type
         mapper.get_config.return_value = config
         return mapper
-    
+
     return _create_mock_protocol_mapper
+
 
 @pytest.fixture
 def mock_group(mock_realm):
