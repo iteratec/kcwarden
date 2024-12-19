@@ -235,7 +235,7 @@ class TestClientWithSensitiveRole:
         ]
     )
     # fmt: on
-    def test_audit(
+    def test_audit(  # noqa: PLR0915
         self,
         db_backed_monitor,
         create_mock_scope,

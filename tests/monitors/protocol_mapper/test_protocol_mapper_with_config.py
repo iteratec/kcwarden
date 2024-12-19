@@ -2,7 +2,6 @@ import pytest
 from unittest.mock import Mock
 
 from kcwarden.monitors.protocol_mapper.protocol_mapper_with_config import ProtocolMapperWithConfig
-from kcwarden.custom_types.keycloak_object import ClientScope
 from kcwarden.custom_types import config_keys
 
 

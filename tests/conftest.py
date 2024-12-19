@@ -4,7 +4,6 @@ from unittest.mock import Mock
 import pytest
 import os
 
-from kcwarden.custom_types.database import Database
 from kcwarden.custom_types.keycloak_object import (
     Realm,
     Client,

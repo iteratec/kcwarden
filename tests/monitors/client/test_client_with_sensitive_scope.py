@@ -1,9 +1,7 @@
 import pytest
-from unittest.mock import Mock
 
 from kcwarden.monitors.client.client_with_sensitive_scope import ClientWithSensitiveScope
 from kcwarden.custom_types import config_keys
-from kcwarden.custom_types.keycloak_object import ClientScope
 
 
 class TestClientWithSensitiveScope:
