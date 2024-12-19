@@ -12,14 +12,15 @@ from kcwarden.custom_types.keycloak_object import (
 
 
 class InMemoryDatabase(Database):
-    CLIENTS = {}
-    SCOPES = {}
-    SERVICE_ACCOUNTS = {}
-    GROUPS = {}
-    REALMS = {}
-    REALM_ROLES = {}
-    CLIENT_ROLES = {}
-    IDENTITY_PROVIDERS = {}
+    def __init__(self):
+        self.CLIENTS = {}
+        self.SCOPES = {}
+        self.SERVICE_ACCOUNTS = {}
+        self.GROUPS = {}
+        self.REALMS = {}
+        self.REALM_ROLES = {}
+        self.CLIENT_ROLES = {}
+        self.IDENTITY_PROVIDERS = {}
 
     ### "Adders"
     def add_realm(self, realm: Realm):
