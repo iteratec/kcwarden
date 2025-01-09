@@ -1,5 +1,6 @@
 from kcwarden.api import Monitor
 from kcwarden.custom_types.result import Severity
+from kcwarden.custom_types.keycloak_object import ServiceAccount, Client
 from kcwarden.database import helper
 
 
@@ -21,6 +22,14 @@ class ServiceAccountWithGroup(Monitor):
     HAS_CUSTOM_CONFIG = True
     CUSTOM_CONFIG_TEMPLATE = {"group": "/group path or regular expression", "allow_no_group": True}
 
+    def _should_consider_service_account(
+        self, service_account: ServiceAccount, allowed_service_accounts: list[str]
+    ) -> bool:
+        if not helper.matches_list_of_regexes(service_account.get_username(), allowed_service_accounts):
+            client: Client = self._DB.get_client(service_account.get_client_id())
+            return not self.is_ignored_disabled_client(client)
+        return False
+
     def audit(self):
         custom_config = self.get_custom_config()
         for monitor_definition in custom_config:
@@ -34,6 +43,8 @@ class ServiceAccountWithGroup(Monitor):
                 continue
 
             for saccount in self._DB.get_all_service_accounts():
+                if not self._should_consider_service_account(saccount, allowed_service_accounts):
+                    continue
                 assigned_groups = saccount.get_groups()
 
                 if not allow_no_group and assigned_groups == []:
@@ -45,9 +56,8 @@ class ServiceAccountWithGroup(Monitor):
                     continue
 
                 if helper.regex_matches_list_entry(monitored_group, assigned_groups):
-                    if not helper.matches_list_of_regexes(saccount.get_username(), allowed_service_accounts):
-                        yield self.generate_finding_with_severity_from_config(
-                            saccount,
-                            monitor_definition,
-                            additional_details={"monitored_group": monitored_group, "assigned_groups": assigned_groups},
-                        )
+                    yield self.generate_finding_with_severity_from_config(
+                        saccount,
+                        monitor_definition,
+                        additional_details={"monitored_group": monitored_group, "assigned_groups": assigned_groups},
+                    )
