@@ -102,5 +102,5 @@ def get_severity_by_name(severity_name: str) -> Severity:
         return Severity[severity_name.lower().capitalize()]
     except KeyError:
         raise ValueError(
-            f"Provided severity was \"{severity_name}\" but must be one of {', '.join(s.name for s in Severity)}."
+            f'Provided severity was "{severity_name}" but must be one of {", ".join(s.name for s in Severity)}.'
         )
