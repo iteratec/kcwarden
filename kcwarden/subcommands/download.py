@@ -103,7 +103,6 @@ def download_config(args: argparse.Namespace):
         print("Unexpected auth_method provided - please file a bug report, this should be impossible")
         return 1
 
-    print(session_token)
     export = requests.post(
         KC_EXPORT_URL.format(base_url, realm), headers={"Authorization": f"Bearer {session_token}"}
     ).json()
