@@ -24,9 +24,9 @@ class TestClientsShouldDisableImplicitGrantFlow:
     )
     def test_consider_client_based_on_oidc_status(self, mock_client, auditor, is_oidc, expected):
         mock_client.is_oidc_client.return_value = is_oidc
-        assert (
-            auditor.should_consider_client(mock_client) == expected
-        ), "Client consideration logic failed based on OIDC status"
+        assert auditor.should_consider_client(mock_client) == expected, (
+            "Client consideration logic failed based on OIDC status"
+        )
 
     @pytest.mark.parametrize(
         "has_implicit_flow,expected",
@@ -37,9 +37,9 @@ class TestClientsShouldDisableImplicitGrantFlow:
     )
     def test_detect_implicit_grant_flow(self, mock_client, auditor, has_implicit_flow, expected):
         mock_client.has_implicit_flow_enabled.return_value = has_implicit_flow
-        assert (
-            auditor.client_uses_implicit_grant_flow(mock_client) == expected
-        ), "Implicit grant flow detection logic failed"
+        assert auditor.client_uses_implicit_grant_flow(mock_client) == expected, (
+            "Implicit grant flow detection logic failed"
+        )
 
     @pytest.mark.parametrize(
         "enable_implicit_flow,expected_count",

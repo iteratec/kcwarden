@@ -27,9 +27,9 @@ class TestConfidentialClientShouldDisableDirectAccessGrants:
     def test_should_consider_client(self, mock_client, auditor, is_oidc, is_public, expected):
         mock_client.is_oidc_client.return_value = is_oidc
         mock_client.is_public.return_value = is_public
-        assert (
-            auditor.should_consider_client(mock_client) == expected
-        ), "Client consideration logic failed based on OIDC status and confidentiality"
+        assert auditor.should_consider_client(mock_client) == expected, (
+            "Client consideration logic failed based on OIDC status and confidentiality"
+        )
 
     @pytest.mark.parametrize(
         "has_direct_access_grants,expected",
@@ -40,9 +40,9 @@ class TestConfidentialClientShouldDisableDirectAccessGrants:
     )
     def test_client_uses_direct_access_grants(self, confidential_client, auditor, has_direct_access_grants, expected):
         confidential_client.has_direct_access_grants_enabled.return_value = has_direct_access_grants
-        assert (
-            auditor.client_uses_direct_access_grants(confidential_client) == expected
-        ), "Direct access grants detection logic failed"
+        assert auditor.client_uses_direct_access_grants(confidential_client) == expected, (
+            "Direct access grants detection logic failed"
+        )
 
     @pytest.mark.parametrize(
         "enable_direct_access_grants,expected_count",
