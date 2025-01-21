@@ -55,7 +55,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     container:
-      image: python:3.12-alpine
+      image: python:3.13-alpine
 
     steps:
       - name: Checkout Repository

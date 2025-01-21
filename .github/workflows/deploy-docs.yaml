@@ -12,7 +12,7 @@ jobs:
       PIP_PROGRESS_BAR: "off"
       PIP_DISABLE_PIP_VERSION_CHECK: "on"
     container:
-      image: python:3.12-slim
+      image: python:3.13-slim
     steps:
       - name: Checkout
         uses: actions/checkout@v4
