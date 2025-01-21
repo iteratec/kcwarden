@@ -19,7 +19,7 @@ jobs:
       POETRY_VIRTUALENVS_IN_PROJECT: true
 
     container:
-      image: python:3.12-alpine
+      image: python:3.13-alpine
 
     outputs:
       version: ${{ steps.version.outputs.version }}
