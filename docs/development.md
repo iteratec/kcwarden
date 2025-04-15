@@ -28,6 +28,11 @@ The integration tests that actually start Keycloak containers using Docker can b
 The Keycloak versions for which the tests are executed can be found in [`conftest.py`](https://iteratec.github.io/kcwarden/tests/integration/conftest.py).
 It can be overridden by setting the environment variable `INTEGRATION_TEST_KEYCLOAK_VERSIONS` to a space-separated list of Keycloak container image tags (see [quay.io](https://quay.io/repository/keycloak/keycloak?tab=tags)).
 
+## Pre-commit Hooks
+
+Linting, formatting, and tests can be automatically run before commiting/pushing.
+To install the git hooks, run `poetry run pre-commit install`.
+
 ## Docker Image
 
 To build a Docker image with a bundled kcwarden from the local repository, you can use:

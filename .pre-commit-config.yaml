@@ -1,0 +1,29 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: poetry-check
+        name: poetry-check
+        entry: poetry check
+        language: system
+        files: ^pyproject\.toml|poetry\.lock/
+        pass_filenames: false
+      - id: ruff-check
+        name: ruff-check
+        entry: poetry run ruff check --fix
+        language: system
+        require_serial: true
+        types: [ python ]
+      - id: ruff-format
+        name: ruff-format
+        entry: poetry run ruff format
+        language: system
+        require_serial: true
+        types: [ python ]
+        stages: [ pre-push ]
