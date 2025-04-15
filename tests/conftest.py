@@ -293,5 +293,6 @@ def example_db():
 
     # Create database and import realm into it
     db = InMemoryDatabase()
-    load_realm_dump(test_json_path, db)
+    with open(test_json_path, "r") as f:
+        load_realm_dump(f, db)
     return db

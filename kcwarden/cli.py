@@ -4,8 +4,9 @@ import os
 import sys
 from importlib.metadata import version
 
+from kcwarden.custom_types.result import Severity
 from kcwarden.subcommands import download, audit, configuration, review
-from kcwarden.utils.arguments import is_dir
+from kcwarden.utils.arguments import is_dir, is_a_file
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,14 @@ def add_plugin_directory_argument(parser: argparse.ArgumentParser):
         required=False,
         nargs="*",
         type=is_dir,
+    )
+
+
+def add_config_dump_input_file_argument(parser: argparse.ArgumentParser):
+    parser.add_argument(
+        "input_file",
+        help="Specify the file that contains the Keycloak config dump",
+        type=argparse.FileType("r", encoding="UTF-8"),
     )
 
 
@@ -57,12 +66,13 @@ def get_parsers() -> argparse.ArgumentParser:
 def add_audit_parser(subparsers):
     parser_audit = subparsers.add_parser("audit", aliases=["a"], help="Audit a Keycloak configuration")
     parser_audit.set_defaults(func=audit.audit)
-    parser_audit.add_argument("input_file", help="Specify the file that contains the Keycloak config dump")
+    add_config_dump_input_file_argument(parser_audit)
     parser_audit.add_argument(
         "-c",
         "--config",
         help="Provide a config file with auditor-specific exclusions and parameters. "
         "Generate a template using generate-config-template",
+        type=is_a_file,
     )
     parser_audit.add_argument(
         "--format",
@@ -75,12 +85,14 @@ def add_audit_parser(subparsers):
         "-o",
         "--output",
         help="File to which the results should be written. Defaults to stdout",
+        type=argparse.FileType("w", encoding="UTF-8"),
+        default="-",
     )
     parser_audit.add_argument(
         "-s",
         "--min-severity",
-        help="The minimum severity of findings that should be reported. Can be one of INFO, LOW, MEDIUM, HIGH, CRITICAL.",
-        type=str,
+        help="The minimum severity of findings that should be reported.",
+        choices=[s.name.upper() for s in Severity],
     )
     add_plugin_directory_argument(parser_audit)
     parser_audit.add_argument(
@@ -106,6 +118,8 @@ def add_config_generator_parser(subparsers):
         "-o",
         "--output",
         help="File to which the config should be written. Defaults to stdout",
+        type=argparse.FileType("w", encoding="UTF-8"),
+        default="-",
     )
 
 
@@ -170,6 +184,8 @@ def add_download_parser(subparsers):
         "-o",
         "--output",
         help="Specifies the file to which the export should be written. If not set, export will be written to STDOUT.",
+        type=argparse.FileType("w", encoding="UTF-8"),
+        default="-",
     )
 
 
@@ -178,11 +194,13 @@ def add_review_parser(subparsers):
         "review", aliases=["r"], help="Prepare a matrix of Keycloak permissions for human review."
     )
     parser_review.set_defaults(func=review.prepare_review)
-    parser_review.add_argument("input_file", help="Specify the file that contains the Keycloak config dump")
+    add_config_dump_input_file_argument(parser_review)
     parser_review.add_argument(
         "-o",
         "--output",
         help="File to which the results should be written. Defaults to stdout. Will be in CSV format.",
+        type=argparse.FileType("w", encoding="UTF-8"),
+        default="-",
     )
 
 

@@ -1,6 +1,5 @@
 import argparse
-import contextlib
-import sys
+from io import TextIOBase
 
 import yaml
 
@@ -19,11 +18,8 @@ def output_config(config: dict, file) -> None:
 
 
 def generate_config(args: argparse.Namespace):
-    output_file = args.output
+    output_file: TextIOBase = args.output
 
     auditors = collect_auditors(additional_auditors_dirs=args.plugin_dir)
 
-    # If output_file is None, we want to fall back to stdout.
-    # stdout should not be closed thus we use `nullcontext`.
-    with open(output_file, "w") if output_file else contextlib.nullcontext(sys.stdout) as fo:
-        output_config(config=generate_config_template(auditors), file=fo)
+    output_config(config=generate_config_template(auditors), file=output_file)

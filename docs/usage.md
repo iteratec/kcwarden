@@ -4,6 +4,11 @@ title: Usage
 
 # Usage
 
+!!! info
+
+    You can use `-` as value for input and outputs to pass the input via `stdin` respective get the output via `stdout`.
+    This is especially useful when using the container image so you don't need volume mounts.
+
 ## Getting a Config Dump
 
 You need a realm export as input to the latter commands.

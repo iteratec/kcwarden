@@ -1,8 +1,7 @@
 import argparse
-import contextlib
 import csv
 import json
-import sys
+from io import TextIOBase
 from typing import Type
 
 import yaml
@@ -78,26 +77,23 @@ def output_findings(findings: list[Result], arguments: argparse.Namespace) -> No
     else:
         min_sev = Severity.Info
 
-    output_file = arguments.output
+    output_file: TextIOBase = arguments.output
 
     filtered_findings = [finding for finding in findings if finding.severity >= min_sev]
 
     output_format = arguments.format
 
-    # If output_file is None, we want to fall back to stdout.
-    # stdout should not be closed thus we use `nullcontext`.
-    with open(output_file, "w") if output_file else contextlib.nullcontext(sys.stdout) as fo:
-        if output_format == "json":
-            json.dump([finding.to_dict() for finding in filtered_findings], fo, indent=4)
-        elif output_format == "csv":
-            writer = csv.DictWriter(fo, fieldnames=result_headers.ALL_HEADERS, dialect="excel")
-            writer.writeheader()
-            for finding in filtered_findings:
-                writer.writerow(finding.to_dict())
-        else:
-            for finding in filtered_findings:
-                fo.write(str(finding) + "\n")
-                fo.write("\n---\n")
+    if output_format == "json":
+        json.dump([finding.to_dict() for finding in filtered_findings], output_file, indent=4)
+    elif output_format == "csv":
+        writer = csv.DictWriter(output_file, fieldnames=result_headers.ALL_HEADERS, dialect="excel")
+        writer.writeheader()
+        for finding in filtered_findings:
+            writer.writerow(finding.to_dict())
+    else:
+        for finding in filtered_findings:
+            output_file.write(str(finding) + "\n")
+            output_file.write("\n---\n")
 
 
 def audit(args: argparse.Namespace):

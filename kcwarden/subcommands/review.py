@@ -1,7 +1,6 @@
 import argparse
-import contextlib
 import csv
-import sys
+from io import TextIOBase
 
 from kcwarden.custom_types import config_keys
 from kcwarden.custom_types.database import Database
@@ -69,16 +68,13 @@ def map_service_account_to_roles(service_accounts: list[str]) -> list[dict]:
     return results
 
 
-def output_findings(findings: list[dict], service_accounts: list[str], output_file: str) -> None:
+def output_findings(findings: list[dict], service_accounts: list[str], output_file: TextIOBase) -> None:
     field_names = ["role"]
     field_names += service_accounts
-    # If output_file is None, we want to fall back to stdout.
-    # stdout should not be closed thus we use `nullcontext`.
-    with open(output_file, "w") if output_file else contextlib.nullcontext(sys.stdout) as fo:
-        writer = csv.DictWriter(fo, fieldnames=field_names, dialect="excel")
-        writer.writeheader()
-        for finding in findings:
-            writer.writerow(finding)
+    writer = csv.DictWriter(output_file, fieldnames=field_names, dialect="excel")
+    writer.writeheader()
+    for finding in findings:
+        writer.writerow(finding)
 
 
 def prepare_review(args: argparse.Namespace):
@@ -88,4 +84,5 @@ def prepare_review(args: argparse.Namespace):
     # Find mapping of service accounts and roles
     findings = map_service_account_to_roles(service_accounts)
     # Output the results
-    output_findings(findings, service_accounts, args.output)
+    output_file: TextIOBase = args.output
+    output_findings(findings, service_accounts, output_file)

@@ -1,11 +1,10 @@
-import contextlib
+from io import TextIOBase
 
 import requests
 import argparse
 from getpass import getpass
 import os
 import json
-import sys
 
 # Hardcoded Keycloak URLs
 KC_TOKEN_AUTH = "{}/realms/{}/protocol/openid-connect/token"
@@ -87,7 +86,7 @@ def download_config(args: argparse.Namespace):
     base_url = args.base_url.removesuffix("/")
 
     realm = args.realm
-    output_file = args.output
+    output_file: TextIOBase = args.output
     client_secret = args.client_secret
 
     if client_secret is None:
@@ -110,7 +109,4 @@ def download_config(args: argparse.Namespace):
     # TODO Mache ich eigentlich schon was mit Gruppen?
     # export = resolve_composite_roles_for_users(export)
 
-    # If output_file is None, we want to fall back to stdout.
-    # stdout should not be closed thus we use `nullcontext`.
-    with open(output_file, "w") if output_file else contextlib.nullcontext(sys.stdout) as fo:
-        json.dump(export, fo, indent=4)
+    json.dump(export, output_file, indent=4)

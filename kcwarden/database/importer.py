@@ -1,4 +1,5 @@
 import json
+from io import TextIOBase
 
 from kcwarden.custom_types.database import Database
 from kcwarden.custom_types.keycloak_object import (
@@ -30,9 +31,8 @@ def add_group(group: dict, realm: Realm, db: Database) -> None:
     recursive_add_to_database(Group(group, realm))
 
 
-def load_realm_dump(filename: str, db: Database) -> None:
-    with open(filename, "r") as fo:
-        data = json.load(fo)
+def load_realm_dump(input_file: TextIOBase, db: Database) -> None:
+    data = json.load(input_file)
 
     ### Start loading the data into our own structure
     # Realm
