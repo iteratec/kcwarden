@@ -25,7 +25,7 @@ The pipeline only succeeds if the code is formatted and there are no linting iss
 The unit tests can be run with `poetry run pytest`.
 
 The integration tests that actually start Keycloak containers using Docker can be executed with `poetry run pytest --integration`.
-The Keycloak versions for which the tests are executed can be found in [`conftest.py`](./tests/integration/conftest.py).
+The Keycloak versions for which the tests are executed can be found in [`conftest.py`](https://iteratec.github.io/kcwarden/tests/integration/conftest.py).
 It can be overridden by setting the environment variable `INTEGRATION_TEST_KEYCLOAK_VERSIONS` to a space-separated list of Keycloak container image tags (see [quay.io](https://quay.io/repository/keycloak/keycloak?tab=tags)).
 
 ## Docker Image
