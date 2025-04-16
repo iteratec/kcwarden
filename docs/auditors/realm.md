@@ -63,6 +63,17 @@ It may also compromise the integrity of user data, especially in applications wh
 Realms detected with email verification turned off are highlighted for administrators to reassess this configuration choice.
 Depending on the application's requirements and the level of trust needed in user-provided email addresses, enabling email verification may be advisable to enhance security and ensure the credibility of user accounts.
 
+## RealmBruteForceProtectionDisabled
+
+This auditor raises a warning about disabled brute-force protection.
+Without this feature, the realm is vulnerable to easy password guessing attacks.
+
+If you are using the realm only for technical users, 
+the brute-force protection can lead to service disruption 
+since attackers can easily lock out such a technical user 
+if they know the username.
+Please note that using technical users is strongly discouraged in favor of Keycloak's _service accounts_ feature.
+
 ## KeycloakVersionShouldBeUpToDate
 
 !!! warning

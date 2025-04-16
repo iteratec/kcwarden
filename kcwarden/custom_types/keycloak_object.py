@@ -42,6 +42,9 @@ class Realm(Dataclass):
     def is_verify_email_enabled(self) -> bool:
         return self._d["verifyEmail"]
 
+    def is_brute_force_protected(self) -> bool:
+        return self._d["bruteForceProtected"]
+
     # Token Handling and Validity
     def has_refresh_token_revocation_enabled(self) -> bool:
         return self._d["revokeRefreshToken"]
