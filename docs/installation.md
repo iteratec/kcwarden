@@ -21,7 +21,7 @@ You might want to use [pipx](https://github.com/pypa/pipx) to automatically enca
 Alternatively, _kcwarden_ is provided as a Docker image and can be executed in this way:
 
 ```shell
-docker run --rm ghcr.io/iteratec/kcwarden:latest
+docker run --rm -i ghcr.io/iteratec/kcwarden:latest
 ```
 
 Using this way, you need to replace the `kcwarden` call with the Docker command above.

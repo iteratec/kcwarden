@@ -51,6 +51,14 @@ There are several optional parameters to customize the execution:
 | `--config`                  | Provide a config file with auditor-specific exclusions and parameters. Generate a template using [generate-config-template](#generate-config-template). |
 | `--ignore-disabled-clients` | When set, will not audit disabled OIDC clients.                                                                                                         |
 
+### Using the Docker container
+
+To use the Docker container, you can use shell piping, e.g.:
+
+```shell
+docker run --rm -i ghcr.io/iteratec/kcwarden:latest audit --format csv - < $KEYCLOAK_CONFIG_FILE > results.csv
+```
+
 ## Generating a _kcwarden_ Configuration {: #generate-config-template}
 
 The [auditors](./auditors/index.md) and [monitors](./monitors/index.md) can be configured in a YAML configuration file.
