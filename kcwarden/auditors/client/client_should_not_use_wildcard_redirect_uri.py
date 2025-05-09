@@ -20,7 +20,8 @@ class ClientShouldNotUseWildcardRedirectURI(Auditor):
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )
 
-    def redirect_uri_is_wildcard_uri(self, redirect) -> bool:
+    @staticmethod
+    def redirect_uri_is_wildcard_uri(redirect) -> bool:
         # The only place Keycloak allows wildcards in a redirect URI is at the very end.
         # So the first approximation can be "is the last character a *?"
         return redirect[-1:] == "*"

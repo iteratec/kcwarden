@@ -4,7 +4,8 @@ import pytest
 
 
 class TestRoleContainsRole:
-    def wrap_role(self, wrapper_role_json, wrapped_role_json, wrapped_role_client=None):
+    @staticmethod
+    def wrap_role(wrapper_role_json, wrapped_role_json, wrapped_role_client=None):
         assert wrapper_role_json["composite"], "Must pass a composite role JSON as parameter"
         if wrapped_role_client:
             wrapper_role_json["composites"] = {"client": {wrapped_role_client: [wrapped_role_json["name"]]}}

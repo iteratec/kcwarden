@@ -11,10 +11,12 @@ class IdentityProviderWithMappersWithoutForceSyncMode(Auditor):
     def should_consider_idp(self, idp) -> bool:
         return self.is_not_ignored(idp)
 
-    def idp_uses_sync_mode_force(self, idp) -> bool:
+    @staticmethod
+    def idp_uses_sync_mode_force(idp) -> bool:
         return idp.get_sync_mode() == "FORCE"
 
-    def idp_uses_information_from_access_token(self, idp) -> bool:
+    @staticmethod
+    def idp_uses_information_from_access_token(idp) -> bool:
         return idp.get_identity_provider_mappers() != []
 
     def audit(self):

@@ -19,7 +19,8 @@ class ConfidentialClientShouldDisableDirectAccessGrants(Auditor):
             and not client.is_public()
         )
 
-    def client_uses_direct_access_grants(self, client) -> bool:
+    @staticmethod
+    def client_uses_direct_access_grants(client) -> bool:
         # All clients with direct access grants should be reported
         return client.has_direct_access_grants_enabled()
 

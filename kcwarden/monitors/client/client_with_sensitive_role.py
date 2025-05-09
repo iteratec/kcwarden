@@ -29,7 +29,8 @@ class ClientWithSensitiveRole(Monitor):
         "ignore_full_scope_allowed": True,
     }
 
-    def _protocol_mapper_is_role_mapper(self, mapper: ProtocolMapper) -> bool:
+    @staticmethod
+    def _protocol_mapper_is_role_mapper(mapper: ProtocolMapper) -> bool:
         return mapper.get_protocol_mapper() in ["oidc-usermodel-client-role-mapper", "oidc-usermodel-realm-role-mapper"]
 
     def _get_role_mappers_for_client(self, client: Client) -> list[ProtocolMapper]:

@@ -21,7 +21,8 @@ class ClientHasErroneouslyConfiguredWildcardURI(Auditor):
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )
 
-    def redirect_uri_has_wildcard_in_domain(self, redirect) -> bool:
+    @staticmethod
+    def redirect_uri_has_wildcard_in_domain(redirect) -> bool:
         parsed_redirect_uri = urllib.parse.urlparse(redirect)
         # The redirect URI has the form https://domain.tld*
         if parsed_redirect_uri.scheme in ["https", "http"] and parsed_redirect_uri.netloc.endswith("*"):

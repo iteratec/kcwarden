@@ -15,7 +15,8 @@ class ClientWithFullScopeAllowed(Auditor):
             and not client.is_realm_specific_client()
         )
 
-    def client_has_full_scope_allowed(self, client) -> bool:
+    @staticmethod
+    def client_has_full_scope_allowed(client) -> bool:
         return client.has_full_scope_allowed()
 
     def audit(self):

@@ -13,7 +13,8 @@ class ClientShouldDisableImplicitGrantFlow(Auditor):
         # - OIDC Clients
         return self.is_not_ignored(client) and client.is_oidc_client() and not client.is_realm_specific_client()
 
-    def client_uses_implicit_grant_flow(self, client) -> bool:
+    @staticmethod
+    def client_uses_implicit_grant_flow(client) -> bool:
         # All clients that have implicit flow enabled are considered suspect
         return client.has_implicit_flow_enabled()
 

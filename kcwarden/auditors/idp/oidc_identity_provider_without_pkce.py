@@ -13,7 +13,8 @@ class OIDCIdentityProviderWithoutPKCE(Auditor):
         # - using either the "oidc" or the "keycloak-oidc" provider (the others don't allow configuring the setting)
         return idp.get_provider_id() in ["oidc", "keycloak-oidc"] and self.is_not_ignored(idp)
 
-    def idp_does_not_enforce_pkce(self, cfg) -> bool:
+    @staticmethod
+    def idp_does_not_enforce_pkce(cfg) -> bool:
         # TODO Refactor with .get once unit tests exist
         # Flag IDPs that:
         # - Either do not explicitly state the PKCE status, or have it set to false

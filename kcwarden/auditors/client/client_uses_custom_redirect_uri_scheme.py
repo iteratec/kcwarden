@@ -8,7 +8,14 @@ from kcwarden.custom_types.result import Severity
 class ClientUsesCustomRedirectUriScheme(Auditor):
     DEFAULT_SEVERITY = Severity.Info
     SHORT_DESCRIPTION = "Client redirect URL scheme uses custom protocol"
-    LONG_DESCRIPTION = "Authorization responses contain sensitive data, like the OAuth Response Code, which should not be exposed. This client uses a custom protocol (i.e., not http:// or https://), which should be closely inspected. Note that the use of custom protocols can pose a security risk when used to connect to a mobile app on a smartphone. See the online documentation for more information."
+    # noinspection HttpUrlsUsage
+    LONG_DESCRIPTION = (
+        "Authorization responses contain sensitive data, like the OAuth Response Code, which should "
+        "not be exposed. This client uses a custom protocol (i.e., not http:// or https://), "
+        "which should be closely inspected. Note that the use of custom protocols can pose a security "
+        "risk when used to connect to a mobile app on a smartphone. See the online documentation for "
+        "more information."
+    )
     REFERENCE = ""
 
     def should_consider_client(self, client: Client) -> bool:

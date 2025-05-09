@@ -34,7 +34,8 @@ class UsingNonDefaultUserAttributesInScopesWithoutUserProfilesFeatureIsDangerous
     def should_consider_scope(self, scope) -> bool:
         return self.is_not_ignored(scope)
 
-    def realm_has_user_profiles_enabled(self, realm) -> bool:
+    @staticmethod
+    def realm_has_user_profiles_enabled(realm) -> bool:
         return realm.has_declarative_user_profiles_enabled()
 
     def mapper_references_non_default_user_attribute(self, mapper) -> bool:

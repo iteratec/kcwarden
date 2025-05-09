@@ -21,7 +21,8 @@ class PublicClientsMustEnforcePKCE(Auditor):
             and client.has_standard_flow_enabled()
         )
 
-    def client_does_not_enforce_pkce(self, client) -> bool:
+    @staticmethod
+    def client_does_not_enforce_pkce(client) -> bool:
         # Clients should use PKCE and pin to S256 as the algorithm
         return client.get_attributes().get("pkce.code.challenge.method", None) != "S256"
 
