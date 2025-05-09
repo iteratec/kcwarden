@@ -1,11 +1,11 @@
 import urllib.parse
 
-from kcwarden.api import Auditor
+from kcwarden.api.auditor import ClientAuditor
 from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class ClientUsesCustomRedirectUriScheme(Auditor):
+class ClientUsesCustomRedirectUriScheme(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Info
     SHORT_DESCRIPTION = "Client redirect URL scheme uses custom protocol"
     # noinspection HttpUrlsUsage
@@ -24,7 +24,7 @@ class ClientUsesCustomRedirectUriScheme(Auditor):
         # - At least one flow that uses the redirect_uri active
         # TODO Are there more flows that use redirect_uri?
         return (
-            self.is_not_ignored(client)
+            super().should_consider_client(client)
             and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
@@ -40,11 +40,9 @@ class ClientUsesCustomRedirectUriScheme(Auditor):
         # All others are suspect and should be reported.
         return parsed_redirect_uri.scheme not in ["http", "https", ""]
 
-    def audit(self):
-        for client in self._DB.get_all_clients():
-            if self.should_consider_client(client):
-                redirect_uris = client.get_resolved_redirect_uris()
+    def audit_client(self, client: Client):
+        redirect_uris = client.get_resolved_redirect_uris()
 
-                for redirect in redirect_uris:
-                    if self.redirect_uri_uses_custom_protocol(redirect):
-                        yield self.generate_finding(client, additional_details={"redirect_uri": redirect})
+        for redirect in redirect_uris:
+            if self.redirect_uri_uses_custom_protocol(redirect):
+                yield self.generate_finding(client, additional_details={"redirect_uri": redirect})

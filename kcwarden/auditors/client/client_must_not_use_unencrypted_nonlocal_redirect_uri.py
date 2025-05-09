@@ -1,10 +1,11 @@
 import urllib.parse
 
-from kcwarden.api import Auditor
+from kcwarden.api.auditor import ClientAuditor
+from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class ClientMustNotUseUnencryptedNonlocalRedirectUri(Auditor):
+class ClientMustNotUseUnencryptedNonlocalRedirectUri(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Authorization Responses MUST NOT be transmitted via unencrypted connections"
     LONG_DESCRIPTION = "Authorization responses contain sensitive data, like the OAuth Response Code, which should not be exposed. Therefore, the redirect_uri MUST be set to a HTTPS URI or (for native apps) a localhost address."
@@ -16,7 +17,7 @@ class ClientMustNotUseUnencryptedNonlocalRedirectUri(Auditor):
         # - At least one flow that uses the redirect_uri active
         # TODO Are there more flows that use redirect_uri?
         return (
-            self.is_not_ignored(client)
+            super().should_consider_client(client)
             and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
@@ -40,12 +41,10 @@ class ClientMustNotUseUnencryptedNonlocalRedirectUri(Auditor):
             "::1",
         ]
 
-    def audit(self):
-        for client in self._DB.get_all_clients():
-            if self.should_consider_client(client):
-                redirect_uris = client.get_resolved_redirect_uris()
+    def audit_client(self, client: Client):
+        redirect_uris = client.get_resolved_redirect_uris()
 
-                # Run checks for every redirect URI
-                for redirect in redirect_uris:
-                    if self.redirect_uri_is_http_and_non_local(redirect):
-                        yield self.generate_finding(client, additional_details={"redirect_uri": redirect})
+        # Run checks for every redirect URI
+        for redirect in redirect_uris:
+            if self.redirect_uri_is_http_and_non_local(redirect):
+                yield self.generate_finding(client, additional_details={"redirect_uri": redirect})

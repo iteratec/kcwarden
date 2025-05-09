@@ -3,8 +3,8 @@ from typing import Generator
 
 from kcwarden.custom_types import config_keys
 from kcwarden.custom_types.database import Database
-from kcwarden.custom_types.keycloak_object import Dataclass, Client
-from kcwarden.custom_types.result import Severity, Result
+from kcwarden.custom_types.keycloak_object import Client, Dataclass
+from kcwarden.custom_types.result import Result, Severity
 from kcwarden.database import helper
 
 
@@ -107,3 +107,24 @@ class Auditor(ABC):
 
     def __str__(self) -> str:
         return self.get_classname()
+
+
+class ClientAuditor(Auditor, ABC):
+    """
+    This abstract auditor encapsulates the looping over all clients,
+    checking whether the auditor is applicable to them
+    and then performing the actual audit.
+    This way, only the audit of a single client must be implemented.
+    """
+
+    def should_consider_client(self, client: Client) -> bool:
+        return self.is_not_ignored(client)
+
+    def audit(self):
+        for client in self._DB.get_all_clients():
+            if self.should_consider_client(client):
+                yield from self.audit_client(client)
+
+    @abstractmethod
+    def audit_client(self, client: Client):
+        raise NotImplementedError()

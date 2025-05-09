@@ -1,10 +1,11 @@
 import urllib.parse
 
-from kcwarden.api import Auditor
+from kcwarden.api.auditor import ClientAuditor
+from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class ClientHasErroneouslyConfiguredWildcardURI(Auditor):
+class ClientHasErroneouslyConfiguredWildcardURI(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Critical
     SHORT_DESCRIPTION = "Erroneously configured Redirect URI allows arbitrary domains for redirects"
     LONG_DESCRIPTION = "Authorization responses contain sensitive data, like the OAuth Response Code, which should not be exposed. Keycloak requires specifying an allowed set of redirect URIs. In this case, a redirect URI was specified that is almost certainly incorrect, as the domain name contains a wildcard in the domain name part (i.e., https://example.com*). This allows arbitrary domains to be specified as a redirect URI as long as they begin with the specified part of the redirect URI, e.g. example.com.attacker.tk. The wildcard should almost certainly be placed behind a slash to make it part of the Path (e.g., https://example.com/*)."
@@ -15,7 +16,7 @@ class ClientHasErroneouslyConfiguredWildcardURI(Auditor):
         # - OIDC Clients
         # - At least one flow that uses the redirect_uri active
         return (
-            self.is_not_ignored(client)
+            super().should_consider_client(client)
             and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
@@ -42,11 +43,9 @@ class ClientHasErroneouslyConfiguredWildcardURI(Auditor):
             and parsed_redirect_uri.path.endswith("*")
         )
 
-    def audit(self):
-        for client in self._DB.get_all_clients():
-            if self.should_consider_client(client):
-                # These clients should use either a localhost or an HTTPS URI
-                redirect_uris = client.get_resolved_redirect_uris()
-                for redirect in redirect_uris:
-                    if self.redirect_uri_has_wildcard_in_domain(redirect):
-                        yield self.generate_finding(client, additional_details={"redirect_uri": redirect})
+    def audit_client(self, client: Client):
+        # These clients should use either a localhost or an HTTPS URI
+        redirect_uris = client.get_resolved_redirect_uris()
+        for redirect in redirect_uris:
+            if self.redirect_uri_has_wildcard_in_domain(redirect):
+                yield self.generate_finding(client, additional_details={"redirect_uri": redirect})

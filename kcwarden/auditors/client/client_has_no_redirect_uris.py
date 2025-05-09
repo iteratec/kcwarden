@@ -1,9 +1,9 @@
-from kcwarden.api import Auditor
+from kcwarden.api.auditor import ClientAuditor
 from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class ClientHasNoRedirectUris(Auditor):
+class ClientHasNoRedirectUris(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Missing client redirect URIs can cause unexpected behavior"
     LONG_DESCRIPTION = (
@@ -24,17 +24,15 @@ class ClientHasNoRedirectUris(Auditor):
         # - At least one flow that uses the redirect_uri active
         # TODO Are there more flows that use redirect_uri?
         return (
-            self.is_not_ignored(client)
+            super().should_consider_client(client)
             and not client.is_default_keycloak_client()
             and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )
 
-    def audit(self):
-        for client in self._DB.get_all_clients():
-            if self.should_consider_client(client):
-                redirect_uris = client.get_resolved_redirect_uris()
+    def audit_client(self, client: Client):
+        redirect_uris = client.get_resolved_redirect_uris()
 
-                if len(redirect_uris) == 0:
-                    yield self.generate_finding(client)
+        if len(redirect_uris) == 0:
+            yield self.generate_finding(client)
