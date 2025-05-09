@@ -11,7 +11,8 @@ class IdentityProviderWithOneTimeSync(Auditor):
     def should_consider_idp(self, idp) -> bool:
         return self.is_not_ignored(idp)
 
-    def idp_does_not_use_force_sync_mode(self, idp) -> bool:
+    @staticmethod
+    def idp_does_not_use_force_sync_mode(idp) -> bool:
         return idp.get_sync_mode() != "FORCE"
 
     def audit(self):

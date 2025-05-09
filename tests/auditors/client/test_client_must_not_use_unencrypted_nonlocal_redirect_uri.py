@@ -6,6 +6,7 @@ from kcwarden.auditors.client.client_must_not_use_unencrypted_nonlocal_redirect_
 )
 
 
+# noinspection HttpUrlsUsage
 class TestClientMustNotUseUnencryptedNonlocalRedirectUri:
     @pytest.fixture
     def auditor(self, database, default_config):
@@ -30,6 +31,7 @@ class TestClientMustNotUseUnencryptedNonlocalRedirectUri:
         mock_client.has_implicit_flow_enabled.return_value = has_implicit_flow
         assert auditor.should_consider_client(mock_client) == expected
 
+    # noinspection HttpUrlsUsage
     @pytest.mark.parametrize(
         "redirect_uri, should_alert",
         [
