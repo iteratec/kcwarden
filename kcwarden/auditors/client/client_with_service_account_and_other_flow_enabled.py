@@ -1,8 +1,9 @@
-from kcwarden.api import Auditor
+from kcwarden.api.auditor import ClientAuditor
+from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class ClientWithServiceAccountAndOtherFlowEnabled(Auditor):
+class ClientWithServiceAccountAndOtherFlowEnabled(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Info
     SHORT_DESCRIPTION = "Confidential Client with Service Accounts and other flow enabled"
     LONG_DESCRIPTION = (
@@ -19,7 +20,7 @@ class ClientWithServiceAccountAndOtherFlowEnabled(Auditor):
         # - Confidential
         # - Has service account
         return (
-            self.is_not_ignored(client)
+            super().should_consider_client(client)
             and not client.is_realm_specific_client()
             and client.is_oidc_client()
             and (not client.is_public())
@@ -32,18 +33,16 @@ class ClientWithServiceAccountAndOtherFlowEnabled(Auditor):
         # TODO Are there any other flows that could be enabled?
         return client.allows_user_authentication()
 
-    def audit(self):
-        for client in self._DB.get_all_clients():
-            if self.should_consider_client(client):
-                if self.client_has_non_service_account_flow_enabled(client):
-                    yield self.generate_finding(
-                        client,
-                        additional_details={
-                            "client_public": client.is_public(),
-                            "service_account_enabled": client.has_service_account_enabled(),
-                            "standard_flow_enabled": client.has_standard_flow_enabled(),
-                            "implicit_flow_enabled": client.has_implicit_flow_enabled(),
-                            "direct_access_grant_enabled": client.has_direct_access_grants_enabled(),
-                            "device_flow_enabled": client.has_device_authorization_grant_flow_enabled(),
-                        },
-                    )
+    def audit_client(self, client: Client):
+        if self.client_has_non_service_account_flow_enabled(client):
+            yield self.generate_finding(
+                client,
+                additional_details={
+                    "client_public": client.is_public(),
+                    "service_account_enabled": client.has_service_account_enabled(),
+                    "standard_flow_enabled": client.has_standard_flow_enabled(),
+                    "implicit_flow_enabled": client.has_implicit_flow_enabled(),
+                    "direct_access_grant_enabled": client.has_direct_access_grants_enabled(),
+                    "device_flow_enabled": client.has_device_authorization_grant_flow_enabled(),
+                },
+            )
