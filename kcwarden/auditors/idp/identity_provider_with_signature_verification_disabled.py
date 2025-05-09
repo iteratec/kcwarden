@@ -11,7 +11,8 @@ class IdentityProviderWithSignatureVerificationDisabled(Auditor):
     def should_consider_idp(self, idp) -> bool:
         return self.is_not_ignored(idp) and idp.get_provider_id() in ["oidc", "keycloak-oidc", "saml"]
 
-    def idp_does_not_verify_signatures(self, config):
+    @staticmethod
+    def idp_does_not_verify_signatures(config):
         return config.get("validateSignature") == "false"
 
     def audit(self):

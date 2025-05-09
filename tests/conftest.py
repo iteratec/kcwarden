@@ -146,7 +146,13 @@ def mock_scope(create_mock_scope):
 
 @pytest.fixture
 def create_mock_scope():
-    def _create_mock_scope(name="sensitive-scope", protocol_mappers=[], realm_roles=[], client_roles={}):
+    def _create_mock_scope(name="sensitive-scope", protocol_mappers=None, realm_roles=None, client_roles=None):
+        if protocol_mappers is None:
+            protocol_mappers = []
+        if realm_roles is None:
+            realm_roles = []
+        if client_roles is None:
+            client_roles = {}
         scope = Mock(spec=ClientScope)
         scope.get_name.return_value = name
         scope.get_protocol_mappers.return_value = protocol_mappers
@@ -207,7 +213,9 @@ def mock_role(create_mock_role):
 @pytest.fixture
 def create_mock_role(mock_realm):
     # Fixture factory pattern, so we can create more than one role in our tests
-    def _create_mock_role(role_name, client="realm", composite=[]):
+    def _create_mock_role(role_name, client="realm", composite=None):
+        if composite is None:
+            composite = []
         if client == "realm":
             role = Mock(spec=RealmRole)
             role.is_client_role.return_value = False
@@ -263,8 +271,10 @@ def mock_protocol_mapper(create_mock_protocol_mapper):
 def create_mock_protocol_mapper():
     def _create_mock_protocol_mapper(
         mapper_type="oidc-usermodel-attribute-mapper",
-        config={"userinfo.token.claim": "true", "user.attribute": "email"},
+        config=None,
     ):
+        if config is None:
+            config = {"userinfo.token.claim": "true", "user.attribute": "email"}
         mapper = Mock(spec=ProtocolMapper)
         mapper.get_protocol_mapper.return_value = mapper_type
         mapper.get_config.return_value = config

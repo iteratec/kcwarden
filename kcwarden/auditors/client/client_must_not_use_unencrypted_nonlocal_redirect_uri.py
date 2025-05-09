@@ -22,7 +22,8 @@ class ClientMustNotUseUnencryptedNonlocalRedirectUri(Auditor):
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )
 
-    def redirect_uri_is_http_and_non_local(self, redirect) -> bool:
+    @staticmethod
+    def redirect_uri_is_http_and_non_local(redirect) -> bool:
         # Parse the redirect URI as an URL
         parsed_redirect_uri = urllib.parse.urlparse(redirect)
         # We only consider those URLs that are explicitly recognized as http.

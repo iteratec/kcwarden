@@ -106,7 +106,8 @@ def download_config(args: argparse.Namespace):
         KC_EXPORT_URL.format(base_url, realm), headers={"Authorization": f"Bearer {session_token}"}
     ).json()
 
-    # TODO Mache ich eigentlich schon was mit Gruppen?
+    # TODO: Do we have checks for groups?
     # export = resolve_composite_roles_for_users(export)
 
     json.dump(export, output_file, indent=4)
+    return None

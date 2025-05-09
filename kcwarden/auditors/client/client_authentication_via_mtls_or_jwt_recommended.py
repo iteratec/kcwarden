@@ -24,7 +24,8 @@ class ClientAuthenticationViaMTLSOrJWTRecommended(Auditor):
             and client.get_name() not in ["broker", "realm-management"]
         )
 
-    def client_does_not_use_mtls_or_jwt_auth(self, client) -> bool:
+    @staticmethod
+    def client_does_not_use_mtls_or_jwt_auth(client) -> bool:
         # If the clientAuthenticatorType is client-secret, basic client secret authentication is used.
         # TODO Check what the correct values for mTLS or signed JWT are, and update this check
         return client.get_client_authenticator_type() == "client-secret"

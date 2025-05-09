@@ -1,3 +1,5 @@
+from typing import Any
+
 from kcwarden.api import Monitor
 from kcwarden.custom_types.keycloak_object import ProtocolMapper, Client
 from kcwarden.custom_types.result import Severity
@@ -31,8 +33,9 @@ class ProtocolMapperWithConfig(Monitor):
         },
     }
 
+    @staticmethod
     def _protocol_mapper_matches_config(
-        self, mapper: ProtocolMapper, target_mapper_type: str, target_mapper_config: dict[str, str]
+        mapper: ProtocolMapper, target_mapper_type: str, target_mapper_config: dict[str, str]
     ) -> bool:
         # If the mapper type does not match, the whole thing isn't a match
         if not helper.matches_as_string_or_regex(mapper.get_protocol_mapper(), target_mapper_type):
@@ -53,7 +56,7 @@ class ProtocolMapperWithConfig(Monitor):
     def _generate_additional_details(
         self, client: Client, mapper: ProtocolMapper, matched_by: str, matched_scope: str | None = None
     ) -> dict:
-        additional_details = {
+        additional_details: dict[str, Any] = {
             "matched_by": matched_by,
             "mapper": str(mapper),
             "mapper_config": mapper.get_config(),
@@ -73,7 +76,7 @@ class ProtocolMapperWithConfig(Monitor):
         return additional_details
 
     def _should_consider_client(self, client: Client) -> bool:
-        # Ignore clients that are disabled, if the global setting says so
+        # Ignore clients that are disabled if the global setting says so
         return not self.is_ignored_disabled_client(client)
 
     def audit(self):

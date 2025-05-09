@@ -42,6 +42,14 @@ class Result:
     def severity(self) -> Severity:
         return self._severity
 
+    @property
+    def offending_object(self) -> Dataclass:
+        return self._offending_object
+
+    @property
+    def additional_details(self) -> dict:
+        return self._additional_details
+
     def __lt__(self, other: "Result"):
         return self.severity < other.severity
 

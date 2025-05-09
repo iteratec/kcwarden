@@ -14,14 +14,16 @@ class TestClientWithSensitiveRole:
         monitor_instance = ClientWithSensitiveRole(database, default_config)
         return monitor_instance
 
+    @staticmethod
     def create_monitor_config(
-        self,
         role_name="sensitive-role",
         role_client="realm",
-        allowed=[],
+        allowed=None,
         ignore_full_scope_allowed=False,
         ignore_disabled_clients=False,
     ):
+        if allowed is None:
+            allowed = []
         return {
             "ignore_disabled_clients": ignore_disabled_clients,
             "auditors": {},
@@ -37,7 +39,8 @@ class TestClientWithSensitiveRole:
             },
         }
 
-    def prepare_mapper_and_scope(self, db_backed_monitor, mapper_type, create_mock_protocol_mapper, create_mock_scope):
+    @staticmethod
+    def prepare_mapper_and_scope(db_backed_monitor, mapper_type, create_mock_protocol_mapper, create_mock_scope):
         # Create a mock protocol mapper that should match the requirements
         mock_protocol_mapper = create_mock_protocol_mapper(mapper_type)
         # Create a scope and attach the protocol mapper
@@ -47,7 +50,8 @@ class TestClientWithSensitiveRole:
 
         return mock_scope
 
-    def prepare_scope_with_mapped_role(self, scope_name, role_name, db_backed_monitor, create_mock_scope):
+    @staticmethod
+    def prepare_scope_with_mapped_role(scope_name, role_name, db_backed_monitor, create_mock_scope):
         # Create a scope and attach the protocol mapper
         mock_scope = create_mock_scope(name=scope_name, realm_roles=[role_name])
 
@@ -254,11 +258,11 @@ class TestClientWithSensitiveRole:
         mapper_optional_scope, # Role mapper assigned through optional scope
         expected_result_count  # Number of expected findings
     ):
-        def _client_matched_by(reason, findings):
-            return reason in [finding._additional_details["matched_by"] for finding in findings]
+        def _client_matched_by(reason, local_findings):
+            return reason in [finding._additional_details["matched_by"] for finding in local_findings]
         
-        def _client_matched_scope(scope, findings):
-            return scope in [finding._additional_details.get("matched_scope", None) for finding in findings]
+        def _client_matched_scope(scope, local_findings):
+            return scope in [finding._additional_details.get("matched_scope", None) for finding in local_findings]
 
         # Initialize config for the monitor
         db_backed_monitor._CONFIG = self.create_monitor_config()

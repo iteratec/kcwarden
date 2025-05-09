@@ -22,7 +22,8 @@ class ClientHasUndefinedBaseDomainAndSchema(Auditor):
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )
 
-    def redirect_uri_has_empty_scheme(self, redirect) -> bool:
+    @staticmethod
+    def redirect_uri_has_empty_scheme(redirect) -> bool:
         parsed_redirect_uri = urllib.parse.urlparse(redirect)
         return parsed_redirect_uri.scheme == ""
 

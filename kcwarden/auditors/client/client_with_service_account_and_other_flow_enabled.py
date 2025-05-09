@@ -5,7 +5,12 @@ from kcwarden.custom_types.result import Severity
 class ClientWithServiceAccountAndOtherFlowEnabled(Auditor):
     DEFAULT_SEVERITY = Severity.Info
     SHORT_DESCRIPTION = "Confidential Client with Service Accounts and other flow enabled"
-    LONG_DESCRIPTION = "Often, confidential clients that have service accounts associated with them are exclusively used for their service account. In these cases, any additional methods (standard flow, implicit flow, ...) can be disabled as a matter of general hygene. If you are using both features of the client, feel free to ignore this finding."
+    LONG_DESCRIPTION = (
+        "Often, confidential clients that have service accounts associated with them are exclusively "
+        "used for their service account. In these cases, any additional methods (standard flow, "
+        "implicit flow, ...) can be disabled as a matter of general hygiene. If you are using both "
+        "features of the client, feel free to ignore this finding."
+    )
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
@@ -21,7 +26,8 @@ class ClientWithServiceAccountAndOtherFlowEnabled(Auditor):
             and client.has_service_account_enabled()
         )
 
-    def client_has_non_service_account_flow_enabled(self, client):
+    @staticmethod
+    def client_has_non_service_account_flow_enabled(client):
         # If this client has any other flows enabled, emit an informational finding
         # TODO Are there any other flows that could be enabled?
         return client.allows_user_authentication()
