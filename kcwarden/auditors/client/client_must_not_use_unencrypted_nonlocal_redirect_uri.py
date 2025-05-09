@@ -22,14 +22,6 @@ class ClientMustNotUseUnencryptedNonlocalRedirectUri(Auditor):
             and (client.has_standard_flow_enabled() or client.has_implicit_flow_enabled())
         )
 
-    def assert_non_default_client_has_redirect_uris(self, client, redirect_uris) -> None:
-        # TODO Refactor this as a sanity check in the client parser - this is the wrong location for that.
-        if not client.is_default_keycloak_client():
-            assert len(redirect_uris) > 0, (
-                "Assumption violated: no redirect URIs specified for client %s, even though I would expect there to be some. Please file a bug with a copy of the clients' JSON."
-                % client
-            )
-
     def redirect_uri_is_http_and_non_local(self, redirect) -> bool:
         # Parse the redirect URI as an URL
         parsed_redirect_uri = urllib.parse.urlparse(redirect)
@@ -51,8 +43,6 @@ class ClientMustNotUseUnencryptedNonlocalRedirectUri(Auditor):
         for client in self._DB.get_all_clients():
             if self.should_consider_client(client):
                 redirect_uris = client.get_resolved_redirect_uris()
-                # Ensure that the client is sane
-                self.assert_non_default_client_has_redirect_uris(client, redirect_uris)
 
                 # Run checks for every redirect URI
                 for redirect in redirect_uris:
