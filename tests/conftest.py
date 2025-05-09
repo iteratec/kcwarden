@@ -1,3 +1,4 @@
+import unittest.mock
 from unittest import mock
 from unittest.mock import Mock
 
@@ -158,13 +159,14 @@ def create_mock_scope():
 
 @pytest.fixture
 def mock_client(mock_realm):
-    client = Mock(spec=Client)
+    client = unittest.mock.create_autospec(spec=Client, instance=True)
     client.get_name.return_value = "mock-test-client"
     client.is_enabled.return_value = True
     client.get_realm.return_value = mock_realm
     client.get_default_client_scopes.return_value = []
     client.get_optional_client_scopes.return_value = []
     client.is_oidc_client.return_value = True
+    client.is_default_keycloak_client.return_value = False
     client.is_realm_specific_client.return_value = False
     client.get_protocol_mappers.return_value = []
     client.has_service_account_enabled.return_value = False
