@@ -39,8 +39,8 @@ def load_realm_dump(input_file: TextIOBase, db: Database) -> None:
     realm = add_realm(data, db)
 
     # Load scope and client scope mappings
-    scope_mappings = data["scopeMappings"]
-    client_scope_mappings = data["clientScopeMappings"]
+    scope_mappings = data.get("scopeMappings", [])
+    client_scope_mappings = data.get("clientScopeMappings", {})
 
     # Client
     for client in data["clients"]:
