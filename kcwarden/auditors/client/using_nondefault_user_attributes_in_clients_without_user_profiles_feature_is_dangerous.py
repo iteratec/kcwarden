@@ -19,7 +19,8 @@ class UsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDangerou
         # is not affected no matter which mappers it has.
         return self.is_not_ignored(client) and not client.get_realm().has_declarative_user_profiles_enabled()
 
-    def mapper_references_non_default_user_attribute(self, mapper) -> bool:
+    @staticmethod
+    def mapper_references_non_default_user_attribute(mapper) -> bool:
         # The mapper type must be oidc-usermodel-attribute-mapper
         # The referenced user attribute must be a non-default user attribute (we will have a separate auditor for default user attributes)
         return (

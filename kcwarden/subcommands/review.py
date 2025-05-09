@@ -48,7 +48,7 @@ def map_service_account_to_roles(service_accounts: list[str]) -> list[dict]:
         monitor_cfg = _configure_monitor_for_role(role)
         mon = ServiceAccountWithSensitiveRole(DATABASE, monitor_cfg)
         for result in mon.audit():
-            role_res[result._offending_object.get_name()] = result._additional_details["matched_by"]
+            role_res[result.offending_object.get_name()] = result.additional_details["matched_by"]
         results.append(role_res)
 
     # Next, do the same thing for client roles
@@ -62,7 +62,7 @@ def map_service_account_to_roles(service_accounts: list[str]) -> list[dict]:
             monitor_cfg = _configure_monitor_for_role(role)
             mon = ServiceAccountWithSensitiveRole(DATABASE, monitor_cfg)
             for result in mon.audit():
-                role_res[result._offending_object.get_name()] = result._additional_details["matched_by"]
+                role_res[result.offending_object.get_name()] = result.additional_details["matched_by"]
             results.append(role_res)
 
     return results

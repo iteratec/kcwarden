@@ -11,7 +11,8 @@ class ClientWithOptionalOfflineAccessScope(Auditor):
     def should_consider_client(self, client) -> bool:
         return self.is_not_ignored(client) and not client.is_realm_specific_client()
 
-    def client_can_generate_offline_tokens(self, client) -> bool:
+    @staticmethod
+    def client_can_generate_offline_tokens(client) -> bool:
         # Check if the "offline_access" scope is in the optional scopes
         # But only report if a flow is activated that can actually give out offline tokens
         # and if refresh tokens are active on that client

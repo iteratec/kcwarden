@@ -726,7 +726,7 @@ class ServiceAccount(Dataclass):
     def has_client_roles(self) -> bool:
         return "clientRoles" in self._d
 
-    def get_client_roles(self) -> dict[str, list]:
+    def get_client_roles(self) -> dict[str, list[str]]:
         if self.has_client_roles():
             return self._d["clientRoles"]
         return {}

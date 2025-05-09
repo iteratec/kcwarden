@@ -28,6 +28,7 @@ class TestClientHasUndefinedBaseDomainAndSchema:
         mock_client.has_implicit_flow_enabled.return_value = has_implicit_flow
         assert auditor.should_consider_client(mock_client) == expected
 
+    # noinspection HttpUrlsUsage
     @pytest.mark.parametrize(
         "redirect_uri, should_alert",
         [
