@@ -38,8 +38,10 @@ class TestClientMustNotUseUnencryptedNonlocalRedirectUri:
             ("http://example.com/path", True),  # HTTP non-local should alert
             ("https://example.com/path", False),  # HTTPS should not alert
             ("http://localhost/callback", False),  # HTTP local should not alert
+            ("http://localhost:3000/callback", False),  # HTTP local with port should not alert
             ("http://127.0.0.1/callback", False),  # HTTP local IP should not alert
-            ("http://::1/callback", False),  # HTTP local IPv6 should not alert
+            ("http://[::1]/callback", False),  # HTTP local IPv6 should not alert
+            ("http://[::1]:4200/callback", False),  # HTTP local IPv6 with port should not alert
             ("example.com", False),  # Incorrect URI, no proper validation here
         ],
     )

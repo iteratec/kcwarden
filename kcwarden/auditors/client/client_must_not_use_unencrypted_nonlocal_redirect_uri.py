@@ -25,17 +25,17 @@ class ClientMustNotUseUnencryptedNonlocalRedirectUri(ClientAuditor):
 
     @staticmethod
     def redirect_uri_is_http_and_non_local(redirect) -> bool:
-        # Parse the redirect URI as an URL
+        # Parse the redirect URI as a URL
         parsed_redirect_uri = urllib.parse.urlparse(redirect)
         # We only consider those URLs that are explicitly recognized as http.
-        # There are several cases where this will not happen, for example if URLs
+        # There are several cases where this will not happen, for example, if URLs
         # are defined relative to the base URL of keycloak, which cannot be determined
         # based on the config dumps.
         # In these cases, we do not match them in this rule. Instead, we have a separate
         # Auditor that emits informational findings for these cases.
-        # Unencrypted connections to a localhost address are permitted.
+        # Unencrypted connections to a `localhost` address are permitted.
         # All others should be reported
-        return parsed_redirect_uri.scheme == "http" and parsed_redirect_uri.netloc not in [
+        return parsed_redirect_uri.scheme == "http" and parsed_redirect_uri.hostname not in [
             "localhost",
             "127.0.0.1",
             "::1",
