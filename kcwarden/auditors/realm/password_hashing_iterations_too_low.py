@@ -1,4 +1,4 @@
-from typing import Generator, Dict, Optional
+from typing import Generator, Dict, Any
 
 from kcwarden.auditors.realm.abstract_realm_auditor import AbstractRealmAuditor
 from kcwarden.custom_types.keycloak_object import Realm
@@ -17,15 +17,19 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
     REFERENCE = "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
 
     # Minimum recommended iterations for each algorithm
-    MINIMUM_ITERATIONS = {"pbkdf2-sha512": 210000, "pbkdf2-sha256": 600000, "pbkdf2": 1300000}
+    MINIMUM_ITERATIONS: Dict[str, int] = {
+        "pbkdf2-sha512": 210_000,
+        "pbkdf2-sha256": 600_000,
+        "pbkdf2": 1_300_000,
+    }
 
     def extract_password_policy(self, realm: Realm) -> Dict[str, str]:
         """Extract password policy settings from realm configuration."""
-        policy_str = realm._d.get("passwordPolicy", "")
+        policy_str: str = realm._d.get("passwordPolicy", "")
         if not policy_str:
             return {}
 
-        policy_dict = {}
+        policy_dict: Dict[str, str] = {}
         for policy in policy_str.split(" and "):
             if "(" in policy and ")" in policy:
                 # Format is like: hashAlgorithm(pbkdf2-sha256)
@@ -41,23 +45,21 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
 
         return policy_dict
 
-    def get_hashing_algorithm(self, realm: Realm) -> Optional[str]:
+    def get_hashing_algorithm(self, realm: Realm) -> str | None:
         """Get the password hashing algorithm from realm configuration."""
-        # Check if hashAlgorithm is defined in password policy
         policy = self.extract_password_policy(realm)
         if "hashAlgorithm" in policy:
             return policy["hashAlgorithm"]
 
         # If not defined in password policy, check if it's defined elsewhere in the realm
         if "passwordHashAlgorithm" in realm._d:
-            return realm._d["passwordHashAlgorithm"]
+            return realm._d.get("passwordHashAlgorithm")
 
         # Default algorithm is pbkdf2 if not specified
         return "pbkdf2"
 
-    def get_hashing_iterations(self, realm: Realm) -> Optional[int]:
+    def get_hashing_iterations(self, realm: Realm) -> int | None:
         """Get the number of password hashing iterations from realm configuration."""
-        # Check if hashIterations is defined in password policy
         policy = self.extract_password_policy(realm)
         if "hashIterations" in policy:
             try:
@@ -67,25 +69,27 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
 
         # If not defined in password policy, check if it's defined elsewhere in the realm
         if "passwordHashIterations" in realm._d:
-            try:
-                return int(realm._d["passwordHashIterations"])
-            except (ValueError, TypeError):
-                return None
+            value = realm._d.get("passwordHashIterations", None)
+            if value is not None:
+                try:
+                    return int(value)
+                except (ValueError, TypeError):
+                    return None
 
         # Return None if no iterations are defined (will use default based on algorithm)
         return None
 
     def is_iterations_too_low(self, realm: Realm) -> bool:
         """Check if the number of hashing iterations is too low."""
-        algorithm = self.get_hashing_algorithm(realm)
-        iterations = self.get_hashing_iterations(realm)
+        algorithm: str | None = self.get_hashing_algorithm(realm)
+        iterations: int | None = self.get_hashing_iterations(realm)
 
         # Skip check for argon2 algorithm
         if algorithm and "argon2" in algorithm.lower():
             return False
 
-        # If algorithm is not recognized or iterations not defined, assume it's using defaults
-        if not algorithm or not iterations:
+        # If algorithm is not recognized or iterations is not defined, assume it's using defaults
+        if algorithm is None or iterations is None:
             return False
 
         # Check if iterations are below the minimum for the algorithm
@@ -102,8 +106,8 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
 
     def audit_realm(self, realm: Realm) -> Generator[Result, None, None]:
         if self.is_iterations_too_low(realm):
-            algorithm = self.get_hashing_algorithm(realm)
-            iterations = self.get_hashing_iterations(realm)
+            algorithm: str | None = self.get_hashing_algorithm(realm)
+            iterations: int | None = self.get_hashing_iterations(realm)
 
             # Determine which minimum applies
             applicable_minimum = None
@@ -116,7 +120,7 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
             if applicable_minimum is None and algorithm and "pbkdf2" in algorithm.lower():
                 applicable_minimum = self.MINIMUM_ITERATIONS["pbkdf2"]
 
-            additional_details = {
+            additional_details: Dict[str, Any] = {
                 "algorithm": algorithm,
                 "current_iterations": iterations,
                 "minimum_recommended_iterations": applicable_minimum,
