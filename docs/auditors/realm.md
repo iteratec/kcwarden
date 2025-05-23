@@ -87,3 +87,21 @@ For this check, it fetches the latest version from the GitHub releases of Keyclo
 
 If a RedHat version of Keycloak is used, it might have received backports.
 In this case, the severity is lowered and the long description includes a corresponding hint.
+
+## PasswordHashingIterationsTooLow
+
+This auditor checks if the number of iterations used for password hashing in Keycloak is too low, which could make password hashes more vulnerable to brute force attacks.
+
+Password hashing is a critical security measure that protects user credentials even if the password database is compromised. The strength of this protection depends significantly on the number of iterations used in the hashing process. More iterations increase the computational cost of verifying passwords, making brute force attacks more time-consuming and expensive for attackers.
+
+Keycloak supports several password hashing algorithms, each with different recommended minimum iteration counts:
+
+- pbkdf2-sha512: Minimum 210,000 iterations
+- pbkdf2-sha256: Minimum 600,000 iterations
+- pbkdf2: Minimum 1,300,000 iterations
+
+This auditor examines the password policy configuration in each realm to determine the hashing algorithm and number of iterations used. If the iterations are below the recommended minimum for the selected algorithm, it flags the realm for review.
+
+Note that this check is not applicable to the argon2 algorithm, which uses a different approach to password hashing that doesn't rely solely on iteration count, and the parameters cannot be configured in Keycloak.
+
+Administrators should ensure that password hashing configurations meet or exceed these minimum recommendations to provide adequate protection against brute force attacks on password hashes. Increasing the iteration count enhances security but may also increase CPU usage during authentication, so a balance should be struck based on the specific security requirements and available resources.
