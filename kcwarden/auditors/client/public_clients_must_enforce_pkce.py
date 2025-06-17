@@ -7,7 +7,7 @@ class PublicClientsMustEnforcePKCE(ClientAuditor):
     DEFAULT_SEVERITY = Severity.High
     SHORT_DESCRIPTION = "Public Clients MUST use and enforce PKCE"
     LONG_DESCRIPTION = "Public Clients using the Authorization Code Grant flow (called 'standard flow' in Keycloak) MUST use PKCE when using the Authorization Code Flow. Otherwise, they may be vulnerable to authorization code injection, Cross-Site Request Forgery (CSRF), or other attacks. PKCE must also be enforced in the Keycloak client settings by setting the PKCE Code Challenge Method to 'S256'. Other methods are less secure."
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.1.1"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.1.1"
 
     def should_consider_client(self, client) -> bool:
         # We are interested in clients that are:
