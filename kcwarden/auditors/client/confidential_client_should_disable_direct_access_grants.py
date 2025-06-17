@@ -7,7 +7,7 @@ class ConfidentialClientShouldDisableDirectAccessGrants(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "The 'direct access grant' flow MUST NOT be used"
     LONG_DESCRIPTION = "The resource owner password credentials grant (called 'direct access grant' in Keycloak) requires the client to submit username and password of the authenticating user. This greatly increases the attack surface for the credentials, as they are exposed outside of Keycloak. Additionally, it is generally incompatible with two-factor-authentication methods like WebAuthN or SMS tokens. This flow MUST NOT be used, and should be disabled on all clients. While it is less dangerous in the case of confidential clients like this one, as using the client requires knowledge of the client secret, the same recommendation still applies. (Some systems use the direct access grant flow to obtain tokens for technical users. In this case, please note that using technical users is strongly discouraged in favor of the 'service accounts' feature of Keycloak.)"
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.4"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.4"
 
     def should_consider_client(self, client) -> bool:
         # We are interested in clients that are:

@@ -9,7 +9,7 @@ class ClientHasUndefinedBaseDomainAndSchema(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Info
     SHORT_DESCRIPTION = "Client redirect URL scheme undefined, cannot be audited"
     LONG_DESCRIPTION = "Authorization responses contain sensitive data, like the OAuth Response Code, which should not be exposed. Therefore, the redirect_uri MUST be set to a HTTPS URI or (for native apps) a localhost address. For this client, this rule could not be validated, as the redirect URI combined with the root URL is insufficient to determine the used scheme. In most cases, this means that no clear redirect URI is defined. To remediate, define a fully qualified domain name including scheme (e.g. 'https://example.com/login') for either the client root URL or the redirect URI(s)."
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.6"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.6"
 
     def should_consider_client(self, client) -> bool:
         # We are interested in clients that are:

@@ -6,7 +6,7 @@ class OIDCIdentityProviderWithoutPKCE(Auditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "OIDC Identity Provider configured without PKCE"
     LONG_DESCRIPTION = "The realm has configured an OIDC Identity Provider, but does not enable PKCE for it. PKCE prevents different kinds of attacks on the OIDC protocol, and it is RECOMMENDED to enable it."
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.1.1"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.1.1"
 
     def should_consider_idp(self, idp) -> bool:
         # We are interested in identity providers that are:

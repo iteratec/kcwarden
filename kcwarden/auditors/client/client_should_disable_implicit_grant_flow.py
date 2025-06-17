@@ -7,7 +7,7 @@ class ClientShouldDisableImplicitGrantFlow(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "The 'implicit grant' flow SHOULD NOT be used"
     LONG_DESCRIPTION = "The implicit grant flow exposes the access token in the URL, which can lead to access token leakage or replay vulnerabilities. The 'Authorization Code' flow (called 'Standard Flow' in Keycloak) should be used, and the implicit flow disabled in Keycloak."
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.1.2"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.1.2"
 
     def should_consider_client(self, client) -> bool:
         # We are interested in clients that are:
