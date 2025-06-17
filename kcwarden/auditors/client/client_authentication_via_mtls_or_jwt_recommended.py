@@ -7,7 +7,7 @@ class ClientAuthenticationViaMTLSOrJWTRecommended(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Info
     SHORT_DESCRIPTION = "Client Authentication via mTLS or Signed JWT is Recommended"
     LONG_DESCRIPTION = "Confidential Clients need to authenticate to Keycloak to use its features. By default, is uses a shared client secret. It is RECOMMENDED to use mTLS or signed JWTs instead, if possible. For details, see the Keycloak documentation: https://www.keycloak.org/docs/latest/server_admin/#_client-credentials"
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.5"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.5"
 
     def should_consider_client(self, client) -> bool:
         # We are interested in clients that are:

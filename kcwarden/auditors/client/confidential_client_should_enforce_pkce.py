@@ -7,7 +7,7 @@ class ConfidentialClientShouldEnforcePKCE(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Confidential Clients should use and enforce PKCE"
     LONG_DESCRIPTION = "It is RECOMMENDED that Confidential Clients using the Authorization Code Grant flow (called 'standard flow' in Keycloak) use PKCE when using the Authorization Code Flow. Otherwise, they may be vulnerable to authorization code injection, Cross-Site Request Forgery (CSRF), or other attacks. PKCE should also be enforced in the Keycloak client settings by setting the PKCE Code Challenge Method to 'S256'. Other methods are less secure. Alternatively, the client MAY use the nonce parameter and respective claim, as described in section 4.5.3.2 of the linked reference."
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.1.1"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.1.1"
 
     def should_consider_client(self, client) -> bool:
         # We are interested in clients that are:
