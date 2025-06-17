@@ -7,7 +7,8 @@ title: Introduction
 kcwarden comes with a number of pre-built detection rules that can detect common Keycloak misconfigurations.
 We call these _auditors_, and each auditor checks for one specific problem.
 There are auditors for OAuth clients, scopes, upstream Identity Provider (IDP) configurations, and realm settings. 
-The auditors are based on a combination of the [OAuth 2.0 Security Best Current Practices RFC Draft (Version 24)](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-24), and additional, Keycloak-specific checks.
+The auditors are based on a combination of the [Best Current Practice for OAuth 2.0 Security
+(RFC 9700)](https://datatracker.ietf.org/doc/html/rfc9700), and additional, Keycloak-specific checks.
 
 ## Running Auditors
 

@@ -9,7 +9,7 @@ class ClientMustNotUseUnencryptedNonlocalRedirectUri(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Authorization Responses MUST NOT be transmitted via unencrypted connections"
     LONG_DESCRIPTION = "Authorization responses contain sensitive data, like the OAuth Response Code, which should not be exposed. Therefore, the redirect_uri MUST be set to a HTTPS URI or (for native apps) a localhost address."
-    REFERENCE = "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics-23#section-2.6"
+    REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.6"
 
     def should_consider_client(self, client) -> bool:
         # We are interested in clients that are:
