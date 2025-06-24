@@ -238,7 +238,6 @@ class TestClientWithSensitiveRole:
             (True , True , True , False, False, True , True , False, True , 5),  # Plus direct assignment => 5 findings (same)
         ]
     )
-    # fmt: on
     def test_audit(  # noqa: PLR0915
         self,
         db_backed_monitor,
@@ -258,6 +257,7 @@ class TestClientWithSensitiveRole:
         mapper_optional_scope, # Role mapper assigned through optional scope
         expected_result_count  # Number of expected findings
     ):
+        # fmt: on
         def _client_matched_by(reason, local_findings):
             return reason in [finding._additional_details["matched_by"] for finding in local_findings]
         
