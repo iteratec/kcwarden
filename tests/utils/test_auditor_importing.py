@@ -12,7 +12,7 @@ def test_get_auditors_from_directory():
 
 
 def test_get_auditors_from_package():
-    from tests.utils import test_data
+    from tests.utils import test_data  # noqa: PLC0415
 
     result = get_auditors_from_package(test_data)
     verify_results(result)
