@@ -19,6 +19,7 @@ classifiers = ["License :: OSI Approved :: Apache Software License", "Topic :: S
 python = "^3.11"
 requests = "^2.32.3"
 pyyaml = "^6.0.2"
+rich = "^14.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
