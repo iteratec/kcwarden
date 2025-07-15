@@ -96,9 +96,9 @@ class TestPasswordHashingIterationsTooLow:
                     auditor._DB.get_all_realms.return_value = [mock_realm]
                     results = list(auditor.audit())
                     assert len(results) == 1
-                    assert results[0]._additional_details["algorithm"] == "pbkdf2-sha256"
-                    assert results[0]._additional_details["current_iterations"] == 300000
-                    assert results[0]._additional_details["minimum_recommended_iterations"] == 600000
+                    assert results[0].additional_details["algorithm"] == "pbkdf2-sha256"
+                    assert results[0].additional_details["current_iterations"] == 300000
+                    assert results[0].additional_details["minimum_recommended_iterations"] == 600000
 
     def test_audit_function_multiple_realms(self, auditor):
         # Create separate mock realms with distinct settings

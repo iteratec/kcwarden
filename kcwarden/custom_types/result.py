@@ -47,6 +47,22 @@ class Result:
         return self._offending_object
 
     @property
+    def reporting_auditor(self) -> str:
+        return self._reporting_auditor
+
+    @property
+    def short_description(self) -> str:
+        return self._short_description
+
+    @property
+    def long_description(self) -> str:
+        return self._long_description
+
+    @property
+    def reference(self) -> str:
+        return self._reference
+
+    @property
     def additional_details(self) -> dict:
         return self._additional_details
 

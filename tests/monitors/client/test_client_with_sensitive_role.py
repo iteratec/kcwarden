@@ -259,10 +259,10 @@ class TestClientWithSensitiveRole:
     ):
         # fmt: on
         def _client_matched_by(reason, local_findings):
-            return reason in [finding._additional_details["matched_by"] for finding in local_findings]
+            return reason in [finding.additional_details["matched_by"] for finding in local_findings]
         
         def _client_matched_scope(scope, local_findings):
-            return scope in [finding._additional_details.get("matched_scope", None) for finding in local_findings]
+            return scope in [finding.additional_details.get("matched_scope", None) for finding in local_findings]
 
         # Initialize config for the monitor
         db_backed_monitor._CONFIG = self.create_monitor_config()
