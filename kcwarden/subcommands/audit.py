@@ -3,6 +3,8 @@ import csv
 import json
 from io import TextIOBase
 from typing import Type
+from rich.console import Console
+from rich.table import Table
 
 import yaml
 
@@ -91,9 +93,27 @@ def output_findings(findings: list[Result], arguments: argparse.Namespace) -> No
         for finding in filtered_findings:
             writer.writerow(finding.to_dict())
     else:
-        for finding in filtered_findings:
-            output_file.write(str(finding) + "\n")
-            output_file.write("\n---\n")
+        console = Console()
+        if len(filtered_findings) > 0:
+            table = Table(show_lines=True)
+            table.add_column("Severity")
+            table.add_column("Type")
+            table.add_column("Object")
+            table.add_column("Summary")
+            table.add_column("Description")
+
+            for finding in filtered_findings:
+                table.add_row(
+                    finding.severity.name,
+                    finding.offending_object.get_type(),
+                    finding.offending_object.get_name(),
+                    finding.short_description,
+                    finding.long_description,
+                )
+
+            console.print(table)
+        else:
+            console.print("No issues found 🥳", style="bold")
 
 
 def audit(args: argparse.Namespace):
