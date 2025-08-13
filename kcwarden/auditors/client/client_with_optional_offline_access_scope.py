@@ -20,7 +20,7 @@ class ClientWithOptionalOfflineAccessScope(ClientAuditor):
         return (
             "offline_access" in client.get_optional_client_scopes()
             and client.allows_user_authentication()
-            and client.get_attributes().get("use.refresh.tokens", "false") == "true"
+            and client.has_refresh_tokens_enabled()
         )
 
     def audit_client(self, client: Client):
