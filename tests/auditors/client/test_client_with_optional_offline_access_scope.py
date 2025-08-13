@@ -17,16 +17,16 @@ class TestClientWithOptionalOfflineAccessScope:
     @pytest.mark.parametrize(
         "optional_scopes, flow_status, use_refresh_tokens, expected",
         [
-            (["offline_access"], {"device": True, "direct": True, "standard": True, "implicit": False}, "true", True),
-            (["offline_access"], {"device": False, "direct": True, "standard": False, "implicit": False}, "true", True),
-            ([], {"device": True, "direct": True, "standard": True, "implicit": True}, "true", False),
+            (["offline_access"], {"device": True, "direct": True, "standard": True, "implicit": False}, True, True),
+            (["offline_access"], {"device": False, "direct": True, "standard": False, "implicit": False}, True, True),
+            ([], {"device": True, "direct": True, "standard": True, "implicit": True}, True, False),
             (
                 ["offline_access"],
                 {"device": False, "direct": False, "standard": False, "implicit": False},
-                "true",
+                True,
                 False,
             ),
-            (["offline_access"], {"device": True, "direct": True, "standard": True, "implicit": True}, "false", False),
+            (["offline_access"], {"device": True, "direct": True, "standard": True, "implicit": True}, False, False),
         ],
     )
     def test_client_can_generate_offline_tokens(
@@ -40,12 +40,12 @@ class TestClientWithOptionalOfflineAccessScope:
         mock_client.allows_user_authentication.return_value = (
             flow_status["device"] or flow_status["direct"] or flow_status["standard"] or flow_status["implicit"]
         )
-        mock_client.get_attributes.return_value = {"use.refresh.tokens": use_refresh_tokens}
+        mock_client.use_refresh_tokens.return_value = use_refresh_tokens
         assert auditor.client_can_generate_offline_tokens(mock_client) == expected
 
     def test_audit_function_no_findings(self, mock_client, auditor):
         mock_client.get_optional_client_scopes.return_value = []
-        mock_client.get_attributes.return_value = {"use.refresh.tokens": "false"}
+        mock_client.use_refresh_tokens.return_value = False
         auditor._DB.get_all_clients.return_value = [mock_client]
         results = list(auditor.audit())
         assert len(results) == 0
@@ -56,7 +56,7 @@ class TestClientWithOptionalOfflineAccessScope:
         mock_client.has_direct_access_grants_enabled.return_value = True
         mock_client.has_standard_flow_enabled.return_value = True
         mock_client.has_implicit_flow_enabled.return_value = False
-        mock_client.get_attributes.return_value = {"use.refresh.tokens": "true"}
+        mock_client.use_refresh_tokens.return_value = True
         mock_client.is_public.return_value = False
         auditor._DB.get_all_clients.return_value = [mock_client]
         results = list(auditor.audit())
@@ -74,7 +74,7 @@ class TestClientWithOptionalOfflineAccessScope:
         client1.has_direct_access_grants_enabled.return_value = True
         client1.has_standard_flow_enabled.return_value = True
         client1.has_implicit_flow_enabled.return_value = False
-        client1.get_attributes.return_value = {"use.refresh.tokens": "true"}
+        client1.use_refresh_tokens.return_value = True
         client1.is_public.return_value = False
         client1.is_realm_specific_client.return_value = False
 
@@ -84,7 +84,7 @@ class TestClientWithOptionalOfflineAccessScope:
         client2.has_direct_access_grants_enabled.return_value = False
         client2.has_standard_flow_enabled.return_value = True
         client2.has_implicit_flow_enabled.return_value = False
-        client2.get_attributes.return_value = {"use.refresh.tokens": "false"}
+        client2.use_refresh_tokens.return_value = False
         client2.is_public.return_value = True
         client2.is_realm_specific_client.return_value = False
 
@@ -94,7 +94,7 @@ class TestClientWithOptionalOfflineAccessScope:
         client3.has_direct_access_grants_enabled.return_value = False
         client3.has_standard_flow_enabled.return_value = False
         client3.has_implicit_flow_enabled.return_value = True
-        client3.get_attributes.return_value = {"use.refresh.tokens": "true"}
+        client3.use_refresh_tokens.return_value = True
         client3.is_public.return_value = False
         client3.is_realm_specific_client.return_value = False
 
