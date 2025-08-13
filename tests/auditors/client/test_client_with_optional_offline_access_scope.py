@@ -66,6 +66,22 @@ class TestClientWithOptionalOfflineAccessScope:
         assert finding.to_dict()["additional_details"]["client_public"] == mock_client.is_public()
         assert finding.to_dict()["additional_details"]["standard_flow_enabled"] is True
 
+    def test_audit_function_with_findings__given_default_value(self, mock_client, auditor):
+        mock_client.get_optional_client_scopes.return_value = ["offline_access"]
+        mock_client.has_device_authorization_grant_flow_enabled.return_value = True
+        mock_client.has_direct_access_grants_enabled.return_value = True
+        mock_client.has_standard_flow_enabled.return_value = True
+        mock_client.has_implicit_flow_enabled.return_value = False
+        mock_client.get_attributes.return_value = {}
+        mock_client.is_public.return_value = False
+        auditor._DB.get_all_clients.return_value = [mock_client]
+        results = list(auditor.audit())
+        assert len(results) == 1
+        finding = results[0]
+        assert finding.to_dict()["additional_details"]["optional_scopes"] == ["offline_access"]
+        assert finding.to_dict()["additional_details"]["client_public"] == mock_client.is_public()
+        assert finding.to_dict()["additional_details"]["standard_flow_enabled"] is True
+
     def test_audit_function_multiple_clients(self, auditor):
         # Create separate mock clients with distinct settings
         client1 = Mock()

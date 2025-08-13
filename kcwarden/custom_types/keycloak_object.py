@@ -574,6 +574,10 @@ class Client(Dataclass):
             or self.has_implicit_flow_enabled()
         )
 
+    def has_refresh_tokens_enabled(self) -> bool:
+        # If the attribute is not present, Keycloak defaults to true for probably legacy reasons
+        return self.get_attributes().get("use.refresh.tokens", "true") == "true"
+
 
 class Group(Dataclass):
     """
