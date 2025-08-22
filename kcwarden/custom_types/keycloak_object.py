@@ -51,8 +51,10 @@ class Realm(Dataclass):
     def get_refresh_token_maximum_reuse_count(self) -> int:
         return self._d["refreshTokenMaxReuse"]
 
-    # Optional / Experimental Features
-    def has_declarative_user_profiles_enabled(self) -> bool:
+    def get_unmanaged_attribute_policy(self) -> str | None:
+        return self._d["attributes"].get("unmanagedAttributePolicy")
+
+    def has_declarative_user_profiles_enabled_legacy_option(self) -> bool:
         return self._d["attributes"].get("userProfileEnabled", "false") == "true"
 
     def get_keycloak_version(self) -> str:

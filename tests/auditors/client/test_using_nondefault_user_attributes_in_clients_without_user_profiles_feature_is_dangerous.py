@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from kcwarden.auditors.client.using_nondefault_user_attributes_in_clients_without_user_profiles_feature_is_dangerous import (
     UsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDangerous,
 )
+from kcwarden.custom_types.keycloak_object import Realm
 
 DEFAULT_ATTRIBUTES = [
     "firstName",
@@ -39,7 +40,7 @@ class TestUsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDang
     def test_should_consider_client(self, mock_client, auditor):
         # Set up mock realm response
         realm = Mock()
-        realm.has_declarative_user_profiles_enabled.return_value = False
+        realm.has_declarative_user_profiles_enabled_legacy_option.return_value = False
         mock_client.get_realm.return_value = realm
 
         assert (
@@ -69,7 +70,7 @@ class TestUsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDang
 
     def test_audit_function_no_findings(self, mock_client, auditor):
         # Setup client and mappers
-        mock_client.get_realm.return_value.has_declarative_user_profiles_enabled.return_value = True
+        mock_client.get_realm.return_value.get_unmanaged_attribute_policy.return_value = "DISABLED"
         mapper = Mock()
         mapper.get_protocol_mapper.return_value = "oidc-usermodel-attribute-mapper"
         mapper.get_config.return_value = {"user.attribute": "email"}  # 'email' is a default attribute
@@ -82,7 +83,7 @@ class TestUsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDang
     def test_audit_function_with_findings(self, mock_client, auditor):
         # Setup client and mappers
         realm = Mock()
-        realm.has_declarative_user_profiles_enabled.return_value = False
+        realm.has_declarative_user_profiles_enabled_legacy_option.return_value = False
         mock_client.get_realm.return_value = realm
         mock_client.is_oidc_client.return_value = True
         mock_client.is_public.return_value = False
@@ -102,8 +103,8 @@ class TestUsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDang
     def test_audit_function_multiple_clients(self, auditor):
         # Create separate mock clients with distinct settings
         client1 = Mock()
-        realm1 = Mock()
-        realm1.has_declarative_user_profiles_enabled.return_value = False
+        realm1: Realm = Mock()
+        realm1.get_unmanaged_attribute_policy.return_value = "ENABLED"
         client1.get_realm.return_value = realm1
         mapper1 = Mock()
         mapper1.get_protocol_mapper.return_value = "oidc-usermodel-attribute-mapper"
@@ -112,7 +113,7 @@ class TestUsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDang
 
         client2 = Mock()
         realm2 = Mock()
-        realm2.has_declarative_user_profiles_enabled.return_value = True
+        realm2.get_unmanaged_attribute_policy.return_value = "ADMIN_EDIT"
         client2.get_realm.return_value = realm2
         mapper2 = Mock()
         mapper2.get_protocol_mapper.return_value = "oidc-usermodel-attribute-mapper"
