@@ -149,6 +149,8 @@ To mitigate this risk, Keycloak introduced the User Profiles feature, allowing a
 This auditor flags clients that use custom user attributes without activating the User Profiles feature, signaling a potential security vulnerability.
 It encourages the use of the User Profiles feature to securely manage user attributes and prevent unauthorized modifications, as detailed in Keycloak's documentation.
 
+Note that this auditor might generate false-positives when the attribute is imported via LDAP user federation and set to read-only there.
+
 !!! info
 
     The user profiles feature was an experimental feature for many versions of Keycloak that was disabled by default. It was

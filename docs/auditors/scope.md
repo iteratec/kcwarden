@@ -16,7 +16,7 @@ Keycloak permits the assignment of custom attributes to user profiles beyond the
 However, without proper restrictions, users might modify their own attributes via the user console, potentially affecting the reliability of these attributes in external systems.
 For instance, a customer number stored as a custom attribute could be altered, disrupting the linkage between a Keycloak account and a customer database.
 
-The danger arises when these custom attributes are employed in client scopes without enabling Keycloak's experimental User Profiles feature.
+The danger arises when these custom attributes are employed in client scopes without enabling Keycloak's User Profiles feature.
 This feature allows administrators to define policies controlling attribute editability, thus preventing users from altering sensitive information.
 
 This auditor raises a flag when client scopes use custom user attributes, and the realm lacks the User Profiles feature activation.
@@ -24,3 +24,5 @@ It suggests reviewing the use of these attributes within scopes, advocating for 
 
 The finding is particularly severe because the lack of restriction could lead to security vulnerabilities, where critical information stored in user attributes could be tampered with by the users themselves or exploited by attackers.
 Implementing the User Profiles feature and adjusting scope configurations accordingly is recommended to ensure data integrity and security.
+
+Note that this auditor might generate false-positives when the attribute is imported via LDAP user federation and set to read-only there.

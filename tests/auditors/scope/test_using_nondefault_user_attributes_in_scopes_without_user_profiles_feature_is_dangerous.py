@@ -1,9 +1,12 @@
+from unittest import mock
+
 import pytest
 from unittest.mock import Mock
 
 from kcwarden.auditors.scope.using_nondefault_user_attributes_in_scopes_without_user_profiles_feature_is_dangerous import (
     UsingNonDefaultUserAttributesInScopesWithoutUserProfilesFeatureIsDangerous,
 )
+from kcwarden.custom_types.keycloak_object import Realm
 
 
 class TestUsingNonDefaultUserAttributesInScopesWithoutUserProfilesFeatureIsDangerous:
@@ -17,18 +20,6 @@ class TestUsingNonDefaultUserAttributesInScopesWithoutUserProfilesFeatureIsDange
 
     def test_should_consider_scope(self, mock_scope, auditor):
         assert auditor.should_consider_scope(mock_scope) is True  # Always consider unless specifically ignored
-
-    @pytest.mark.parametrize(
-        "user_profiles_enabled, expected",
-        [
-            (True, True),  # User profiles feature enabled, not considered dangerous
-            (False, False),  # User profiles feature disabled, considered dangerous
-        ],
-    )
-    def test_realm_has_user_profiles_enabled(self, mock_scope, mock_realm, auditor, user_profiles_enabled, expected):
-        mock_realm.has_declarative_user_profiles_enabled.return_value = user_profiles_enabled
-        mock_scope.get_realm.return_value = mock_realm
-        assert auditor.realm_has_user_profiles_enabled(mock_realm) == expected
 
     @pytest.mark.parametrize(
         "mapper_config, expected",
@@ -53,7 +44,7 @@ class TestUsingNonDefaultUserAttributesInScopesWithoutUserProfilesFeatureIsDange
     def test_audit_function_no_findings(self, auditor, mock_scope):
         # Setup scope in a realm with user profiles enabled
         realm = Mock()
-        realm.has_declarative_user_profiles_enabled.return_value = True
+        realm.has_declarative_user_profiles_enabled_legacy_option.return_value = True
         mock_scope.get_realm.return_value = realm
         mock_scope.get_protocol_mappers.return_value = []
         auditor._DB.get_all_scopes.return_value = [mock_scope]
@@ -64,7 +55,7 @@ class TestUsingNonDefaultUserAttributesInScopesWithoutUserProfilesFeatureIsDange
     def test_audit_function_with_findings(self, auditor, mock_scope):
         # Setup scope in a realm without user profiles enabled
         realm = Mock()
-        realm.has_declarative_user_profiles_enabled.return_value = False
+        realm.has_declarative_user_profiles_enabled_legacy_option.return_value = False
         mock_scope.get_realm.return_value = realm
         mapper = Mock()
         mapper.get_protocol_mapper.return_value = "oidc-usermodel-attribute-mapper"
@@ -101,9 +92,10 @@ class TestUsingNonDefaultUserAttributesInScopesWithoutUserProfilesFeatureIsDange
     def test_audit_function_multiple_scopes(self, auditor):
         # Create separate mock scopes with distinct settings in different realms
         scope1, scope2, scope3 = Mock(), Mock(), Mock()
-        realm1, realm2 = Mock(), Mock()
-        realm1.has_declarative_user_profiles_enabled.return_value = False
-        realm2.has_declarative_user_profiles_enabled.return_value = True
+        realm1: Realm = mock.create_autospec(Realm, instance=True)
+        realm2: Realm = mock.create_autospec(Realm, instance=True)
+        realm1.get_unmanaged_attribute_policy.return_value = "ENABLED"
+        realm2.get_unmanaged_attribute_policy.return_value = "DISABLED"
         scope1.get_realm.return_value = realm1
         scope2.get_realm.return_value = realm1
         scope3.get_realm.return_value = realm2
