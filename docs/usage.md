@@ -50,6 +50,7 @@ There are several optional parameters to customize the execution:
 | `--auditors`                | Specify the exact auditors to run, separated by space (others will be ignored).                                                                         |
 | `--config`                  | Provide a config file with auditor-specific exclusions and parameters. Generate a template using [generate-config-template](#generate-config-template). |
 | `--ignore-disabled-clients` | When set, will not audit disabled OIDC clients.                                                                                                         |
+| `--fail-on-findings`        | When set, will exit with return code 42 on findings. Otherwise, will exit with return code 0.                                                           |
 
 ### Using the Docker container
 
