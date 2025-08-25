@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from urllib.parse import urlparse
 
 
 class Dataclass(ABC):
@@ -527,6 +526,9 @@ class Client(Dataclass):
     def get_root_url(self) -> str | None:
         return self._d.get("rootUrl", None)
 
+    def get_base_url(self) -> str | None:
+        return self._d.get("baseUrl", None)
+
     def get_redirect_uris(self) -> list[str]:
         return self._d["redirectUris"]
 
@@ -537,23 +539,16 @@ class Client(Dataclass):
         root_url = self.get_root_url()
         if root_url is None:
             root_url = ""
+
         rv = []
         for uri in redirect_uris:
-            # If the uri is a valid full domain, it is used as-is by keycloak.
-            # We approximate this by saying that it has to have something that
-            # urlllib.parse.urlparse recognizes as a hostname. This will usually
-            # mean that it is defined as http[s]://domain.tld/path.
-            if urlparse(uri).hostname != "":
-                rv.append(uri)
-            else:
-                # If it is not a valid full domain, it is resolved relative to the root
-                # URI of the client. We append the two together.
+            # For relative URIs, we prepend the root URL.
+            # See https://github.com/keycloak/keycloak/blob/main/services/src/main/java/org/keycloak/protocol/oidc/utils/RedirectUtils.java#L54
+            # and https://github.com/keycloak/keycloak/blob/main/services/src/main/java/org/keycloak/protocol/oidc/utils/RedirectUtils.java#L63
+            if uri.startswith("/"):
                 rv.append(root_url + uri)
-            # Note that this still does not guarantee that the result is a valid URL.
-            # If the root URL is unset, the value is relative to the keycloak URL (?).
-            # However, this keycloak URL apparently cannot be pulled from the config
-            # dump, so there is no way of resolving the actual redirect URIs, as
-            # used by Keycloak.
+            else:
+                rv.append(uri)
         return rv
 
     def is_default_keycloak_client(self) -> bool:
