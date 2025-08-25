@@ -72,7 +72,7 @@ def execute_auditors(auditors: list[Type[Auditor]], config: dict[str, str | list
     return findings
 
 
-def output_findings(findings: list[Result], arguments: argparse.Namespace) -> None:
+def output_findings(findings: list[Result], arguments: argparse.Namespace) -> int:
     # Long-term, this should support filtering by severity, etc.
     if arguments.min_severity is not None:
         min_sev = get_severity_by_name(arguments.min_severity)
@@ -115,6 +115,8 @@ def output_findings(findings: list[Result], arguments: argparse.Namespace) -> No
         else:
             console.print("No issues found 🥳", style="bold")
 
+    return len(filtered_findings)
+
 
 def audit(args: argparse.Namespace):
     # Split auditors, if available
@@ -128,4 +130,7 @@ def audit(args: argparse.Namespace):
     # Execute all auditor modules
     findings = execute_auditors(auditors, config)
     # Output the results
-    output_findings(findings, args)
+    finding_count = output_findings(findings, args)
+    if args.fail_on_findings and finding_count > 0:
+        return 42
+    return 0
