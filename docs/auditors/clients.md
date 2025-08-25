@@ -116,6 +116,14 @@ In OAuth, redirect URIs are crucial for directing the user-agent back to the app
 Keycloak mandates specifying allowed redirect URIs to prevent unauthorized redirects.
 However, a configuration error like specifying a wildcard in the domain part of the redirect URI (e.g., `https://example.com*`) instead of after a path delimiter (e.g., `https://example.com/*`) could let an attacker specify a malicious domain that still matches the configured pattern (e.g., `https://example.com.attacker.com/`).
 
+## ClientMustNotUseGlobalWildcardURI
+
+This auditor identifies clients with dangerously configured redirect URIs that potentially allow redirects to arbitrary URIs, posing a significant security risk.
+In OAuth, redirect URIs are crucial for directing the user-agent back to the application with the authorization code.
+Keycloak mandates specifying allowed redirect URIs to prevent unauthorized redirects.
+However, a configuration error like specifying a global wildcard as redirect URI (i.e., `*`) instead of a domain with a path (e.g., `https://example.com/oidc-callback`) could let an attacker specify an arbitrary URI that always matches the configured pattern.
+For instance, this significantly simplifies phishing attacks since the attackers can leverage the legitimate login to redirect to their own application to steal authorization codes and, if the client is public, also the tokens of their victims.
+
 ## ClientWithServiceAccountAndOtherFlowEnabled
 
 This auditor examines confidential OIDC clients that have service accounts enabled alongside other authorization flows, such as standard, implicit, or direct access grants.

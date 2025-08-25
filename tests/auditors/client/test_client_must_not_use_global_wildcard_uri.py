@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.client.client_should_not_use_wildcard_redirect_uri import ClientShouldNotUseWildcardRedirectURI
+from kcwarden.auditors.client.client_must_not_use_global_wildcard_uri import ClientMustNotUseGlobalWildcardURI
 
 
-class TestClientShouldNotUseWildcardRedirectURI:
+class TestClientMustNotUseGlobalWildcardURI:
     @pytest.fixture
     def auditor(self, database, default_config):
-        auditor_instance = ClientShouldNotUseWildcardRedirectURI(database, default_config)
+        auditor_instance = ClientMustNotUseGlobalWildcardURI(database, default_config)
         auditor_instance._DB = Mock()
         return auditor_instance
 
@@ -32,18 +32,24 @@ class TestClientShouldNotUseWildcardRedirectURI:
     @pytest.mark.parametrize(
         "redirect_uri, should_alert",
         [
-            ("https://example.com/callback*", True),  # Wildcard at the end
+            ("*", True),  # Global wildcard
+            ("https://*", True),  # Arbitrary https link as wildcard
+            ("http://*", True),  # Arbitrary http link as wildcard
+            ("tel://*", True),  # Arbitrary other protocol link as wildcard
+            (
+                "https://example.com*",
+                False,
+            ),  # Wildcard in domain part → caught by ClientHasErroneouslyConfiguredWildcardURI
+            ("https://example.com/*", False),  # Wildcard at the end → caught by ClientShouldNotUseWildcardRedirectURI
+            (
+                "https://example.com/callback*",
+                False,
+            ),  # Wildcard at the end → caught by ClientShouldNotUseWildcardRedirectURI
             ("https://example.com/callback", False),  # No wildcard
-            ("https://example.com/call*back", False),  # Asterisk not at the end
-            ("http://localhost/callback/*", True),  # Localhost with wildcard
-            ("https://example.com/*", True),  # Wildcard directly after domain
-            ("https://example.com/auth?*", True),  # Wildcard in GET parameters
-            ("http://::1/auth?*", True),  # Wildcard in GET parameters
-            ("*", False),  # Global wildcard → is caught by ClientMustNotUseGlobalWildcardURI
         ],
     )
-    def test_redirect_uri_is_wildcard_uri(self, auditor, redirect_uri, should_alert):
-        assert auditor.redirect_uri_is_wildcard_uri(redirect_uri) == should_alert
+    def test_redirect_uri_is_global_wildcard(self, auditor, redirect_uri, should_alert):
+        assert auditor.redirect_uri_is_global_wildcard(redirect_uri) == should_alert
 
     def test_audit_function_no_findings(self, mock_client, auditor):
         mock_client.get_resolved_redirect_uris.return_value = [
@@ -56,7 +62,7 @@ class TestClientShouldNotUseWildcardRedirectURI:
 
     def test_audit_function_with_findings(self, mock_client, auditor):
         mock_client.get_resolved_redirect_uris.return_value = [
-            "https://example.com/callback*",
+            "*",
             "https://valid.com/path",
         ]
         mock_client.is_public.return_value = False
@@ -66,15 +72,16 @@ class TestClientShouldNotUseWildcardRedirectURI:
         finding = results[0]
         assert (
             "redirect_uri" in finding.to_dict()["additional_details"]
-            and finding.to_dict()["additional_details"]["redirect_uri"] == "https://example.com/callback*"
+            and finding.to_dict()["additional_details"]["redirect_uri"] == "*"
         )
 
     def test_audit_function_multiple_clients(self, mock_client, auditor):
         # Setting up various redirect URI configurations
         mock_client.get_resolved_redirect_uris.side_effect = [
             ["https://secure.com/path", "https://example.com/callback"],
-            ["https://bad.com/callback*", "https://also.bad.com/endswith*"],
+            ["*"],
+            ["*"],
         ]
-        auditor._DB.get_all_clients.return_value = [mock_client, mock_client]
+        auditor._DB.get_all_clients.return_value = [mock_client, mock_client, mock_client]
         results = list(auditor.audit())
-        assert len(results) == 2  # Expect two findings from the second client
+        assert len(results) == 2  # Expect a finding from the second and third client

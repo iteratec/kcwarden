@@ -1,4 +1,5 @@
 from kcwarden.api.auditor import ClientAuditor
+from kcwarden.auditors.client.client_must_not_use_global_wildcard_uri import ClientMustNotUseGlobalWildcardURI
 from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
@@ -23,8 +24,13 @@ class ClientShouldNotUseWildcardRedirectURI(ClientAuditor):
 
     @staticmethod
     def redirect_uri_is_wildcard_uri(redirect) -> bool:
+        # Skip the findings that are caught by ClientMustNotUseGlobalWildcardURI
+        if ClientMustNotUseGlobalWildcardURI.redirect_uri_is_global_wildcard(redirect):
+            return False
+
         # The only place Keycloak allows wildcards in a redirect URI is at the very end.
-        # So the first approximation can be "is the last character a *?"
+        # So the first approximation can be "is the last character a *?".
+        # But we catch the case the redirect URI is only an asterix since it then handled by ClientHasGlobalWildcardURI.
         return redirect[-1:] == "*"
 
     def audit_client(self, client: Client):
@@ -32,4 +38,6 @@ class ClientShouldNotUseWildcardRedirectURI(ClientAuditor):
         redirect_uris = client.get_resolved_redirect_uris()
         for redirect in redirect_uris:
             if self.redirect_uri_is_wildcard_uri(redirect):
-                yield self.generate_finding(client, additional_details={"redirect_uri": redirect})
+                yield self.generate_finding(
+                    client, additional_details={"redirect_uri": redirect, "public_client": client.is_public()}
+                )
