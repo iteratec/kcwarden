@@ -107,6 +107,12 @@ def add_audit_parser(subparsers):
         action="store_true",
     )
 
+    parser_audit.add_argument(
+        "--fail-on-findings",
+        help="When set, will exit with return code 42 on findings. Otherwise, will exit with return code 0.",
+        action="store_true",
+    )
+
 
 def add_config_generator_parser(subparsers):
     parser_config_generator = subparsers.add_parser(
