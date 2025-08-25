@@ -1,13 +1,14 @@
 import urllib.parse
 
 from kcwarden.api.auditor import ClientAuditor
+from kcwarden.auditors.client.client_must_not_use_global_wildcard_uri import ClientMustNotUseGlobalWildcardURI
 from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
 class ClientHasErroneouslyConfiguredWildcardURI(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Critical
-    SHORT_DESCRIPTION = "Erroneously configured Redirect URI allows arbitrary domains for redirects"
+    SHORT_DESCRIPTION = "Erroneously configured redirect URI allows arbitrary domains for redirects"
     LONG_DESCRIPTION = "Authorization responses contain sensitive data, like the OAuth Response Code, which should not be exposed. Keycloak requires specifying an allowed set of redirect URIs. In this case, a redirect URI was specified that is almost certainly incorrect, as the domain name contains a wildcard in the domain name part (i.e., https://example.com*). This allows arbitrary domains to be specified as a redirect URI as long as they begin with the specified part of the redirect URI, e.g. example.com.attacker.tk. The wildcard should almost certainly be placed behind a slash to make it part of the Path (e.g., https://example.com/*)."
     REFERENCE = ""
 
@@ -24,6 +25,10 @@ class ClientHasErroneouslyConfiguredWildcardURI(ClientAuditor):
 
     @staticmethod
     def redirect_uri_has_wildcard_in_domain(redirect) -> bool:
+        # Skip the findings that are caught by ClientMustNotUseGlobalWildcardURI
+        if ClientMustNotUseGlobalWildcardURI.redirect_uri_is_global_wildcard(redirect):
+            return False
+
         parsed_redirect_uri = urllib.parse.urlparse(redirect)
         # The redirect URI has the form https://domain.tld*
         if parsed_redirect_uri.scheme in ["https", "http"] and parsed_redirect_uri.netloc.endswith("*"):
@@ -40,6 +45,7 @@ class ClientHasErroneouslyConfiguredWildcardURI(ClientAuditor):
             parsed_redirect_uri.scheme == ""
             and parsed_redirect_uri.netloc == ""
             and "/" not in parsed_redirect_uri.path
+            and not redirect == "*"
             and parsed_redirect_uri.path.endswith("*")
         )
 
@@ -48,4 +54,6 @@ class ClientHasErroneouslyConfiguredWildcardURI(ClientAuditor):
         redirect_uris = client.get_resolved_redirect_uris()
         for redirect in redirect_uris:
             if self.redirect_uri_has_wildcard_in_domain(redirect):
-                yield self.generate_finding(client, additional_details={"redirect_uri": redirect})
+                yield self.generate_finding(
+                    client, additional_details={"redirect_uri": redirect, "public_client": client.is_public()}
+                )

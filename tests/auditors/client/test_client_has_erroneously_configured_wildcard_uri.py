@@ -41,8 +41,11 @@ class TestClientHasErroneouslyConfiguredWildcardURI:
             ("http://example.com*", True),  # Wildcard in domain part with http
             ("", False),  # Empty URI
             ("https://example.com", False),  # No wildcard
-            ("https://*", True),  # Edge case: entire domain as wildcard
-            ("*", True),  # Edge case: Only wildcard without protocol
+            (
+                "https://*",
+                False,
+            ),  # Edge case: arbitrary https link as wildcard → is caught by ClientMustNotUseGlobalWildcardURI
+            ("*", False),  # Edge case: Only wildcard without protocol → is caught by ClientMustNotUseGlobalWildcardURI
         ],
     )
     def test_redirect_uri_has_wildcard_in_domain(self, auditor, redirect_uri, should_alert):
@@ -55,6 +58,7 @@ class TestClientHasErroneouslyConfiguredWildcardURI:
         assert len(results) == 0
 
     def test_audit_function_with_findings(self, mock_client, auditor):
+        mock_client.is_public.return_value = True
         mock_client.get_resolved_redirect_uris.return_value = ["https://example.com*", "https://valid.com/path"]
         auditor._DB.get_all_clients.return_value = [mock_client]
         results = list(auditor.audit())
@@ -69,6 +73,7 @@ class TestClientHasErroneouslyConfiguredWildcardURI:
             ["https://secure.com/path"],
             ["https://anotherbad.com*"],
         ]
+        mock_client.is_public.return_value = True
         auditor._DB.get_all_clients.return_value = [mock_client, mock_client, mock_client]
         results = list(auditor.audit())
         assert len(results) == 2  # Expect findings from two clients
