@@ -202,3 +202,9 @@ The security of the OIDC standard flow and others rely on the allowed redirect U
 This behavior is not emulated by kcwarden, and thus other auditors do not produce correct findings. 
 In addition, Keycloak's fallback mechanism might change over time and can lead to unexpected behavior. 
 It is highly recommended to explicitly set the redirect URIs for this client.
+
+## ClientAccessTokenLifespanTooLong
+
+The auditor triggers if a client sets an override for the access token lifespan
+and if the value is too long.
+See the realm auditor [AccessTokenLifespanTooLong](./realm.md#AccessTokenLifespanTooLong) for details.
