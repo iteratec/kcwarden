@@ -21,6 +21,7 @@ nav:
   - index.md
   - installation.md
   - usage.md
+  - advanced_usage.md
   - development.md
   - Auditors:
       - auditors/index.md
