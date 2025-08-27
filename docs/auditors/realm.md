@@ -105,3 +105,12 @@ This auditor examines the password policy configuration in each realm to determi
 Note that this check is not applicable to the argon2 algorithm, which uses a different approach to password hashing that doesn't rely solely on iteration count, and the parameters cannot be configured in Keycloak.
 
 Administrators should ensure that password hashing configurations meet or exceed these minimum recommendations to provide adequate protection against brute force attacks on password hashes. Increasing the iteration count enhances security but may also increase CPU usage during authentication, so a balance should be struck based on the specific security requirements and available resources.
+
+## AccessTokenLifespanTooLong
+
+This auditor ensures that the access token lifespan has a short value.
+Access tokens should have a short lifespan to minimize the impact of potential token compromise.
+An attacker can use it until it expires.
+Since an access token is stateless, it cannot be revoked.
+The worst case is a configured lifespan of `0` since that leads to unlimited validity of the tokens.
+A recommended lifespan is 1 to 5 minutes, or 10 minutes at maximum.

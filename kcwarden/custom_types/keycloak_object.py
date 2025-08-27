@@ -51,6 +51,10 @@ class Realm(Dataclass):
     def get_refresh_token_maximum_reuse_count(self) -> int:
         return self._d["refreshTokenMaxReuse"]
 
+    def get_access_token_lifespan(self) -> int:
+        """Get access token lifespan in seconds."""
+        return self._d["accessTokenLifespan"]
+
     def get_unmanaged_attribute_policy(self) -> str | None:
         return self._d["attributes"].get("unmanagedAttributePolicy")
 
@@ -574,6 +578,16 @@ class Client(Dataclass):
     def use_refresh_tokens(self) -> bool:
         # If the attribute is not present, Keycloak defaults to true for probably legacy reasons
         return self.get_attributes().get("use.refresh.tokens", "true") == "true"
+
+    def get_access_token_lifespan_override(self) -> int | None:
+        """Get client-specific access token lifespan override in seconds, if set."""
+        lifespan_str = self.get_attributes().get("access.token.lifespan")
+        if lifespan_str is None:
+            return None
+        try:
+            return int(lifespan_str)
+        except ValueError:
+            return None
 
 
 class Group(Dataclass):
