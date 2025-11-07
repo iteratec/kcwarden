@@ -93,7 +93,7 @@ def output_findings(findings: list[Result], arguments: argparse.Namespace) -> in
         for finding in filtered_findings:
             writer.writerow(finding.to_dict())
     else:
-        console = Console()
+        console = Console(file=output_file)
         if len(filtered_findings) > 0:
             table = Table(show_lines=True)
             table.add_column("Severity")
