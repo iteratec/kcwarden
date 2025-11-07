@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
+import json
 
 
 class Dataclass(ABC):
@@ -56,7 +57,17 @@ class Realm(Dataclass):
         return self._d["accessTokenLifespan"]
 
     def get_unmanaged_attribute_policy(self) -> str | None:
-        return self._d["attributes"].get("unmanagedAttributePolicy")
+        try:
+            attribute_config = json.loads(
+                self._d["components"]
+                .get("org.keycloak.userprofile.UserProfileProvider")[0]
+                .get("config")
+                .get("kc.user.profile.config")[0]
+            )
+        except TypeError:  # Will be thrown if the UserProfileProvider wasn't found
+            return None
+        # Default value in Keycloak 26+ is "DISABLED", which will sometimes be omitted from the config file
+        return attribute_config.get("unmanagedAttributePolicy", "DISABLED")
 
     def has_declarative_user_profiles_enabled_legacy_option(self) -> bool:
         return self._d["attributes"].get("userProfileEnabled", "false") == "true"
