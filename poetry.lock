@@ -1249,14 +1249,14 @@ files = [
 
 [[package]]
 name = "testcontainers"
-version = "4.13.2"
+version = "4.13.3"
 description = "Python library for throwaway instances of anything that can run in a Docker container"
 optional = false
-python-versions = "<4.0,>=3.9.2"
+python-versions = ">=3.9.2"
 groups = ["dev"]
 files = [
-    {file = "testcontainers-4.13.2-py3-none-any.whl", hash = "sha256:0209baf8f4274b568cde95bef2cadf7b1d33b375321f793790462e235cd684ee"},
-    {file = "testcontainers-4.13.2.tar.gz", hash = "sha256:2315f1e21b059427a9d11e8921f85fef322fbe0d50749bcca4eaa11271708ba4"},
+    {file = "testcontainers-4.13.3-py3-none-any.whl", hash = "sha256:063278c4805ffa6dd85e56648a9da3036939e6c0ac1001e851c9276b19b05970"},
+    {file = "testcontainers-4.13.3.tar.gz", hash = "sha256:9d82a7052c9a53c58b69e1dc31da8e7a715e8b3ec1c4df5027561b47e2efe646"},
 ]
 
 [package.dependencies]
@@ -1272,26 +1272,25 @@ arangodb = ["python-arango (>=7.8,<8.0)"]
 aws = ["boto3", "httpx"]
 azurite = ["azure-storage-blob (>=12.19,<13.0)"]
 chroma = ["chromadb-client (>=1.0.0,<2.0.0)"]
-clickhouse = ["clickhouse-driver"]
 cosmosdb = ["azure-cosmos"]
 db2 = ["ibm_db_sa ; platform_machine != \"aarch64\" and platform_machine != \"arm64\"", "sqlalchemy"]
 generic = ["httpx", "redis"]
 google = ["google-cloud-datastore (>=2)", "google-cloud-pubsub (>=2)"]
 influxdb = ["influxdb", "influxdb-client"]
-k3s = ["kubernetes", "pyyaml"]
+k3s = ["kubernetes", "pyyaml (>=6.0.3)"]
 keycloak = ["python-keycloak"]
 localstack = ["boto3"]
 mailpit = ["cryptography"]
 minio = ["minio"]
 mongodb = ["pymongo"]
-mssql = ["pymssql ; platform_machine != \"arm64\" or python_version >= \"3.10\"", "sqlalchemy"]
+mssql = ["pymssql (>=2.3.9) ; platform_machine != \"arm64\" or python_version >= \"3.10\"", "sqlalchemy"]
 mysql = ["pymysql[rsa]", "sqlalchemy"]
 nats = ["nats-py"]
 neo4j = ["neo4j"]
 openfga = ["openfga-sdk ; python_version >= \"3.10\""]
-opensearch = ["opensearch-py"]
-oracle = ["oracledb", "sqlalchemy"]
-oracle-free = ["oracledb", "sqlalchemy"]
+opensearch = ["opensearch-py ; python_version < \"4.0\""]
+oracle = ["oracledb (>=3.4.1)", "sqlalchemy"]
+oracle-free = ["oracledb (>=3.4.1)", "sqlalchemy"]
 qdrant = ["qdrant-client"]
 rabbitmq = ["pika"]
 redis = ["redis"]
