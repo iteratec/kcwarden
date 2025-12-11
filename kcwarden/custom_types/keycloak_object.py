@@ -78,6 +78,7 @@ class Realm(Dataclass):
     def get_password_policy(self) -> str:
         return self._d.get("passwordPolicy", "")
 
+
 class RealmRole(Dataclass):
     """
     Example Payload
