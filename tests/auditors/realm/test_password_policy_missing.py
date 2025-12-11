@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 
 from kcwarden.auditors.realm.password_policy_missing import PasswordPolicyMissing
@@ -13,11 +15,11 @@ class TestPasswordPolicyMissing:
         assert auditor.should_consider_realm(mock_realm) is True  # Always consider unless specifically ignored
 
     def test_password_policy_empty(self, auditor, mock_realm: Realm):
-            # Test with no password policy set
-            mock_realm._d = {}
-            assert auditor.realm_has_no_password_policy(mock_realm)
+        # Test with no password policy set
+        mock_realm.get_password_policy.return_value = ""
+        assert auditor.realm_has_no_password_policy(mock_realm)
 
     def test_password_policy_set(self, auditor, mock_realm: Realm):
-            # Test with some password policy set
-            mock_realm._d = {"passwordPolicy": "length(15)"}
-            assert not auditor.realm_has_no_password_policy(mock_realm)
+        # Test with some password policy set
+        mock_realm.get_password_policy.return_value = "length(15)"
+        assert not auditor.realm_has_no_password_policy(mock_realm)

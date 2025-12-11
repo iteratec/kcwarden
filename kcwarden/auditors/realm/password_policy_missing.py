@@ -17,7 +17,7 @@ class PasswordPolicyMissing(AbstractRealmAuditor):
 
     @staticmethod
     def realm_has_no_password_policy(realm: Realm) -> bool:
-        policy_str: str = realm._d.get("passwordPolicy", "")
+        policy_str: str = realm.get_password_policy()
         return len(policy_str) == 0
 
     def audit_realm(self, realm: Realm) -> Generator[Result, None, None]:
