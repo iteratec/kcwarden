@@ -88,6 +88,13 @@ For this check, it fetches the latest version from the GitHub releases of Keyclo
 If a RedHat version of Keycloak is used, it might have received backports.
 In this case, the severity is lowered and the long description includes a corresponding hint.
 
+## PasswordPolicyMissing
+
+This auditor checks if any password policy is configured for the realm.
+
+The default Keycloak configuration does not enforce any password policies.
+Password policies are important security features that ensure that user passwords are secure enough.
+
 ## PasswordHashingIterationsTooLow
 
 This auditor checks if the number of iterations used for password hashing in Keycloak is too low, which could make password hashes more vulnerable to brute force attacks.
