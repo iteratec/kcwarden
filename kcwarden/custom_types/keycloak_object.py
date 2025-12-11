@@ -75,6 +75,9 @@ class Realm(Dataclass):
     def get_keycloak_version(self) -> str:
         return self._d["keycloakVersion"]
 
+    def get_password_policy(self) -> str:
+        return self._d.get("passwordPolicy", "")
+
 
 class RealmRole(Dataclass):
     """

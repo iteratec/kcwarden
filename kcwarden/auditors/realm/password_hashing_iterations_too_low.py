@@ -25,7 +25,7 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
 
     def extract_password_policy(self, realm: Realm) -> Dict[str, str]:
         """Extract password policy settings from realm configuration."""
-        policy_str: str = realm._d.get("passwordPolicy", "")
+        policy_str: str = realm.get_password_policy()
         if not policy_str:
             return {}
 

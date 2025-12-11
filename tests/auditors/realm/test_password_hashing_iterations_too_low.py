@@ -19,14 +19,14 @@ class TestPasswordHashingIterationsTooLow:
 
     def test_extract_password_policy(self, auditor, mock_realm):
         # Test with a password policy string
-        mock_realm._d = {"passwordPolicy": "hashAlgorithm(pbkdf2-sha256) and hashIterations(300000)"}
+        mock_realm.get_password_policy.return_value = "hashAlgorithm(pbkdf2-sha256) and hashIterations(300000)"
         expected = {"hashAlgorithm": "pbkdf2-sha256", "hashIterations": "300000"}
         result = auditor.extract_password_policy(mock_realm)
         assert result == expected
 
     def test_get_hashing_algorithm_from_policy(self, auditor, mock_realm):
         # Test getting algorithm from password policy
-        mock_realm._d = {"passwordPolicy": "hashAlgorithm(pbkdf2-sha256) and hashIterations(300000)"}
+        mock_realm.get_password_policy.return_value = "hashAlgorithm(pbkdf2-sha256) and hashIterations(300000)"
         with patch.object(auditor, "extract_password_policy", return_value={"hashAlgorithm": "pbkdf2-sha256"}):
             assert auditor.get_hashing_algorithm(mock_realm) == "pbkdf2-sha256"
 
@@ -44,7 +44,7 @@ class TestPasswordHashingIterationsTooLow:
 
     def test_get_hashing_iterations_from_policy(self, auditor, mock_realm):
         # Test getting iterations from password policy
-        mock_realm._d = {"passwordPolicy": "hashAlgorithm(pbkdf2-sha256) and hashIterations(300000)"}
+        mock_realm.get_password_policy.return_value = "hashAlgorithm(pbkdf2-sha256) and hashIterations(300000)"
         with patch.object(auditor, "extract_password_policy", return_value={"hashIterations": "300000"}):
             assert auditor.get_hashing_iterations(mock_realm) == 300000
 
