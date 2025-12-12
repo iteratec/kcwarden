@@ -70,7 +70,7 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
 
         # If not defined in password policy, check if it's defined elsewhere in the realm
         password_hash_iterations = realm.get_password_hash_iterations()
-        if password_hash_iterations != "":       
+        if password_hash_iterations != "":
             try:
                 return int(password_hash_iterations)
             except (ValueError, TypeError):

@@ -77,10 +77,10 @@ class Realm(Dataclass):
 
     def get_password_policy(self) -> str:
         return self._d.get("passwordPolicy", "")
-    
+
     def get_password_hash_algorithm(self) -> str:
         return self._d.get("passwordHashAlgorithm", "")
-    
+
     def get_password_hash_iterations(self) -> str:
         return self._d.get("passwordHashIterations", "")
 
