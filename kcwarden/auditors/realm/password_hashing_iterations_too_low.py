@@ -52,8 +52,9 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
             return policy["hashAlgorithm"]
 
         # If not defined in password policy, check if it's defined elsewhere in the realm
-        if "passwordHashAlgorithm" in realm._d:
-            return realm._d.get("passwordHashAlgorithm")
+        password_hash_algorithm = realm.get_password_hash_algorithm()
+        if password_hash_algorithm != "":
+            return password_hash_algorithm
 
         # Default algorithm is pbkdf2 if not specified
         return "pbkdf2"
@@ -68,13 +69,12 @@ class PasswordHashingIterationsTooLow(AbstractRealmAuditor):
                 return None
 
         # If not defined in password policy, check if it's defined elsewhere in the realm
-        if "passwordHashIterations" in realm._d:
-            value = realm._d.get("passwordHashIterations", None)
-            if value is not None:
-                try:
-                    return int(value)
-                except (ValueError, TypeError):
-                    return None
+        password_hash_iterations = realm.get_password_hash_iterations()
+        if password_hash_iterations != "":       
+            try:
+                return int(password_hash_iterations)
+            except (ValueError, TypeError):
+                return None
 
         # Return None if no iterations are defined (will use default based on algorithm)
         return None
