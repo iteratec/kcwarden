@@ -32,13 +32,13 @@ class TestPasswordHashingIterationsTooLow:
 
     def test_get_hashing_algorithm_from_realm(self, auditor, mock_realm):
         # Test getting algorithm from realm config
-        mock_realm._d = {"passwordHashAlgorithm": "pbkdf2-sha512"}
+        mock_realm.get_password_hash_algorithm.return_value = "pbkdf2-sha512"
         with patch.object(auditor, "extract_password_policy", return_value={}):
             assert auditor.get_hashing_algorithm(mock_realm) == "pbkdf2-sha512"
 
     def test_get_hashing_algorithm_default(self, auditor, mock_realm):
         # Test default algorithm when none specified
-        mock_realm._d = {}
+        mock_realm.get_password_hash_algorithm.return_value = ""
         with patch.object(auditor, "extract_password_policy", return_value={}):
             assert auditor.get_hashing_algorithm(mock_realm) == "pbkdf2"
 
@@ -50,13 +50,13 @@ class TestPasswordHashingIterationsTooLow:
 
     def test_get_hashing_iterations_from_realm(self, auditor, mock_realm):
         # Test getting iterations from realm config
-        mock_realm._d = {"passwordHashIterations": 500000}
+        mock_realm.get_password_hash_iterations.return_value = 500000
         with patch.object(auditor, "extract_password_policy", return_value={}):
             assert auditor.get_hashing_iterations(mock_realm) == 500000
 
     def test_get_hashing_iterations_none(self, auditor, mock_realm):
         # Test when no iterations are specified
-        mock_realm._d = {}
+        mock_realm.get_password_hash_iterations.return_value = ""
         with patch.object(auditor, "extract_password_policy", return_value={}):
             assert auditor.get_hashing_iterations(mock_realm) is None
 
