@@ -1,7 +1,6 @@
 from unittest.mock import Mock
 
 import pytest
-from unittest.mock import Mock, patch
 
 from kcwarden.custom_types.keycloak_object import Client, Realm
 
