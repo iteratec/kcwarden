@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Dict
 from copy import deepcopy
 import json
 
@@ -78,11 +79,59 @@ class Realm(Dataclass):
     def get_password_policy(self) -> str:
         return self._d.get("passwordPolicy", "")
 
-    def get_password_hash_algorithm(self) -> str:
-        return self._d.get("passwordHashAlgorithm", "")
+    def _interpret_password_policy(self) -> Dict[str, str]:
+        """Extract password policy settings from realm configuration."""
+        policy_str: str = self.get_password_policy()
+        if not policy_str:
+            return {}
 
-    def get_password_hash_iterations(self) -> str:
-        return self._d.get("passwordHashIterations", "")
+        policy_dict: Dict[str, str] = {}
+        for policy in policy_str.split(" and "):
+            if "(" in policy and ")" in policy:
+                # Format is like: hashAlgorithm(pbkdf2-sha256)
+                key, value = policy.split("(", 1)
+                value = value.rstrip(")")
+                policy_dict[key.strip()] = value.strip()
+            elif ":" in policy:
+                # Alternative format with colon
+                key, value = policy.split(":", 1)
+                policy_dict[key.strip()] = value.strip()
+            else:
+                policy_dict[policy.strip()] = "enabled"
+
+        return policy_dict
+
+    def get_password_hash_algorithm(self) -> str:
+        policy = self._interpret_password_policy()
+        if "hashAlgorithm" in policy:
+            return policy["hashAlgorithm"]
+
+        # If not defined in password policy, check if it's defined elsewhere in the realm
+        password_hash_algorithm = self._d.get("passwordHashAlgorithm", "")
+        if password_hash_algorithm != "":
+            return password_hash_algorithm
+
+        # Default algorithm is pbkdf2 if not specified
+        return "pbkdf2"
+
+    def get_password_hash_iterations(self) -> int | None:
+        policy = self._interpret_password_policy()
+        if "hashIterations" in policy:
+            try:
+                return int(policy["hashIterations"])
+            except (ValueError, TypeError):
+                return None
+
+        # If not defined in password policy, check if it's defined elsewhere in the realm
+        password_hash_iterations = self._d.get("passwordHashIterations", "")
+        if password_hash_iterations != "":
+            try:
+                return int(password_hash_iterations)
+            except (ValueError, TypeError):
+                return None
+
+        # Return None if no iterations are defined (will use default based on algorithm)
+        return None
 
 
 class RealmRole(Dataclass):
