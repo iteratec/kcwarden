@@ -29,9 +29,9 @@ class TestPasswordHashingIterationsTooLow:
         ],
     )
     def test_is_iterations_too_low(self, auditor, mock_realm, algorithm, iterations, expected):
-        with patch.object(mock_realm, "get_password_hash_algorithm", return_value=algorithm):
-            with patch.object(mock_realm, "get_password_hash_iterations", return_value=iterations):
-                assert auditor.is_iterations_too_low(mock_realm) == expected
+        mock_realm.get_password_hash_algorithm.return_value = algorithm
+        mock_realm.get_password_hash_iterations.return_value = iterations
+        assert auditor.is_iterations_too_low(mock_realm) == expected
 
     def test_audit_function_no_findings(self, auditor, mock_realm):
         # Setup realm with sufficient iterations
@@ -43,14 +43,14 @@ class TestPasswordHashingIterationsTooLow:
     def test_audit_function_with_findings(self, auditor, mock_realm):
         # Setup realm with insufficient iterations
         with patch.object(auditor, "is_iterations_too_low", return_value=True):
-            with patch.object(mock_realm, "get_password_hash_algorithm", return_value="pbkdf2-sha256"):
-                with patch.object(mock_realm, "get_password_hash_iterations", return_value=300000):
-                    auditor._DB.get_all_realms.return_value = [mock_realm]
-                    results = list(auditor.audit())
-                    assert len(results) == 1
-                    assert results[0].additional_details["algorithm"] == "pbkdf2-sha256"
-                    assert results[0].additional_details["current_iterations"] == 300000
-                    assert results[0].additional_details["minimum_recommended_iterations"] == 600000
+            mock_realm.get_password_hash_algorithm.return_value = "pbkdf2-sha256"
+            mock_realm.get_password_hash_iterations.return_value = 300000
+            auditor._DB.get_all_realms.return_value = [mock_realm]
+            results = list(auditor.audit())
+            assert len(results) == 1
+            assert results[0].additional_details["algorithm"] == "pbkdf2-sha256"
+            assert results[0].additional_details["current_iterations"] == 300000
+            assert results[0].additional_details["minimum_recommended_iterations"] == 600000
 
     def test_audit_function_multiple_realms(self, auditor):
         # Create separate mock realms with distinct settings
