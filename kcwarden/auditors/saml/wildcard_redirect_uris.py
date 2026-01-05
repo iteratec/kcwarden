@@ -13,20 +13,8 @@ class WildcardRedirectUriCheck(Auditor):
         
         return True
 
-    @staticmethod
-    def _get_redirect_uris(client):
-        """Helper to safely retrieve redirect URIs from the client object."""
-        if hasattr(client, "get_redirect_uris"):
-            return client.get_redirect_uris()
-        
-        elif isinstance(client, dict):
-            return client.get("redirectUris", [])
-            
-        else:
-            return getattr(client, "redirectUris", [])
-
     def is_vulnerable(self, client) -> bool:
-        uris = self._get_redirect_uris(client)
+        uris = client.get_redirect_uris()
 
         if not uris:
             return False
@@ -42,7 +30,7 @@ class WildcardRedirectUriCheck(Auditor):
             if self.should_consider_client(client):
                 if self.is_vulnerable(client):
                     # Re-fetch URIs for the report detail
-                    uris = self._get_redirect_uris(client)
+                    uris = client.get_redirect_uris()
                     bad_uris = [u for u in uris if u.endswith("*")]
                     
                     yield self.generate_finding(
