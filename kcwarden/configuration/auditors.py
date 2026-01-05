@@ -6,6 +6,7 @@ from kcwarden.auditors import (
     client as client_auditors,
     idp as idp_auditors,
     scope as scope_auditors,
+    saml as saml_auditors,
 )
 from kcwarden.api import Auditor
 from kcwarden.monitors import (
@@ -16,6 +17,7 @@ from kcwarden.monitors import (
     protocol_mapper as protocol_mapper_monitors,
 )
 from kcwarden.utils import auditor_importing
+
 
 
 def collect_auditors(
@@ -32,6 +34,7 @@ def collect_auditors(
         realm_auditors,
         idp_auditors,
         scope_auditors,
+        saml_auditors,
         client_monitors,
         group_monitors,
         role_monitors,
