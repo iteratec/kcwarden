@@ -22,13 +22,7 @@ class SamlClientSignatureCheck(Auditor):
 
     @staticmethod
     def is_vulnerable(client) -> bool:
-        if hasattr(client, "get_attributes"):
-            attributes = client.get_attributes()
-        elif hasattr(client, "get"):
-            attributes = client.get("attributes", {})
-        else:
-            attributes = getattr(client, "attributes", {})
-
+        attributes = client.get_attributes()
         # Default is often false if missing, or explicitly set to false
         val = attributes.get("saml.client.signature", "false")
         return val != "true"
