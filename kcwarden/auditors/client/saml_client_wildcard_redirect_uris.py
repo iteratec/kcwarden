@@ -1,17 +1,14 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
-class WildcardRedirectUriCheck(Auditor):
+class SamlClientWildcardRedirectUriCheck(Auditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Client allows wildcard redirect URIs"
     LONG_DESCRIPTION = "The client configuration contains a wildcard (*) at the end of a Redirect URI. This allows open redirects to subdirectories, potentially leading to token theft."
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        if not self.is_not_ignored(client):
-            return False
-        
-        return True
+        return self.is_not_ignored(client) and client.get_protocol() == "saml"
 
     def is_vulnerable(self, client) -> bool:
         uris = client.get_redirect_uris()
@@ -33,7 +30,4 @@ class WildcardRedirectUriCheck(Auditor):
                     uris = client.get_redirect_uris()
                     bad_uris = [u for u in uris if u.endswith("*")]
                     
-                    yield self.generate_finding(
-                        client, 
-                        additional_details={"vulnerable_uris": bad_uris}
-                    )
+                    yield self.generate_finding(client, additional_details={"vulnerable_uris": bad_uris})
