@@ -8,16 +8,11 @@ class SamlClientSignatureCheck(Auditor):
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        if not self.is_not_ignored(client):
-            return False
-            
-        protocol = client.get_protocol()
-        return protocol == "saml"
+        return self.is_not_ignored(client) and client.get_protocol() == "saml"
 
     @staticmethod
     def is_vulnerable(client) -> bool:
         attributes = client.get_attributes()
-        # Default is often false if missing, or explicitly set to false
         val = attributes.get("saml.client.signature", "false")
         return val != "true"
 
