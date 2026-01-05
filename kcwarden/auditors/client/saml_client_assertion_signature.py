@@ -1,24 +1,18 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
-class SamlAssertionSignatureCheck(Auditor):
+class SamlClientAssertionSignatureCheck(Auditor):
     DEFAULT_SEVERITY = Severity.High
     SHORT_DESCRIPTION = "SAML Assertion block is not signed"
     LONG_DESCRIPTION = "Keycloak issues tokens without signing the Assertion block. This allows attackers to modify the NameID (username) or Roles in the XML to commit Token Forgery."
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        if not self.is_not_ignored(client):
-            return False
-            
-        protocol = client.get_protocol()
-        return protocol == "saml"
+        return self.is_not_ignored(client) and client.get_protocol() == "saml"
 
     @staticmethod
     def is_vulnerable(client) -> bool:
         attributes = client.get_attributes()
-
-        # Check for saml.assertion.signature
         val = attributes.get("saml.assertion.signature", "false")
         return val != "true"
 

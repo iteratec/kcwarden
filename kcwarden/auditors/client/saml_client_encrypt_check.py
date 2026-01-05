@@ -1,23 +1,18 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
-class SamlEncryptCheck(Auditor):
+class SamlClientEncryptCheck(Auditor):
     DEFAULT_SEVERITY = Severity.High
     SHORT_DESCRIPTION = "SAML Assertion encryption is disabled"
     LONG_DESCRIPTION = "The SAML Assertion is sent in cleartext (Base64 encoded only). This allows intermediaries to read PII and facilitates XML Signature Wrapping (XSW) attacks."
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        if not self.is_not_ignored(client):
-            return False
-            
-        protocol = client.get_protocol()
-        return protocol == "saml"
+        return self.is_not_ignored(client) and client.get_protocol() == "saml"
 
     @staticmethod
     def is_vulnerable(client) -> bool:
         attributes = client.get_attributes()
-        # Check for saml.encrypt
         val = attributes.get("saml.encrypt", "false")
         return val != "true"
 
