@@ -13,19 +13,8 @@ class IdpWantAssertionsEncryptedCheck(Auditor):
             pid = idp.get("providerId", "")
         return pid == "saml"
 
-    @staticmethod
-    def _get_config(idp):
-        if hasattr(idp, "get_config"):
-            return idp.get_config()
-        elif hasattr(idp, "config"):
-            return idp.config
-        elif isinstance(idp, dict):
-            return idp.get("config", {})
-        else:
-            return getattr(idp, "config", {})
-
     def is_vulnerable(self, idp) -> bool:
-        config = self._get_config(idp)
+        config = idp.get_config()
         # Check specific key for encryption
         val = config.get("wantAssertionsEncrypted", "false")
         return val != "true"

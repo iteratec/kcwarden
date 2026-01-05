@@ -22,13 +22,7 @@ class SamlWeakAlgorithmCheck(Auditor):
 
     @staticmethod
     def is_vulnerable(client) -> bool:
-        if hasattr(client, "get_attributes"):
-            attributes = client.get_attributes()
-        elif hasattr(client, "get"):
-            attributes = client.get("attributes", {})
-        else:
-            attributes = getattr(client, "attributes", {})
-
+        attributes = client.get_attributes()
         # Check for specific weak algorithms
         algo = attributes.get("saml.signature.algorithm", "")
         weak_algos = ["RSA_SHA1", "DSA_SHA1"]
