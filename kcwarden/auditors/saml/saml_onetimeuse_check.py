@@ -11,13 +11,7 @@ class SamlOneTimeUseCheck(Auditor):
         if not self.is_not_ignored(client):
             return False
             
-        if hasattr(client, "get_protocol"):
-            protocol = client.get_protocol()
-        elif hasattr(client, "get"):
-            protocol = client.get("protocol")
-        else:
-            protocol = getattr(client, "protocol", None)
-
+        protocol = client.get_protocol()
         return protocol == "saml"
 
     @staticmethod
