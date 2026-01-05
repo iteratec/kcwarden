@@ -22,13 +22,7 @@ class SamlOneTimeUseCheck(Auditor):
 
     @staticmethod
     def is_vulnerable(client) -> bool:
-        if hasattr(client, "get_attributes"):
-            attributes = client.get_attributes()
-        elif hasattr(client, "get"):
-            attributes = client.get("attributes", {})
-        else:
-            attributes = getattr(client, "attributes", {})
-
+        attributes = client.get_attributes()
         # Check for saml.onetimeuse.condition
         val = attributes.get("saml.onetimeuse.condition", "false")
         return val != "true"

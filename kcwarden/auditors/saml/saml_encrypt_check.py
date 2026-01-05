@@ -22,13 +22,7 @@ class SamlEncryptCheck(Auditor):
 
     @staticmethod
     def is_vulnerable(client) -> bool:
-        if hasattr(client, "get_attributes"):
-            attributes = client.get_attributes()
-        elif hasattr(client, "get"):
-            attributes = client.get("attributes", {})
-        else:
-            attributes = getattr(client, "attributes", {})
-
+        attributes = client.get_attributes()
         # Check for saml.encrypt
         val = attributes.get("saml.encrypt", "false")
         return val != "true"
