@@ -208,3 +208,37 @@ It is highly recommended to explicitly set the redirect URIs for this client.
 The auditor triggers if a client sets an override for the access token lifespan
 and if the value is too long.
 See the realm auditor [AccessTokenLifespanTooLong](./realm.md#AccessTokenLifespanTooLong) for details.
+
+## SamlClientAssertionSignatureCheck
+
+This auditor identifies SAML clients configured to issue tokens without signing the Assertion block. By default, Keycloak might not enforce signing of the specific assertion element within the SAML response.
+
+This configuration allows for Token Forgery or Signature Exclusion attacks. If the Service Provider (SP) accepts unsigned assertions, an attacker could capture the XML, modify the NameID (username) or Roles, Base64 encode it, and potentially impersonate any user or escalate privileges. To prevent this, the saml.assertion.signature attribute should be set to true, ensuring Keycloak cryptographically signs the assertion block.
+
+## SamlClientEncryptCheck
+
+This auditor checks if the SAML client is configured to encrypt the SAML Assertion. When disabled, the SAML Assertion is transmitted as a standard Base64 encoded XML string, effectively in cleartext.
+
+The absence of encryption leads to Information Disclosure, as intermediaries can easily read Personally Identifiable Information (PII) contained in the assertion. Critically, sending assertions in cleartext significantly facilitates XML Signature Wrapping (XSW) attacks. Without encryption, an attacker can manipulate the XML structure without needing the Service Provider's private key to decrypt and re-encrypt the payload. It is highly recommended to enable saml.encrypt to ensure confidentiality and integrity.
+
+## SamlClientOneTimeUseCheck
+
+This auditor detects if the <OneTimeUse> condition is omitted from SAML Assertions issued by Keycloak. While the Service Provider (SP) is technically responsible for tracking used Assertion IDs (jti) to prevent replay attacks, relying solely on the SP is risky if the SP is stateless or has a flushed cache.
+
+Keycloak should be configured to explicitly add the OneTimeUse condition to the assertion. This acts as a critical defense-in-depth measure against SAML Token Replay attacks. If an attacker steals a token, this condition signals to the SP that the token must not be accepted more than once, enforcing stricter validation rules.
+
+## SamlClientSignatureCheck
+
+This auditor verifies if Keycloak is configured to validate the digital signature of the AuthnRequest sent by the Service Provider. If this check (saml.client.signature) is disabled, Keycloak will process login requests from the SP without verifying their authenticity.
+
+This misconfiguration exposes the system to AuthnRequest Spoofing and Login CSRF. An attacker could generate a fake login request, potentially forcing a victim to log into an attacker-controlled account. Furthermore, if the AssertionConsumerServiceURL is not strictly validated elsewhere, an attacker could alter the request to redirect the token to a malicious location. Keycloak should always be configured to require and verify client signatures for SAML requests.
+
+## SamlClientWeakAlgorithmCheck
+
+This auditor scans SAML clients for the use of weak signature algorithms, specifically RSA_SHA1 or DSA_SHA1. Although these algorithms were standards in the past, they are now considered cryptographically weak and are deprecated in modern security standards.
+
+Using these algorithms leaves the signing process vulnerable to collision attacks, potentially allowing attackers to forge signatures. It is strongly recommended to update the saml.signature.algorithm to a stronger standard, such as RSA_SHA256 or higher, to ensure the cryptographic integrity of the SAML exchange.
+
+## SamlClientWildcardRedirectUriCheck
+
+This auditor identifies SAML clients that utilize wildcard characters /* at the end of their configured Redirect URIs (Assertion Consumer Service URLs). For example, a configuration like http://localhost:9009/* is considered dangerous. Wildcards in this context facilitate Open Redirect vulnerabilities and Token Theft. It allows Keycloak to redirect the user (and the SAML artifact) to any subdirectory or path under the specified domain. If the application running on that domain has an open redirect vulnerability or allows user-generated content, an attacker could manipulate the URL to steal the authorization code or SAML artifact. Redirect URIs should be explicit and specific to prevent unauthorized redirection.
