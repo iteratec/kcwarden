@@ -8,16 +8,10 @@ class SamlClientOneTimeUseCheck(Auditor):
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        return self.is_not_ignored(client) and client.get_protocol() == "saml"
-
-    @staticmethod
-    def is_vulnerable(client) -> bool:
-        attributes = client.get_attributes()
-        val = attributes.get("saml.onetimeuse.condition", "false")
-        return val != "true"
+        return self.is_not_ignored(client) and client.is_saml_client()
 
     def audit(self):
         for client in self._DB.get_all_clients():
             if self.should_consider_client(client):
-                if self.is_vulnerable(client):
+                if not client.is_saml_onetimeuse_condition_enabled():
                     yield self.generate_finding(client)

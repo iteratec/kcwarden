@@ -1,8 +1,6 @@
 import pytest
 from unittest.mock import Mock
 
-# Adjust the import path below to match where your file is actually located within your project structure
-# e.g., from kcwarden.auditors.idp.saml_idp_want_assertions_signed import SamlIdpWantAssertionsSignedCheck
 from kcwarden.auditors.idp.saml_idp_want_assertions_signed import SamlIdpWantAssertionsSignedCheck
 from kcwarden.custom_types import config_keys
 
@@ -15,73 +13,59 @@ class TestSamlIdpWantAssertionsSignedCheck:
         return auditor_instance
 
     @pytest.mark.parametrize(
-        "provider_id, expected",
+        "is_saml, expected",
         [
-            ("saml", True),  # SAML provider should be considered
-            ("oidc", False),  # OIDC provider should not be considered
-            ("keycloak-oidc", False),  # Keycloak OIDC provider should not be considered
-            ("github", False),  # Github provider should not be considered
+            (True, True),   # SAML provider should be considered
+            (False, False), # Non-SAML provider should not be considered
         ],
     )
-    def test_should_consider_idp(self, auditor, provider_id, expected):
+    def test_should_consider_idp(self, auditor, is_saml, expected):
         mock_idp = Mock()
-        mock_idp.get_provider_id.return_value = provider_id
+        mock_idp.is_saml_provider.return_value = is_saml
         assert auditor.should_consider_idp(mock_idp) == expected
 
-    @pytest.mark.parametrize(
-        "config, expected",
-        [
-            ({"wantAssertionsSigned": "true"}, False),  # Signed assertions required -> Not vulnerable
-            ({"wantAssertionsSigned": "false"}, True),  # Signed assertions not required -> Vulnerable
-            ({}, True),  # Config missing (defaults to false) -> Vulnerable
-            ({"wantAssertionsSigned": "garbage"}, True),  # Invalid value (defaults to false logic) -> Vulnerable
-        ],
-    )
-    def test_is_vulnerable(self, auditor, config, expected):
+    def test_audit_function_no_findings(self, auditor):
         mock_idp = Mock()
-        mock_idp.get_config.return_value = config
-        assert auditor.is_vulnerable(mock_idp) == expected
-
-    def test_audit_function_no_findings(self, auditor, mock_idp):
-        # Setup SAML IDP with signed assertions enabled
-        mock_idp.get_provider_id.return_value = "saml"
-        mock_idp.get_config.return_value = {"wantAssertionsSigned": "true"}
+        # Setup SAML IDP: Signed Assertions Enabled (Secure)
+        mock_idp.is_saml_provider.return_value = True
+        mock_idp.is_want_assertions_signed.return_value = True
+        
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         results = list(auditor.audit())
         assert len(results) == 0
 
-    def test_audit_function_with_findings(self, auditor, mock_idp):
-        # Setup SAML IDP with signed assertions disabled
-        mock_idp.get_provider_id.return_value = "saml"
-        mock_idp.get_config.return_value = {"wantAssertionsSigned": "false"}
+    def test_audit_function_with_findings(self, auditor):
+        mock_idp = Mock()
+        # Setup SAML IDP: Signed Assertions Disabled (Vulnerable)
+        mock_idp.is_saml_provider.return_value = True
+        mock_idp.is_want_assertions_signed.return_value = False
+        
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         results = list(auditor.audit())
         assert len(results) == 1
 
     def test_audit_function_multiple_idps(self, auditor):
-        # Create separate mock IDPs with distinct settings
-        
         # IDP 1: SAML, Vulnerable (false)
         idp1 = Mock()
-        idp1.get_provider_id.return_value = "saml"
-        idp1.get_config.return_value = {"wantAssertionsSigned": "false"}
+        idp1.is_saml_provider.return_value = True
+        idp1.is_want_assertions_signed.return_value = False
 
         # IDP 2: SAML, Secure (true)
         idp2 = Mock()
-        idp2.get_provider_id.return_value = "saml"
-        idp2.get_config.return_value = {"wantAssertionsSigned": "true"}
+        idp2.is_saml_provider.return_value = True
+        idp2.is_want_assertions_signed.return_value = True
 
         # IDP 3: OIDC, Vulnerable config (but should be ignored by provider type)
         idp3 = Mock()
-        idp3.get_provider_id.return_value = "oidc"
-        idp3.get_config.return_value = {"wantAssertionsSigned": "false"}
+        idp3.is_saml_provider.return_value = False
+        idp3.is_want_assertions_signed.return_value = False
 
-        # IDP 4: SAML, Vulnerable (missing config)
+        # IDP 4: SAML, Vulnerable (simulating missing config logic handled by IDP class)
         idp4 = Mock()
-        idp4.get_provider_id.return_value = "saml"
-        idp4.get_config.return_value = {}
+        idp4.is_saml_provider.return_value = True
+        idp4.is_want_assertions_signed.return_value = False
 
         auditor._DB.get_all_identity_providers.return_value = [idp1, idp2, idp3, idp4]
         results = list(auditor.audit())
@@ -89,17 +73,23 @@ class TestSamlIdpWantAssertionsSignedCheck:
         # Expect findings from idp1 and idp4 only
         assert len(results) == 2
 
-    def test_ignore_list_functionality(self, auditor, mock_idp):
+    def test_ignore_list_functionality(self, auditor):
+        mock_idp = Mock()
         # Setup Vulnerable SAML IDP
-        mock_idp.get_provider_id.return_value = "saml"
-        mock_idp.get_config.return_value = {"wantAssertionsSigned": "false"}
+        mock_idp.is_saml_provider.return_value = True
+        mock_idp.is_want_assertions_signed.return_value = False
         
         mock_idp.get_alias.return_value = "ignored_idp"
-        mock_idp.get_name.return_value = mock_idp.get_alias.return_value
+        mock_idp.get_name.return_value = "ignored_idp"
+        
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         # Add the IDP to the ignore list
-        auditor._CONFIG = {config_keys.AUDITOR_CONFIG: {auditor.get_classname(): ["ignored_idp"]}}
+        auditor._CONFIG = {
+            config_keys.AUDITOR_CONFIG: {
+                auditor.get_classname(): ["ignored_idp"]
+            }
+        }
 
         results = list(auditor.audit())
-        assert len(results) == 0  # No findings due to ignore list
+        assert len(results) == 0
