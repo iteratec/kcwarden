@@ -13,81 +13,78 @@ class TestSamlIdpPostBindingResponseCheck:
         return auditor_instance
 
     @pytest.mark.parametrize(
-        "provider_id, expected",
+        "is_saml, expected",
         [
-            ("saml", True),  # SAML provider should be considered
-            ("oidc", False),  # OIDC provider should not be considered
-            ("keycloak-oidc", False),  # Keycloak OIDC should not be considered
+            (True, True),   # SAML provider should be considered
+            (False, False), # Non-SAML provider should not be considered
         ],
     )
-    def test_should_consider_idp(self, auditor, provider_id, expected):
+    def test_should_consider_idp(self, auditor, is_saml, expected):
         mock_idp = Mock()
-        mock_idp.get_provider_id.return_value = provider_id
+        mock_idp.is_saml_provider.return_value = is_saml
         assert auditor.should_consider_idp(mock_idp) == expected
 
-    @pytest.mark.parametrize(
-        "config, expected",
-        [
-            ({"postBindingResponse": "true"}, False),  # Post Binding enabled (Safe)
-            ({"postBindingResponse": "false"}, True),  # Post Binding disabled (Vulnerable)
-            ({}, True),  # Config missing (Default is false -> Vulnerable)
-        ],
-    )
-    def test_is_vulnerable(self, auditor, config, expected):
+    def test_audit_function_no_findings(self, auditor):
         mock_idp = Mock()
-        mock_idp.get_config.return_value = config
-        assert auditor.is_vulnerable(mock_idp) == expected
-
-    def test_audit_function_no_findings(self, auditor, mock_idp):
-        # Setup IDP with correct configuration (Post Binding Response enabled)
-        mock_idp.get_provider_id.return_value = "saml"
-        mock_idp.get_config.return_value = {"postBindingResponse": "true"}
+        # Setup IDP: Is SAML + Post Binding Enabled (Safe)
+        mock_idp.is_saml_provider.return_value = True
+        mock_idp.is_post_binding_response_enabled.return_value = True
+        
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         results = list(auditor.audit())
         assert len(results) == 0
 
-    def test_audit_function_with_findings(self, auditor, mock_idp):
-        # Setup IDP with vulnerable configuration (Post Binding Response disabled)
-        mock_idp.get_provider_id.return_value = "saml"
-        mock_idp.get_config.return_value = {"postBindingResponse": "false"}
+    def test_audit_function_with_findings(self, auditor):
+        mock_idp = Mock()
+        # Setup IDP: Is SAML + Post Binding Disabled (Vulnerable)
+        mock_idp.is_saml_provider.return_value = True
+        mock_idp.is_post_binding_response_enabled.return_value = False
+        
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         results = list(auditor.audit())
         assert len(results) == 1
 
     def test_audit_function_multiple_idps(self, auditor):
-        # Create separate mock IDPs with distinct settings
-        
-        # IDP 1: Vulnerable SAML
+        # IDP 1: Vulnerable SAML (Post Binding Disabled)
         idp1 = Mock()
-        idp1.get_provider_id.return_value = "saml"
-        idp1.get_config.return_value = {"postBindingResponse": "false"}
+        idp1.is_saml_provider.return_value = True
+        idp1.is_post_binding_response_enabled.return_value = False
 
-        # IDP 2: Safe SAML
+        # IDP 2: Safe SAML (Post Binding Enabled)
         idp2 = Mock()
-        idp2.get_provider_id.return_value = "saml"
-        idp2.get_config.return_value = {"postBindingResponse": "true"}
+        idp2.is_saml_provider.return_value = True
+        idp2.is_post_binding_response_enabled.return_value = True
 
         # IDP 3: OIDC (Should be ignored regardless of config)
         idp3 = Mock()
-        idp3.get_provider_id.return_value = "oidc"
-        idp3.get_config.return_value = {"postBindingResponse": "false"}
+        idp3.is_saml_provider.return_value = False
+        # Even if this method returns False, it shouldn't trigger because is_saml_provider is False
+        idp3.is_post_binding_response_enabled.return_value = False
 
         auditor._DB.get_all_identity_providers.return_value = [idp1, idp2, idp3]
         results = list(auditor.audit())
-        assert len(results) == 1  # Expect finding from idp1 only
+        
+        assert len(results) == 1
 
-    def test_ignore_list_functionality(self, auditor, mock_idp):
-        # Setup IDP that is vulnerable but should be ignored
-        mock_idp.get_provider_id.return_value = "saml"
-        mock_idp.get_config.return_value = {"postBindingResponse": "false"}
+    def test_ignore_list_functionality(self, auditor):
+        mock_idp = Mock()
+        # Setup IDP: Vulnerable SAML
+        mock_idp.is_saml_provider.return_value = True
+        mock_idp.is_post_binding_response_enabled.return_value = False
+        
         mock_idp.get_alias.return_value = "ignored_idp"
-        mock_idp.get_name.return_value = mock_idp.get_alias.return_value
+        mock_idp.get_name.return_value = "ignored_idp"
+        
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
-        # Add the IDP to the ignore list
-        auditor._CONFIG = {config_keys.AUDITOR_CONFIG: {auditor.get_classname(): ["ignored_idp"]}}
+        # Add the IDP to the ignore list in the config
+        auditor._CONFIG = {
+            config_keys.AUDITOR_CONFIG: {
+                auditor.get_classname(): ["ignored_idp"]
+            }
+        }
 
         results = list(auditor.audit())
-        assert len(results) == 0  # No findings due to ignore list
+        assert len(results) == 0

@@ -8,17 +8,10 @@ class SamlIdpWantAssertionsEncryptedCheck(Auditor):
     REFERENCE = ""
 
     def should_consider_idp(self, idp) -> bool:
-        return self.is_not_ignored(idp) and idp.get_provider_id() == "saml"
-
-    def is_vulnerable(self, idp) -> bool:
-        config = idp.get_config()
-        val = config.get("wantAssertionsEncrypted", "false")
-        return val != "true"
+        return self.is_not_ignored(idp) and idp.is_saml_provider()
 
     def audit(self):
         for idp in self._DB.get_all_identity_providers():
-            if not self.should_consider_idp(idp):
-                continue
-            if not self.is_vulnerable(idp):
-                continue  
-            yield self.generate_finding(idp)
+            if self.should_consider_idp(idp):
+                if not idp.is_want_assertions_encrypted():
+                    yield self.generate_finding(idp)

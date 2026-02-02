@@ -8,26 +8,20 @@ class SamlClientWildcardRedirectUriCheck(Auditor):
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        return self.is_not_ignored(client) and client.get_protocol() == "saml"
+        return self.is_not_ignored(client) and client.is_saml_client()
 
-    def is_vulnerable(self, client) -> bool:
-        uris = client.get_redirect_uris()
-
+    def get_vulnerable_uris(self, client) -> list[str]:
+        uris = client.get_resolved_redirect_uris()
         if not uris:
-            return False
-
-        for uri in uris:
-            # Check for trailing wildcard
-            if uri and uri.strip().endswith("*"):
-                return True
-        return False
+            return []
+        return [uri for uri in uris if uri and uri.strip().endswith("*")]
 
     def audit(self):
         for client in self._DB.get_all_clients():
             if self.should_consider_client(client):
-                if self.is_vulnerable(client):
-                    # Re-fetch URIs for the report detail
-                    uris = client.get_redirect_uris()
-                    bad_uris = [u for u in uris if u.endswith("*")]
-                    
-                    yield self.generate_finding(client, additional_details={"vulnerable_uris": bad_uris})
+                bad_uris = self.get_vulnerable_uris(client)
+                if bad_uris:
+                    yield self.generate_finding(
+                        client, 
+                        additional_details={"vulnerable_uris": bad_uris}
+                    )
