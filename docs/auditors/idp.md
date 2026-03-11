@@ -56,3 +56,51 @@ However, if dynamic synchronization of user attributes and roles with the upstre
 This setting can be applied globally to the IDP, affecting all user data, including name and email, or specifically to relevant mappers, allowing for selective updates based on upstream changes.
 
 This finding carries a higher severity compared to the general recommendation for enabling `Force` sync mode due to the explicit use of Identity Provider Mappers, indicating a reliance on upstream IDP data for crucial access control decisions.
+
+## SamlIdpPostBindingResponseCheck
+
+This auditor warns about SAML Identity Providers configured to use the **HTTP-Redirect (GET)** binding instead of the **HTTP-POST** binding for responses.
+This occurs when the `Post Binding Response` setting is disabled.
+
+When using HTTP-Redirect, the entire SAML XML payload is encoded into the URL query parameters.
+This places sensitive token data into the URL, which is frequently recorded in browser history, proxy logs, and firewall logs, leading to potential data leakage.
+Additionally, this configuration risks Denial of Service (DoS) issues, as the large XML payload can easily exceed browser or server URL length limits, causing login failures.
+
+We recommend enabling `Post Binding Response` to ensure the SAML payload is sent within the HTTP body rather than the URL.
+
+## SamlIdpValidateSignatureCheck
+
+This auditor warns about SAML Identity Providers configured with `Validate Signature` set to `false`.
+When disabled, Keycloak accepts SAML responses without verifying the digital signature of the upstream Identity Provider.
+
+This is a critical security risk.
+Without signature verification, an attacker can forge a completely fabricated SAML response or inject a malicious assertion into a valid response (known as XML Signature Wrapping or XSW).
+This effectively allows an attacker to log in as any user, including administrators, without a valid password.
+We strongly recommend ensuring that `Validate Signature` is enabled for all SAML providers.
+
+## SamlIdpWantAssertionsEncryptedCheck
+
+This auditor identifies SAML Identity Providers that do not require assertions to be encrypted (`Want Assertions Encrypted` is disabled).
+When assertions are unencrypted, they are transported as Base64 strings that can be easily decoded.
+
+Because the assertion passes through the user's browser (User Agent), any Sensitive Personally Identifiable Information (PII) contained within—such as emails, phone numbers, or group memberships—becomes visible in plain text.
+This data can be exposed in browser network tabs, browser extensions, and intermediate proxy logs.
+To prevent confidentiality breaches and PII leakage, we recommend enabling encryption for assertions.
+
+## SamlIdpWantAssertionsSignedCheck
+
+This auditor warns about SAML Identity Providers where `Want Assertions Signed` is disabled.
+While the outer SAML Response envelope might be validly signed (if `Validate Signature` is on), the specific Assertion element containing the user identity is not required to be signed in this configuration.
+
+This allows for **Assertion Substitution** attacks.
+An attacker could take a valid, signed response envelope and replace the internal assertion with a forged one, bypassing authentication integrity.
+For robust security, both the outer envelope and the inner assertions should be signed to prevent identity spoofing.
+
+## SamlIdpWantAuthnRequestsSignedCheck
+
+This auditor flags SAML Identity Providers where `Want AuthnRequests Signed` is disabled.
+In this state, Keycloak sends authentication requests to the Identity Provider without a signature, causing the IdP to treat them as anonymous requests.
+
+This configuration increases the risk of **IdP Confusion** and **Login CSRF** attacks.
+It allows an attacker to craft malicious login links that force a user to authenticate against an attacker-controlled IdP or manipulate the login context, potentially leading to session hijacking.
+We recommend enabling signed authentication requests to ensure the IdP can verify the origin of the login attempt.

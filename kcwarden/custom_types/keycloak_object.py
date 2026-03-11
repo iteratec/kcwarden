@@ -585,6 +585,28 @@ class Client(Dataclass):
 
     def is_oidc_client(self) -> bool:
         return self.get_protocol() == "openid-connect"
+    
+    def is_saml_client(self) -> bool:
+        return self.get_protocol() == "saml"
+
+    def get_saml_assertion_signature(self) -> bool:
+        val = self.get_attributes().get("saml.assertion.signature", "false")
+        return str(val).lower() == "true"
+
+    def get_saml_signature_algorithm(self) -> str:
+        return self.get_attributes().get("saml.signature.algorithm", "")
+
+    def is_saml_encryption_enabled(self) -> bool:
+        val = self.get_attributes().get("saml.encrypt", "false")
+        return str(val).lower() == "true"
+
+    def is_saml_onetimeuse_condition_enabled(self) -> bool:
+        val = self.get_attributes().get("saml.onetimeuse.condition", "false")
+        return val == "true"
+
+    def is_saml_client_signature_required(self) -> bool:
+        val = self.get_attributes().get("saml.client.signature", "false")
+        return val == "true"
 
     def get_attributes(self) -> dict[str, str]:
         return self._d["attributes"]
@@ -957,3 +979,26 @@ class IdentityProvider(Dataclass):
 
     def get_sync_mode(self) -> str | None:
         return self._d["config"].get("syncMode", "LEGACY")
+
+    def is_saml_provider(self) -> bool:
+        return self.get_provider_id() == "saml"
+
+    def is_post_binding_response_enabled(self) -> bool:
+        val = self.get_config().get("postBindingResponse", "false")
+        return val == "true"
+
+    def is_signature_validation_enabled(self) -> bool:
+        val = self.get_config().get("validateSignature", "false")
+        return val == "true"
+
+    def is_want_assertions_encrypted(self) -> bool:
+        val = self.get_config().get("wantAssertionsEncrypted", "false")
+        return val == "true"
+
+    def is_want_assertions_signed(self) -> bool:
+        val = self.get_config().get("wantAssertionsSigned", "false")
+        return val == "true"
+
+    def is_want_authn_requests_signed(self) -> bool:
+        val = self.get_config().get("wantAuthnRequestsSigned", "false")
+        return val == "true"
