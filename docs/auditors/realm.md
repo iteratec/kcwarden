@@ -121,3 +121,9 @@ An attacker can use it until it expires.
 Since an access token is stateless, it cannot be revoked.
 The worst case is a configured lifespan of `0` since that leads to unlimited validity of the tokens.
 A recommended lifespan is 1 to 5 minutes, or 10 minutes at maximum.
+
+## OfflineSessionMaxLifespanDisabled
+
+This auditor flags realms where the maximum lifespan for offline sessions is not enforced.
+When this setting is disabled (which is the Keycloak default), offline tokens can be renewed indefinitely as long as they are used within the idle timeout, effectively granting permanent access.
+In environments with upstream identity providers or strict session governance requirements, this undermines token revocation and session expiry controls.
