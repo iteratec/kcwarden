@@ -22,9 +22,4 @@ class OfflineSessionMaxLifespanDisabled(AbstractRealmAuditor):
 
     def audit_realm(self, realm: Realm) -> Generator[Result, None, None]:
         if self.realm_has_offline_session_max_lifespan_disabled(realm):
-            yield self.generate_finding(
-                realm,
-                additional_details={
-                    "offline_session_idle_timeout": realm.get_offline_session_idle_timeout(),
-                },
-            )
+            yield self.generate_finding(realm)

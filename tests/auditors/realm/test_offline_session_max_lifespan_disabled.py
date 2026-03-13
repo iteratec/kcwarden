@@ -33,26 +33,20 @@ class TestOfflineSessionMaxLifespanDisabled:
 
     def test_audit_function_with_findings(self, auditor, mock_realm):
         mock_realm.is_offline_session_max_lifespan_enabled.return_value = False
-        mock_realm.get_offline_session_idle_timeout.return_value = 2592000
         auditor._DB.get_all_realms.return_value = [mock_realm]
 
         results = list(auditor.audit())
         assert len(results) == 1
 
-        finding = results[0]
-        assert finding.additional_details["offline_session_idle_timeout"] == 2592000
-
     def test_audit_function_multiple_realms(self, auditor):
         realm1 = Mock()
         realm1.is_offline_session_max_lifespan_enabled.return_value = False
-        realm1.get_offline_session_idle_timeout.return_value = 2592000
 
         realm2 = Mock()
         realm2.is_offline_session_max_lifespan_enabled.return_value = True
 
         realm3 = Mock()
         realm3.is_offline_session_max_lifespan_enabled.return_value = False
-        realm3.get_offline_session_idle_timeout.return_value = 1296000
 
         auditor._DB.get_all_realms.return_value = [realm1, realm2, realm3]
         results = list(auditor.audit())

@@ -60,9 +60,6 @@ class Realm(Dataclass):
     def is_offline_session_max_lifespan_enabled(self) -> bool:
         return self._d["offlineSessionMaxLifespanEnabled"]
 
-    def get_offline_session_idle_timeout(self) -> int:
-        return self._d["offlineSessionIdleTimeout"]
-
     def get_unmanaged_attribute_policy(self) -> str | None:
         try:
             attribute_config = json.loads(
