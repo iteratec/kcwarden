@@ -5,6 +5,7 @@ from kcwarden.auditors.client.saml_client_assertion_signature import (
     SamlClientAssertionSignatureCheck,
 )
 
+
 class TestSamlClientAssertionSignatureCheck:
     @pytest.fixture
     def auditor(self, database, default_config):
@@ -65,9 +66,9 @@ class TestSamlClientAssertionSignatureCheck:
         client_oidc.get_saml_assertion_signature.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_secure, client_vuln, client_oidc]
-        
+
         results = list(auditor.audit())
-        
+
         assert len(results) == 1
-        
+
         assert results[0]._offending_object.name == "vuln-client"

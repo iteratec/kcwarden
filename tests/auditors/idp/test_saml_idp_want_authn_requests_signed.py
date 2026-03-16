@@ -17,8 +17,8 @@ class TestSamlIdpWantAuthnRequestsSignedCheck:
     @pytest.mark.parametrize(
         "is_saml, expected",
         [
-            (True, True),   # SAML provider should be considered
-            (False, False), # Non-SAML provider should not be considered
+            (True, True),  # SAML provider should be considered
+            (False, False),  # Non-SAML provider should not be considered
         ],
     )
     def test_should_consider_idp(self, auditor, is_saml, expected):
@@ -32,7 +32,7 @@ class TestSamlIdpWantAuthnRequestsSignedCheck:
         # Setup IDP: SAML + Signed Requests Enabled (Secure)
         mock_idp.is_saml_provider.return_value = True
         mock_idp.is_want_authn_requests_signed.return_value = True
-        
+
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         results = list(auditor.audit())
@@ -43,7 +43,7 @@ class TestSamlIdpWantAuthnRequestsSignedCheck:
         # Setup IDP: SAML + Signed Requests Disabled (Vulnerable)
         mock_idp.is_saml_provider.return_value = True
         mock_idp.is_want_authn_requests_signed.return_value = False
-        
+
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
         results = list(auditor.audit())
@@ -67,7 +67,7 @@ class TestSamlIdpWantAuthnRequestsSignedCheck:
 
         auditor._DB.get_all_identity_providers.return_value = [idp1, idp2, idp3]
         results = list(auditor.audit())
-        
+
         assert len(results) == 1
 
     def test_ignore_list_functionality(self, auditor):
@@ -75,17 +75,13 @@ class TestSamlIdpWantAuthnRequestsSignedCheck:
         # Setup IDP: Vulnerable SAML
         mock_idp.is_saml_provider.return_value = True
         mock_idp.is_want_authn_requests_signed.return_value = False
-        
+
         mock_idp.get_alias.return_value = "ignored_idp"
         mock_idp.get_name.return_value = "ignored_idp"
-        
+
         auditor._DB.get_all_identity_providers.return_value = [mock_idp]
 
-        auditor._CONFIG = {
-            config_keys.AUDITOR_CONFIG: {
-                auditor.get_classname(): ["ignored_idp"]
-            }
-        }
+        auditor._CONFIG = {config_keys.AUDITOR_CONFIG: {auditor.get_classname(): ["ignored_idp"]}}
 
         results = list(auditor.audit())
         assert len(results) == 0

@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from kcwarden.auditors.client.saml_client_encrypt_check import SamlClientEncryptCheck
 
+
 class TestSamlClientEncryptCheck:
     @pytest.fixture
     def auditor(self, database, default_config):
@@ -53,11 +54,11 @@ class TestSamlClientEncryptCheck:
         client_oidc.name = "oidc-client"
         client_oidc.__str__ = Mock(return_value="oidc-client")
         client_oidc.is_saml_client.return_value = False
-        client_oidc.is_saml_encryption_enabled.return_value = False 
+        client_oidc.is_saml_encryption_enabled.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_secure, client_vuln, client_oidc]
-        
+
         results = list(auditor.audit())
-        
+
         assert len(results) == 1
         assert results[0]._offending_object.name == "vuln-saml"

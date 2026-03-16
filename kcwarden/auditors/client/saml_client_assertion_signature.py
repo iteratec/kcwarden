@@ -1,6 +1,7 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
+
 class SamlClientAssertionSignatureCheck(Auditor):
     DEFAULT_SEVERITY = Severity.High
     SHORT_DESCRIPTION = "SAML Assertion block is not signed"

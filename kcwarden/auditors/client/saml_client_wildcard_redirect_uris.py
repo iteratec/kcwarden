@@ -1,6 +1,7 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
+
 class SamlClientWildcardRedirectUriCheck(Auditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Client allows wildcard redirect URIs"
@@ -21,7 +22,4 @@ class SamlClientWildcardRedirectUriCheck(Auditor):
             if self.should_consider_client(client):
                 bad_uris = self.get_vulnerable_uris(client)
                 if bad_uris:
-                    yield self.generate_finding(
-                        client, 
-                        additional_details={"vulnerable_uris": bad_uris}
-                    )
+                    yield self.generate_finding(client, additional_details={"vulnerable_uris": bad_uris})
