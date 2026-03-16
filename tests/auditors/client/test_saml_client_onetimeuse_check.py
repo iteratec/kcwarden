@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from kcwarden.auditors.client.saml_client_onetimeuse_check import SamlClientOneTimeUseCheck
 
+
 class TestSamlClientOneTimeUseCheck:
     @pytest.fixture
     def auditor(self, database, default_config):
@@ -56,8 +57,8 @@ class TestSamlClientOneTimeUseCheck:
         client_oidc.is_saml_onetimeuse_condition_enabled.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_secure, client_vuln, client_oidc]
-        
+
         results = list(auditor.audit())
-        
+
         assert len(results) == 1
         assert results[0]._offending_object.name == "vuln-saml"

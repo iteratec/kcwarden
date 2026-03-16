@@ -5,6 +5,7 @@ from kcwarden.auditors.client.saml_client_wildcard_redirect_uris import (
     SamlClientWildcardRedirectUriCheck,
 )
 
+
 class TestSamlClientWildcardRedirectUriCheck:
     @pytest.fixture
     def auditor(self, database, default_config):
@@ -50,7 +51,7 @@ class TestSamlClientWildcardRedirectUriCheck:
         client_safe.__str__ = Mock(return_value="safe-saml")
         client_safe.is_saml_client.return_value = True
         client_safe.get_resolved_redirect_uris.return_value = ["https://ok.com"]
-        
+
         client_vuln = Mock()
         client_vuln.name = "vuln-saml"
         client_vuln.__str__ = Mock(return_value="vuln-saml")
@@ -64,9 +65,9 @@ class TestSamlClientWildcardRedirectUriCheck:
         client_oidc.get_resolved_redirect_uris.return_value = ["https://bad-oidc.com/*"]
 
         auditor._DB.get_all_clients.return_value = [client_safe, client_vuln, client_oidc]
-        
+
         results = list(auditor.audit())
-        
+
         assert len(results) == 1
         assert results[0]._offending_object.name == "vuln-saml"
         assert results[0].additional_details["vulnerable_uris"] == ["https://bad.com/*"]

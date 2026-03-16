@@ -1,6 +1,7 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
+
 class SamlIdpWantAssertionsSignedCheck(Auditor):
     DEFAULT_SEVERITY = Severity.High
     SHORT_DESCRIPTION = "SAML IdP 'Want Assertions Signed' is disabled"

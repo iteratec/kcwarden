@@ -588,7 +588,7 @@ class Client(Dataclass):
 
     def is_oidc_client(self) -> bool:
         return self.get_protocol() == "openid-connect"
-    
+
     def is_saml_client(self) -> bool:
         return self.get_protocol() == "saml"
 

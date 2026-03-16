@@ -1,6 +1,7 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
+
 class SamlClientOneTimeUseCheck(Auditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "SAML OneTimeUse condition not enabled"

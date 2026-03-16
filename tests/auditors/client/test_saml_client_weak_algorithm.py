@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from kcwarden.auditors.client.saml_client_weak_algorithm import SamlClientWeakAlgorithmCheck
 
+
 class TestSamlClientWeakAlgorithmCheck:
     @pytest.fixture
     def auditor(self, database, default_config):
@@ -39,7 +40,7 @@ class TestSamlClientWeakAlgorithmCheck:
         mock_client.is_saml_client.return_value = True
         mock_client.get_saml_signature_algorithm.return_value = algorithm
         auditor._DB.get_all_clients.return_value = [mock_client]
-        
+
         results = list(auditor.audit())
         assert len(results) == expected_findings
 
@@ -51,7 +52,7 @@ class TestSamlClientWeakAlgorithmCheck:
         client_oidc.name = "oidc"
         client_oidc.__str__ = Mock(return_value="oidc")
         client_oidc.is_saml_client.return_value = False
-        client_oidc.get_saml_signature_algorithm.return_value = "RSA_SHA1" 
+        client_oidc.get_saml_signature_algorithm.return_value = "RSA_SHA1"
 
         client_strong = Mock()
         client_strong.name = "strong"
@@ -66,9 +67,9 @@ class TestSamlClientWeakAlgorithmCheck:
         client_weak.get_saml_signature_algorithm.return_value = "RSA_SHA1"
 
         auditor._DB.get_all_clients.return_value = [client_oidc, client_strong, client_weak]
-        
+
         results = list(auditor.audit())
-        
+
         assert len(results) == 1
         assert results[0]._offending_object.name == "weak"
-        assert results[0].additional_details['detected_algorithm'] == "RSA_SHA1"
+        assert results[0].additional_details["detected_algorithm"] == "RSA_SHA1"

@@ -1,6 +1,7 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
+
 class SamlIdpWantAssertionsEncryptedCheck(Auditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "SAML IdP 'Want Assertions Encrypted' is disabled"

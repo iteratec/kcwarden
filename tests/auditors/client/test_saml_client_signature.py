@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 from kcwarden.auditors.client.saml_client_signature import SamlClientSignatureCheck
 
+
 class TestSamlClientSignatureCheck:
     @pytest.fixture
     def auditor(self, database, default_config):
@@ -58,8 +59,8 @@ class TestSamlClientSignatureCheck:
         client_vuln.is_saml_client_signature_required.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_oidc, client_secure, client_vuln]
-        
+
         results = list(auditor.audit())
-        
+
         assert len(results) == 1
         assert results[0]._offending_object.name == "vuln-saml"
