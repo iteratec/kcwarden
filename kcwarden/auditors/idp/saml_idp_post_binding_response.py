@@ -1,6 +1,7 @@
 from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
+
 class SamlIdpPostBindingResponseCheck(Auditor):
     DEFAULT_SEVERITY = Severity.Low
     SHORT_DESCRIPTION = "SAML IdP uses HTTP-Redirect (GET) binding"
