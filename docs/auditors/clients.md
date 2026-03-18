@@ -208,3 +208,13 @@ It is highly recommended to explicitly set the redirect URIs for this client.
 The auditor triggers if a client sets an override for the access token lifespan
 and if the value is too long.
 See the realm auditor [AccessTokenLifespanTooLong](./realm.md#AccessTokenLifespanTooLong) for details.
+
+## ClientWebOriginsMustBeValid
+
+This auditor checks if the `webOrigins` entries configured for a client are valid origins as defined by [RFC 6454](https://datatracker.ietf.org/doc/html/rfc6454#section-3.2).
+Keycloak uses the `webOrigins` setting to control which origins are permitted for CORS requests.
+Each entry must be of the form `scheme://host` or `scheme://host:port`, without a path, query string, or fragment component.
+Invalid entries are silently ignored by Keycloak, which can lead to unexpected CORS failures that are difficult to diagnose.
+
+The special Keycloak values `+` (inherit allowed origins from the configured redirect URIs) and `*` (allow all origins) are accepted without a finding.
+If no `webOrigins` are configured, the auditor produces no findings.
