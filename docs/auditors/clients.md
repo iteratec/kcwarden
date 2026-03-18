@@ -96,6 +96,15 @@ This auditor identifies clients where the redirect URI, in combination with the 
 This often indicates that a fully qualified domain name, including the scheme (e.g., 'https://example.com/login'), is not defined for either the client root URL or the redirect URIs.
 To address this issue, clients should specify clear redirect URIs with proper schemes to enhance security.
 
+## ClientHasUndefinedBaseDomainAndSchemaInPostLogoutRedirectUri
+
+This auditor checks if OIDC clients have undefined or insufficiently specified `post_logout_redirect_uri` schemes.
+After an RP-initiated logout, the OpenID Provider redirects the user back to the Relying Party using a URI from the client's registered `post_logout_redirect_uris`.
+According to the [OIDC RP-Initiated Logout specification](https://openid.net/specs/openid-connect-rpinitiated-1_0.html#ClientMetadata), these URIs should use the HTTPS scheme.
+This auditor identifies clients where a `post_logout_redirect_uri`, in combination with the client's root URL, does not resolve to a fully qualified address with a defined scheme.
+The specification requires the OpenID Provider to redirect to one of the registered `post_logout_redirect_uris` values; a URI without a defined scheme cannot be successfully resolved, and Keycloak will display an "invalid redirect uri" error page instead of redirecting the user back to the application.
+To address this issue, clients should specify fully qualified `post_logout_redirect_uris` including the scheme (e.g., `https://example.com/logout`).
+
 ## ClientShouldNotUseWildcardRedirectURI
 
 This auditor focuses on identifying OIDC clients within Keycloak that use wildcard characters in their `redirect_uri` configurations.
