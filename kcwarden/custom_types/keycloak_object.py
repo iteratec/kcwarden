@@ -632,6 +632,20 @@ class Client(Dataclass):
                 rv.append(uri)
         return rv
 
+    def get_post_logout_redirect_uris(self) -> list[str]:
+        # Stored in attributes as a ##-separated string; "+" means "inherit from redirect URIs"
+        raw = self._d.get("attributes", {}).get("post.logout.redirect.uris", "")
+        if not raw:
+            return []
+        return raw.split("##")
+
+    def get_resolved_post_logout_redirect_uris(self) -> list[str]:
+        uris = self.get_post_logout_redirect_uris()
+        if not uris:
+            return uris
+        root_url = self.get_root_url() or ""
+        return [root_url + uri if uri.startswith("/") else uri for uri in uris]
+
     def is_default_keycloak_client(self) -> bool:
         return self.get_name() in [
             "account",
