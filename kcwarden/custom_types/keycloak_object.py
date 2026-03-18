@@ -607,6 +607,9 @@ class Client(Dataclass):
     def get_base_url(self) -> str | None:
         return self._d.get("baseUrl", None)
 
+    def get_web_origins(self) -> list[str]:
+        return self._d.get("webOrigins", [])
+
     def get_redirect_uris(self) -> list[str]:
         return self._d["redirectUris"]
 
