@@ -19,6 +19,9 @@ class ClientWebOriginsMustBeValid(ClientAuditor):
     )
     REFERENCE = "https://datatracker.ietf.org/doc/html/rfc6454#section-3.2"
 
+    def should_consider_client(self, client: Client) -> bool:
+        return super().should_consider_client(client) and client.is_oidc_client()
+
     @staticmethod
     def is_valid_origin(value: str) -> bool:
         if value in _KEYCLOAK_SPECIAL_ORIGINS or value == "":

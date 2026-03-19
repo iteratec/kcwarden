@@ -12,6 +12,19 @@ class TestClientWebOriginsMustBeValid:
         instance._DB = Mock()
         return instance
 
+    # --- should_consider_client ---
+
+    @pytest.mark.parametrize(
+        "is_oidc,expected",
+        [
+            (True, True),  # OIDC client is considered
+            (False, False),  # non-OIDC (e.g. SAML) client is excluded
+        ],
+    )
+    def test_should_consider_client(self, mock_client, auditor, is_oidc, expected):
+        mock_client.is_oidc_client.return_value = is_oidc
+        assert auditor.should_consider_client(mock_client) == expected
+
     # --- is_valid_origin ---
 
     @pytest.mark.parametrize(
