@@ -218,6 +218,13 @@ The auditor triggers if a client sets an override for the access token lifespan
 and if the value is too long.
 See the realm auditor [AccessTokenLifespanTooLong](./realm.md#AccessTokenLifespanTooLong) for details.
 
+## ClientWebOriginsMustNotUseWildcard
+
+This auditor checks if OIDC clients allow all origins for CORS requests by setting `webOrigins` to `*`.
+While the wildcard value is technically valid, it disables the browser's same-origin policy for this client, permitting any website to send cross-origin requests to it.
+This can expose the client to cross-site request forgery and data exfiltration from malicious websites.
+Instead, `webOrigins` should explicitly list only the origins that are legitimately allowed to interact with the client.
+
 ## ClientWebOriginsMustBeValid
 
 This auditor checks if the `webOrigins` entries configured for a client are valid origins as defined by [RFC 6454](https://datatracker.ietf.org/doc/html/rfc6454#section-3.2).
