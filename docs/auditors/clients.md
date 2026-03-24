@@ -268,3 +268,12 @@ Using these algorithms leaves the signing process vulnerable to collision attack
 ## SamlClientWildcardRedirectUriCheck
 
 This auditor identifies SAML clients that utilize wildcard characters `/*` at the end of their configured Redirect URIs (Assertion Consumer Service URLs). For example, a configuration like `https://example.com/*` is considered dangerous. Wildcards in this context facilitate Open Redirect vulnerabilities and Token Theft. It allows Keycloak to redirect the user (and the SAML artifact) to any subdirectory or path under the specified domain. If the application running on that domain has an open redirect vulnerability or allows user-generated content, an attacker could manipulate the URL to steal the authorization code or SAML artifact. Redirect URIs should be explicit and specific to prevent unauthorized redirection.
+
+## SamlClientHasErroneouslyConfiguredWildcardURI
+
+This auditor is the SAML counterpart to [ClientHasErroneouslyConfiguredWildcardURI](#clienthaserroneouslyconfiguredwildcarduri) and identifies SAML clients with dangerously misconfigured Assertion Consumer Service (ACS) URLs that potentially allow SAML assertions to be sent to arbitrary domains.
+
+Keycloak uses the configured ACS URLs as an allowlist to validate where SAML assertions may be redirected after authentication.
+A configuration error like placing a wildcard in the domain part of the URL (e.g., `https://example.com*`) instead of after a path delimiter (e.g., `https://example.com/*`) allows any domain that begins with the specified prefix to match.
+For example, `https://example.com*` would also match `https://example.com.attacker.tk`, enabling an attacker to redirect SAML assertions — including session-establishing identity claims — to a server under their control.
+This is almost always an unintentional misconfiguration rather than a deliberate choice, hence the Critical severity.
