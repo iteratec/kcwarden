@@ -16,7 +16,7 @@ class SamlClientWildcardRedirectUriCheck(ClientAuditor):
         uris = client.get_resolved_redirect_uris()
         if not uris:
             return []
-        return [uri for uri in uris if uri and uri.strip().endswith("*")]
+        return [uri for uri in uris if uri[-1:] == "*"]
 
     def audit_client(self, client: Client):
         for uri in self.get_vulnerable_uris(client):

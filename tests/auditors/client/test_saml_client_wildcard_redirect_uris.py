@@ -36,7 +36,9 @@ class TestSamlClientWildcardRedirectUriCheck:
             (["https://valid.com/*"], ["https://valid.com/*"]),
             (["https://valid.com", "https://bad.com/*"], ["https://bad.com/*"]),
             (["https://valid.com/path*"], ["https://valid.com/path*"]),
-            ([" * "], [" * "]),
+            (["*"], ["*"]),
+            ([" * "], []),
+            ([""], []),
             (["https://domain.com/*?query=1"], []),
         ],
     )
