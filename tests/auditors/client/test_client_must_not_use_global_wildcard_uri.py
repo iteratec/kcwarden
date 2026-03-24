@@ -34,6 +34,7 @@ class TestClientMustNotUseGlobalWildcardURI:
         [
             ("*", True),  # Global wildcard
             ("https://*", True),  # Arbitrary https link as wildcard
+            ("https://*/path", False),  # Wildcard in netloc but not last character → not a wildcard in Keycloak
             ("http://*", True),  # Arbitrary http link as wildcard
             ("tel://*", True),  # Arbitrary other protocol link as wildcard
             (

@@ -26,8 +26,10 @@ class ClientMustNotUseGlobalWildcardURI(ClientAuditor):
     def redirect_uri_is_global_wildcard(redirect: str) -> bool:
         if redirect == "*":
             return True
+        # Keycloak only treats * as a wildcard when it is the last character of the URI,
+        # so https://*/path would not be expanded and must not be flagged.
         parsed_redirect = urlparse(redirect)
-        return parsed_redirect.netloc == "*"
+        return parsed_redirect.netloc == "*" and redirect[-1:] == "*"
 
     def audit_client(self, client: Client):
         redirect_uris = client.get_resolved_redirect_uris()
