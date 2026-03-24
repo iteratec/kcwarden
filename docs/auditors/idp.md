@@ -61,13 +61,14 @@ This finding carries a higher severity compared to the general recommendation fo
 ## SamlIdpPostBindingResponseCheck
 
 This auditor warns about SAML Identity Providers configured to use the **HTTP-Redirect (GET)** binding instead of the **HTTP-POST** binding for responses.
-This occurs when the `Post Binding Response` setting is disabled.
+This occurs when the `Post Binding Response` setting is disabled. The two bindings differ in where the SAML response payload is carried:
 
-When using HTTP-Redirect, the entire SAML XML payload is encoded into the URL query parameters.
-This places sensitive token data into the URL, which is frequently recorded in browser history, proxy logs, and firewall logs, leading to potential data leakage.
-Additionally, this configuration risks Denial of Service (DoS) issues, as the large XML payload can easily exceed browser or server URL length limits, causing login failures.
+- **HTTP-Redirect (GET):** The entire SAML XML response is Base64-encoded and appended to the URL as a query parameter. Because the payload travels in the URL, it is routinely captured in browser history, server access logs, proxy logs, and HTTP `Referer` headers, exposing assertion data (including user attributes and roles) to unintended parties.
+- **HTTP-POST:** The payload is sent in the HTTP request body, which is not recorded by most logging infrastructure and has no practical size limit.
 
-We recommend enabling `Post Binding Response` to ensure the SAML payload is sent within the HTTP body rather than the URL.
+Beyond confidentiality, HTTP-Redirect creates a reliability problem: browsers and servers enforce URL length limits (typically 2-8 KB). SAML assertions that include many roles or attributes can easily exceed these limits, causing intermittent login failures for users with complex permission sets. This is a form of Denial of Service that is difficult to diagnose because it only affects certain users.
+
+We strongly recommend enabling `Post Binding Response` to ensure assertions are delivered securely and reliably via the HTTP body.
 
 ## SamlIdpValidateSignatureCheck
 
