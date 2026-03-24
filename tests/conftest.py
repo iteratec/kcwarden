@@ -228,9 +228,8 @@ def create_mock_role(mock_realm):
             comp_map = {}
             for c_role in composite:
                 if c_role.is_client_role():
-                    if c_role.get_client_name() not in comp_map:
-                        comp_map[c_role.get_client_name()] = []
-                    comp_map[c_role.get_client_name()].append(c_role.get_name())
+                    comp_map.setdefault("client", {})
+                    comp_map["client"].setdefault(c_role.get_client_name(), []).append(c_role.get_name())
                 else:
                     if "realm" not in comp_map:
                         comp_map["realm"] = []

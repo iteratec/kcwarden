@@ -29,4 +29,4 @@ Set the `role-client` field to `realm` when monitoring realm roles, or to the na
 
 !!! info
 
-    If you want to create comprehensive monitoring for a single role, we recommend combining this monitor with the [ClientWithSensitiveRole](client_monitor.md#clientwithsensitiverole) and [ServiceAccountWithSensitiveRole](service_account_monitor.md#serviceaccountwithsensitiverole) monitors to achieve more comprehensive coverage.
+    If you want to create comprehensive monitoring for a single role, we recommend combining this monitor with the [RoleWithSensitiveAssociatedRole](role_monitor.md#rolewithsensitiveassociatedrole), [ClientWithSensitiveRole](client_monitor.md#clientwithsensitiverole), and [ServiceAccountWithSensitiveRole](service_account_monitor.md#serviceaccountwithsensitiverole) monitors to achieve more comprehensive coverage.
