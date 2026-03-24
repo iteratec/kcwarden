@@ -33,5 +33,6 @@ nav:
     - monitors/index.md
     - monitors/client_monitor.md
     - monitors/group_monitor.md
+    - monitors/role_monitor.md
     - monitors/service_account_monitor.md
     - monitors/protocol_mapper_monitor.md

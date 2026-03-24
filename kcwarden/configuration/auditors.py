@@ -11,6 +11,7 @@ from kcwarden.api import Auditor
 from kcwarden.monitors import (
     client as client_monitors,
     group as group_monitors,
+    role as role_monitors,
     service_account as service_account_monitors,
     protocol_mapper as protocol_mapper_monitors,
 )
@@ -33,6 +34,7 @@ def collect_auditors(
         scope_auditors,
         client_monitors,
         group_monitors,
+        role_monitors,
         service_account_monitors,
         protocol_mapper_monitors,
     ):
