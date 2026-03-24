@@ -13,6 +13,7 @@ class SamlIdpWantAuthnRequestsSignedCheck(Auditor):
 
     def audit(self):
         for idp in self._DB.get_all_identity_providers():
-            if self.should_consider_idp(idp):
-                if not idp.is_want_authn_requests_signed():
-                    yield self.generate_finding(idp)
+            if not self.should_consider_idp(idp):
+                continue
+            if not idp.is_want_authn_requests_signed():
+                yield self.generate_finding(idp)
