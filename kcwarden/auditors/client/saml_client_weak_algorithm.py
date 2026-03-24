@@ -1,8 +1,9 @@
-from kcwarden.api import Auditor
+from kcwarden.api.auditor import ClientAuditor
+from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class SamlClientWeakAlgorithmCheck(Auditor):
+class SamlClientWeakAlgorithmCheck(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Weak SAML Signature Algorithm detected"
     LONG_DESCRIPTION = "The client is configured to use RSA_SHA1 or DSA_SHA1. These algorithms are considered weak and vulnerable to collision attacks."
@@ -10,13 +11,10 @@ class SamlClientWeakAlgorithmCheck(Auditor):
 
     WEAK_ALGORITHMS = ["RSA_SHA1", "DSA_SHA1"]
 
-    def should_consider_client(self, client) -> bool:
-        return self.is_not_ignored(client) and client.is_saml_client()
+    def should_consider_client(self, client: Client) -> bool:
+        return super().should_consider_client(client) and client.is_saml_client()
 
-    def audit(self):
-        for client in self._DB.get_all_clients():
-            if self.should_consider_client(client):
-                algo = client.get_saml_signature_algorithm()
-
-                if algo in self.WEAK_ALGORITHMS:
-                    yield self.generate_finding(client, additional_details={"detected_algorithm": algo})
+    def audit_client(self, client: Client):
+        algo = client.get_saml_signature_algorithm()
+        if algo in self.WEAK_ALGORITHMS:
+            yield self.generate_finding(client, additional_details={"detected_algorithm": algo})
