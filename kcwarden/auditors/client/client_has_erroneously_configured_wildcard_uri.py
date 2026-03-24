@@ -31,7 +31,10 @@ class ClientHasErroneouslyConfiguredWildcardURI(ClientAuditor):
 
         parsed_redirect_uri = urllib.parse.urlparse(redirect)
         # The redirect URI has the form https://domain.tld*
-        if parsed_redirect_uri.scheme in ["https", "http"] and parsed_redirect_uri.netloc.endswith("*"):
+        # Keycloak only treats * as a wildcard when it is the last character of the URI, so we
+        # additionally require redirect[-1:] == "*" to avoid false positives on URIs like
+        # https://domain.tld*/path, where the * is in the netloc but not at the end.
+        if parsed_redirect_uri.scheme in ["https", "http"] and parsed_redirect_uri.netloc.endswith("*") and redirect[-1:] == "*":
             return True
         # If the protocol is missing, the domain is recognized as part of the path by urllib.
         # Workaround for these cases:
