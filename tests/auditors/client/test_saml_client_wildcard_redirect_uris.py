@@ -70,4 +70,23 @@ class TestSamlClientWildcardRedirectUriCheck:
 
         assert len(results) == 1
         assert results[0]._offending_object.name == "vuln-saml"
-        assert results[0].additional_details["vulnerable_uris"] == ["https://bad.com/*"]
+        assert results[0].additional_details["redirect_uri"] == "https://bad.com/*"
+
+    def test_audit_function_multiple_bad_uris(self, auditor):
+        client_multi = Mock()
+        client_multi.name = "multi-bad"
+        client_multi.__str__ = Mock(return_value="multi-bad")
+        client_multi.is_saml_client.return_value = True
+        client_multi.get_resolved_redirect_uris.return_value = [
+            "https://ok.com",
+            "https://bad.com/*",
+            "https://also-bad.com/*",
+        ]
+
+        auditor._DB.get_all_clients.return_value = [client_multi]
+
+        results = list(auditor.audit())
+
+        assert len(results) == 2
+        uris = {r.additional_details["redirect_uri"] for r in results}
+        assert uris == {"https://bad.com/*", "https://also-bad.com/*"}
