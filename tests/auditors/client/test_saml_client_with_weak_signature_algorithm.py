@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.client.saml_client_weak_algorithm import SamlClientWeakAlgorithmCheck
+from kcwarden.auditors.client.saml_client_with_weak_signature_algorithm import SamlClientWithWeakSignatureAlgorithm
 
 
-class TestSamlClientWeakAlgorithmCheck:
+class TestSamlClientWithWeakSignatureAlgorithm:
     @pytest.fixture
     def auditor(self, database, default_config):
-        auditor_instance = SamlClientWeakAlgorithmCheck(database, default_config)
+        auditor_instance = SamlClientWithWeakSignatureAlgorithm(database, default_config)
         auditor_instance._DB = Mock()
         auditor_instance.is_not_ignored = Mock(return_value=True)
         return auditor_instance

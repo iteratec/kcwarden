@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.client.saml_client_wildcard_redirect_uris import (
-    SamlClientWildcardRedirectUriCheck,
+from kcwarden.auditors.client.saml_client_should_not_use_wildcard_redirect_uri import (
+    SamlClientShouldNotUseWildcardRedirectURI,
 )
 
 
-class TestSamlClientWildcardRedirectUriCheck:
+class TestSamlClientShouldNotUseWildcardRedirectURI:
     @pytest.fixture
     def auditor(self, database, default_config):
-        auditor_instance = SamlClientWildcardRedirectUriCheck(database, default_config)
+        auditor_instance = SamlClientShouldNotUseWildcardRedirectURI(database, default_config)
         auditor_instance._DB = Mock()
         auditor_instance.is_not_ignored = Mock(return_value=True)
         return auditor_instance

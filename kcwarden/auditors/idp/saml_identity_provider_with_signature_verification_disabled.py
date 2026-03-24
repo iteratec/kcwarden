@@ -2,7 +2,7 @@ from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
 
-class SamlIdpValidateSignatureCheck(Auditor):
+class SamlIdentityProviderWithSignatureVerificationDisabled(Auditor):
     DEFAULT_SEVERITY = Severity.Critical
     SHORT_DESCRIPTION = "SAML IdP 'Validate Signature' is disabled"
     LONG_DESCRIPTION = "The Identity Provider is configured with 'validateSignature' set to false. Keycloak will not verify the digital signature of incoming SAML documents, allowing for token forgery."

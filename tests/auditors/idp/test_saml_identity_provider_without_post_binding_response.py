@@ -1,14 +1,14 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.idp.saml_idp_post_binding_response import SamlIdpPostBindingResponseCheck
+from kcwarden.auditors.idp.saml_identity_provider_without_post_binding_response import SamlIdentityProviderWithoutPostBindingResponse
 from kcwarden.custom_types import config_keys
 
 
-class TestSamlIdpPostBindingResponseCheck:
+class TestSamlIdentityProviderWithoutPostBindingResponse:
     @pytest.fixture
     def auditor(self, database, default_config):
-        auditor_instance = SamlIdpPostBindingResponseCheck(database, default_config)
+        auditor_instance = SamlIdentityProviderWithoutPostBindingResponse(database, default_config)
         auditor_instance._DB = Mock()
         return auditor_instance
 

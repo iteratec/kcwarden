@@ -3,7 +3,7 @@ from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class SamlClientOneTimeUseCheck(ClientAuditor):
+class SamlClientWithoutOneTimeUseCondition(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "SAML OneTimeUse condition not enabled"
     LONG_DESCRIPTION = "Keycloak is not configured to add the <OneTimeUse> condition to SAML Assertions. This increases the risk of Replay Attacks if the Service Provider does not strictly track Assertion IDs."
