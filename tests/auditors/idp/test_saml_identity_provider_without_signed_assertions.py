@@ -1,7 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.idp.saml_identity_provider_without_signed_assertions import SamlIdentityProviderWithoutSignedAssertions
+from kcwarden.auditors.idp.saml_identity_provider_without_signed_assertions import (
+    SamlIdentityProviderWithoutSignedAssertions,
+)
 from kcwarden.custom_types import config_keys
 
 
