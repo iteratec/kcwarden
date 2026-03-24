@@ -2,7 +2,7 @@ from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
 
-class SamlIdpWantAssertionsSignedCheck(Auditor):
+class SamlIdentityProviderWithoutSignedAssertions(Auditor):
     DEFAULT_SEVERITY = Severity.High
     SHORT_DESCRIPTION = "SAML IdP 'Want Assertions Signed' is disabled"
     LONG_DESCRIPTION = "The Identity Provider does not require SAML Assertions to be signed. This may allow attackers to modify the assertion content (e.g., username/roles) even if the envelope signature is valid, or if used in conjunction with other flaws."

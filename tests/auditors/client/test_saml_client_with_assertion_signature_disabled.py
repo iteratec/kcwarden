@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.client.saml_client_assertion_signature import (
-    SamlClientAssertionSignatureCheck,
+from kcwarden.auditors.client.saml_client_with_assertion_signature_disabled import (
+    SamlClientWithAssertionSignatureDisabled,
 )
 
 
-class TestSamlClientAssertionSignatureCheck:
+class TestSamlClientWithAssertionSignatureDisabled:
     @pytest.fixture
     def auditor(self, database, default_config):
-        auditor_instance = SamlClientAssertionSignatureCheck(database, default_config)
+        auditor_instance = SamlClientWithAssertionSignatureDisabled(database, default_config)
         auditor_instance._DB = Mock()
         auditor_instance.is_not_ignored = Mock(return_value=True)
         return auditor_instance

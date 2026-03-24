@@ -3,7 +3,7 @@ from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class SamlClientWildcardRedirectUriCheck(ClientAuditor):
+class SamlClientShouldNotUseWildcardRedirectURI(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Client allows wildcard redirect URIs"
     LONG_DESCRIPTION = "The client configuration contains a wildcard (*) at the end of a Redirect URI. This allows open redirects to subdirectories, potentially leading to token theft."

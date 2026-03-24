@@ -19,7 +19,7 @@ We strongly recommend setting up signature checks.
 
 The auditor covers OIDC and Keycloak OIDC providers.
 Provider-specific IDPs (like GitHub, GitLab, etc.) do not have an option to disable signature verification and should thus be safe by default.
-SAML Identity Providers are handled separately by [SamlIdpValidateSignatureCheck](#samlidpvalidatesignaturecheck).
+SAML Identity Providers are handled separately by [SamlIdentityProviderWithSignatureVerificationDisabled](#samlidentityproviderwithsignatureverificationdisabled).
 
 ## OIDCIdentityProviderWithoutPKCE
 
@@ -58,7 +58,7 @@ This setting can be applied globally to the IDP, affecting all user data, includ
 
 This finding carries a higher severity compared to the general recommendation for enabling `Force` sync mode due to the explicit use of Identity Provider Mappers, indicating a reliance on upstream IDP data for crucial access control decisions.
 
-## SamlIdpPostBindingResponseCheck
+## SamlIdentityProviderWithoutPostBindingResponse
 
 This auditor warns about SAML Identity Providers configured to use the **HTTP-Redirect (GET)** binding instead of the **HTTP-POST** binding for responses.
 This occurs when the `Post Binding Response` setting is disabled. The two bindings differ in where the SAML response payload is carried:
@@ -70,7 +70,7 @@ Beyond confidentiality, HTTP-Redirect creates a reliability problem: browsers an
 
 We strongly recommend enabling `Post Binding Response` to ensure assertions are delivered securely and reliably via the HTTP body.
 
-## SamlIdpValidateSignatureCheck
+## SamlIdentityProviderWithSignatureVerificationDisabled
 
 This auditor warns about SAML Identity Providers configured with `Validate Signature` set to `false`.
 When disabled, Keycloak accepts SAML responses without verifying the digital signature of the upstream Identity Provider.
@@ -80,7 +80,7 @@ Without signature verification, an attacker can forge a completely fabricated SA
 This effectively allows an attacker to log in as any user, including administrators, without a valid password.
 We strongly recommend ensuring that `Validate Signature` is enabled for all SAML providers.
 
-## SamlIdpWantAssertionsEncryptedCheck
+## SamlIdentityProviderWithoutEncryptedAssertions
 
 This auditor identifies SAML Identity Providers that do not require assertions to be encrypted (`Want Assertions Encrypted` is disabled).
 When assertions are unencrypted, they are transported as Base64 strings that can be easily decoded.
@@ -89,7 +89,7 @@ Because the assertion passes through the user's browser (User Agent), any Sensit
 This data can be exposed in browser network tabs, browser extensions, and intermediate proxy logs.
 To prevent confidentiality breaches and PII leakage, we recommend enabling encryption for assertions.
 
-## SamlIdpWantAssertionsSignedCheck
+## SamlIdentityProviderWithoutSignedAssertions
 
 This auditor warns about SAML Identity Providers where `Want Assertions Signed` is disabled.
 While the outer SAML Response envelope might be validly signed (if `Validate Signature` is on), the specific Assertion element containing the user identity is not required to be signed in this configuration.
@@ -98,7 +98,7 @@ This allows for **Assertion Substitution** attacks.
 An attacker could take a valid, signed response envelope and replace the internal assertion with a forged one, bypassing authentication integrity.
 For robust security, both the outer envelope and the inner assertions should be signed to prevent identity spoofing.
 
-## SamlIdpWantAuthnRequestsSignedCheck
+## SamlIdentityProviderWithoutSignedAuthnRequests
 
 This auditor flags SAML Identity Providers where `Want AuthnRequests Signed` is disabled.
 In this state, Keycloak sends authentication requests to the Identity Provider without a signature, causing the IdP to treat them as anonymous requests.

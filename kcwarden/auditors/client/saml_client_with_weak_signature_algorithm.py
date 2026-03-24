@@ -3,7 +3,7 @@ from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
 
-class SamlClientWeakAlgorithmCheck(ClientAuditor):
+class SamlClientWithWeakSignatureAlgorithm(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "Weak SAML Signature Algorithm detected"
     LONG_DESCRIPTION = "The client is configured to use RSA_SHA1 or DSA_SHA1. These algorithms are considered weak and vulnerable to collision attacks."

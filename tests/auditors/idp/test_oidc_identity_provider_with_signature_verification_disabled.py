@@ -19,7 +19,7 @@ class TestOIDCIdentityProviderWithSignatureVerificationDisabled:
         [
             ("oidc", True),  # OIDC provider should be considered
             ("keycloak-oidc", True),  # Keycloak OIDC provider should be considered
-            ("saml", False),  # SAML provider is handled by SamlIdpValidateSignatureCheck
+            ("saml", False),  # SAML provider is handled by SamlIdentityProviderWithSignatureVerificationDisabled
             ("github", False),  # SAML provider should also be considered
         ],
     )
@@ -78,7 +78,7 @@ class TestOIDCIdentityProviderWithSignatureVerificationDisabled:
         results = list(auditor.audit())
         assert (
             len(results) == 2
-        )  # Expect findings from idp1 and idp3; idp4 (SAML) is handled by SamlIdpValidateSignatureCheck
+        )  # Expect findings from idp1 and idp3; idp4 (SAML) is handled by SamlIdentityProviderWithSignatureVerificationDisabled
 
     def test_ignore_list_functionality(self, auditor, mock_idp):
         # Setup IDP without force sync mode and with mappers

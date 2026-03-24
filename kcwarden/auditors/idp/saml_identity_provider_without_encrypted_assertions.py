@@ -2,10 +2,10 @@ from kcwarden.api import Auditor
 from kcwarden.custom_types.result import Severity
 
 
-class SamlIdpWantAuthnRequestsSignedCheck(Auditor):
+class SamlIdentityProviderWithoutEncryptedAssertions(Auditor):
     DEFAULT_SEVERITY = Severity.Medium
-    SHORT_DESCRIPTION = "SAML IdP 'Want AuthnRequests Signed' is disabled"
-    LONG_DESCRIPTION = "Keycloak is sending authentication requests to the Identity Provider without a signature. The IdP treats these requests as anonymous, increasing the risk of IdP Confusion attacks and Login CSRF."
+    SHORT_DESCRIPTION = "SAML IdP 'Want Assertions Encrypted' is disabled"
+    LONG_DESCRIPTION = "The Identity Provider accepts unencrypted assertions. This exposes PII to intermediaries and makes the system more susceptible to XML Signature Wrapping (XSW) attacks."
     REFERENCE = ""
 
     def should_consider_idp(self, idp) -> bool:
@@ -15,5 +15,5 @@ class SamlIdpWantAuthnRequestsSignedCheck(Auditor):
         for idp in self._DB.get_all_identity_providers():
             if not self.should_consider_idp(idp):
                 continue
-            if not idp.is_want_authn_requests_signed():
+            if not idp.is_want_assertions_encrypted():
                 yield self.generate_finding(idp)
