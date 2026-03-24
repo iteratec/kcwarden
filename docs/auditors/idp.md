@@ -17,8 +17,9 @@ Not checking the signatures of the tokens the IDP provides is dangerous, as the 
 This may lead to an account takeover or other attacks.
 We strongly recommend setting up signature checks.
 
-The auditor supports OIDC, Keycloak OIDC, and SAML IDPs.
+The auditor covers OIDC and Keycloak OIDC providers.
 Provider-specific IDPs (like GitHub, GitLab, etc.) do not have an option to disable signature verification and should thus be safe by default.
+SAML Identity Providers are handled separately by [SamlIdpValidateSignatureCheck](#samlidpvalidatesignaturecheck).
 
 ## OIDCIdentityProviderWithoutPKCE
 
