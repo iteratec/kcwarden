@@ -1,7 +1,9 @@
 import pytest
 from unittest.mock import Mock
 
-from kcwarden.auditors.idp.saml_identity_provider_without_post_binding_response import SamlIdentityProviderWithoutPostBindingResponse
+from kcwarden.auditors.idp.saml_identity_provider_without_post_binding_response import (
+    SamlIdentityProviderWithoutPostBindingResponse,
+)
 from kcwarden.custom_types import config_keys
 
 
