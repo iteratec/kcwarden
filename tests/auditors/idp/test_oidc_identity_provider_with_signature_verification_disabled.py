@@ -76,7 +76,9 @@ class TestOIDCIdentityProviderWithSignatureVerificationDisabled:
 
         auditor._DB.get_all_identity_providers.return_value = [idp1, idp2, idp3, idp4]
         results = list(auditor.audit())
-        assert len(results) == 2  # Expect findings from idp1 and idp3; idp4 (SAML) is handled by SamlIdpValidateSignatureCheck
+        assert (
+            len(results) == 2
+        )  # Expect findings from idp1 and idp3; idp4 (SAML) is handled by SamlIdpValidateSignatureCheck
 
     def test_ignore_list_functionality(self, auditor, mock_idp):
         # Setup IDP without force sync mode and with mappers
