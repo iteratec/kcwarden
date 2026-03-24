@@ -35,7 +35,10 @@ class TestClientHasErroneouslyConfiguredWildcardURI:
         "redirect_uri, should_alert",
         [
             ("https://example.com*", True),  # Wildcard in domain part, last character → flagged
-            ("https://example.com*/path", False),  # Wildcard in domain but not last character → not a wildcard in Keycloak
+            (
+                "https://example.com*/path",
+                False,
+            ),  # Wildcard in domain but not last character → not a wildcard in Keycloak
             ("https://example.com/*", False),  # Wildcard correctly in path
             ("https://example.com/subpath*", False),  # Wildcard correctly in path
             ("https://example.com/subpath/login?*", False),  # Wildcard in GET Parameters
