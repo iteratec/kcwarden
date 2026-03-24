@@ -593,23 +593,19 @@ class Client(Dataclass):
         return self.get_protocol() == "saml"
 
     def get_saml_assertion_signature(self) -> bool:
-        val = self.get_attributes().get("saml.assertion.signature", "false")
-        return str(val).lower() == "true"
+        return self.get_attributes().get("saml.assertion.signature", "false") == "true"
 
     def get_saml_signature_algorithm(self) -> str:
         return self.get_attributes().get("saml.signature.algorithm", "")
 
     def is_saml_encryption_enabled(self) -> bool:
-        val = self.get_attributes().get("saml.encrypt", "false")
-        return str(val).lower() == "true"
+        return self.get_attributes().get("saml.encrypt", "false") == "true"
 
     def is_saml_onetimeuse_condition_enabled(self) -> bool:
-        val = self.get_attributes().get("saml.onetimeuse.condition", "false")
-        return val == "true"
+        return self.get_attributes().get("saml.onetimeuse.condition", "false") == "true"
 
     def is_saml_client_signature_required(self) -> bool:
-        val = self.get_attributes().get("saml.client.signature", "false")
-        return val == "true"
+        return self.get_attributes().get("saml.client.signature", "false") == "true"
 
     def get_attributes(self) -> dict[str, str]:
         return self._d["attributes"]
