@@ -44,7 +44,7 @@ If you are aware of other ways to assign roles to service accounts, let us know 
 
 !!! info
 
-    If you want to create comprehensive monitoring for a single role, we recommend combining this monitor with the [ClientWithSensitiveRole](client_monitor.md#clientwithsensitiverole) and [GroupWithSensitiveRole](group_monitor.md#groupwithsensitiverole) monitors to achieve more comprehensive coverage.
+    If you want to create comprehensive monitoring for a single role, we recommend combining this monitor with the [ClientWithSensitiveRole](client_monitor.md#clientwithsensitiverole), [RoleWithSensitiveAssociatedRole](role_monitor.md#rolewithsensitiveassociatedrole), and [GroupWithSensitiveRole](group_monitor.md#groupwithsensitiverole) monitors to achieve more comprehensive coverage.
 
 
 ## ServiceAccountWithGroup
