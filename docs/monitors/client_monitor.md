@@ -42,7 +42,7 @@ The `role-client` field does not support regular expressions and is case-sensiti
 
 !!! info
 
-    If you want to create comprehensive monitoring for a single role, we recommend combining this monitor with the [GroupWithSensitiveRole](group_monitor.md#groupwithsensitiverole) and [ServiceAccountWithSensitiveRole](service_account_monitor.md#serviceaccountwithsensitiverole) monitors to achieve more comprehensive coverage.
+    If you want to create comprehensive monitoring for a single role, we recommend combining this monitor with the [GroupWithSensitiveRole](group_monitor.md#groupwithsensitiverole), [RoleWithSensitiveAssociatedRole](role_monitor.md#rolewithsensitiveassociatedrole), and [ServiceAccountWithSensitiveRole](service_account_monitor.md#serviceaccountwithsensitiverole) monitors to achieve more comprehensive coverage.
 
 
 ## ClientWithSensitiveScope
