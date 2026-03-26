@@ -9,17 +9,11 @@ class IdentityProviderWithSignatureVerificationDisabled(Auditor):
     REFERENCE = ""
 
     def should_consider_idp(self, idp) -> bool:
-        return self.is_not_ignored(idp) and idp.get_provider_id() in ["oidc", "keycloak-oidc", "saml"]
-
-    @staticmethod
-    def idp_does_not_verify_signatures(config):
-        return config.get("validateSignature") == "false"
+        return self.is_not_ignored(idp) and idp.get_provider_id() in ["oidc", "keycloak-oidc"]
 
     def audit(self):
         for idp in self._DB.get_all_identity_providers():
-            # Skip IDPs that were explicitly ignored, or that aren't OIDC IDPs
             if not self.should_consider_idp(idp):
                 continue
-            # Check if signature verification is disabled
-            if self.idp_does_not_verify_signatures(idp.get_config()):
+            if not idp.is_signature_validation_enabled():
                 yield self.generate_finding(idp)
