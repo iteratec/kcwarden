@@ -64,9 +64,10 @@ flow for any client type, public or confidential.
 
 ## ClientAuthenticationViaMTLSOrJWTRecommended
 
-This auditor evaluates whether confidential OIDC clients within Keycloak are using mutual TLS (mTLS) or signed JWTs for client authentication, as opposed to the default _shared client secret_ method.
+This auditor evaluates whether confidential OIDC clients within Keycloak are using Federated JWT, mutual TLS (mTLS), or signed JWTs for client authentication, as opposed to the default _shared client secret_ method.
 Confidential clients are those that can securely hold credentials, making them responsible for authenticating to Keycloak to access its features.
-While using a shared client secret is common, it's recommended to opt for more secure authentication methods such as mTLS or signed JWTs.
+While using a shared client secret is common, it's recommended to opt for more secure authentication methods such as Federated JWT, mTLS, or signed JWTs.
+Federated JWT is currently the most recommended approach, enabling token-based trust relationships via OIDC, SPIFFE/SPIRE, or Kubernetes Service Accounts without long-lived credentials.
 These methods provide enhanced security by ensuring that client credentials are not exposed and are authenticated in a manner that is both secure and verifiable.
 This recommendation aligns with best practices for securing OAuth clients and protecting resource access.
 For more detailed guidance on implementing these recommended authentication methods, refer to the Keycloak documentation.

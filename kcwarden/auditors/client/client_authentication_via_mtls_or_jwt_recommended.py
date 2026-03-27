@@ -2,11 +2,13 @@ from kcwarden.api.auditor import ClientAuditor
 from kcwarden.custom_types.keycloak_object import Client
 from kcwarden.custom_types.result import Severity
 
+STRONG_AUTH_METHODS = {"federated-jwt", "client-jwt", "client-secret-jwt", "client-x509"}
+
 
 class ClientAuthenticationViaMTLSOrJWTRecommended(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Info
-    SHORT_DESCRIPTION = "Client Authentication via mTLS or Signed JWT is Recommended"
-    LONG_DESCRIPTION = "Confidential Clients need to authenticate to Keycloak to use its features. By default, is uses a shared client secret. It is RECOMMENDED to use mTLS or signed JWTs instead, if possible. For details, see the Keycloak documentation: https://www.keycloak.org/docs/latest/server_admin/#_client-credentials"
+    SHORT_DESCRIPTION = "Client Authentication via Federated JWT, mTLS, or Signed JWT is Recommended"
+    LONG_DESCRIPTION = "Confidential Clients need to authenticate to Keycloak to use its features. By default, it uses a shared client secret. It is RECOMMENDED to use Federated JWT, mTLS, or signed JWTs instead, if possible. For details, see the Keycloak documentation: https://www.keycloak.org/docs/latest/server_admin/#_client-credentials"
     REFERENCE = "https://datatracker.ietf.org/doc/html/rfc9700#section-2.5"
 
     def should_consider_client(self, client) -> bool:
@@ -27,11 +29,11 @@ class ClientAuthenticationViaMTLSOrJWTRecommended(ClientAuditor):
 
     @staticmethod
     def client_does_not_use_mtls_or_jwt_auth(client) -> bool:
-        # If the clientAuthenticatorType is client-secret, basic client secret authentication is used.
-        # TODO Check what the correct values for mTLS or signed JWT are, and update this check
-        return client.get_client_authenticator_type() == "client-secret"
+        return client.get_client_authenticator_type() not in STRONG_AUTH_METHODS
 
     def audit_client(self, client: Client):
         if self.client_does_not_use_mtls_or_jwt_auth(client):
             # All clients matching these criteria should be reported
-            yield self.generate_finding(client)
+            yield self.generate_finding(
+                client, additional_details={"client_authenticator_type": client.get_client_authenticator_type()}
+            )
