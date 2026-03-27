@@ -1,5 +1,5 @@
 # Build image
-FROM docker.io/library/python:3-alpine as builder
+FROM docker.io/library/python:3-alpine AS builder
 
 # Switch to non-root (a group with gid=uid is automatically created)
 RUN adduser -D -u 65532 nonroot
