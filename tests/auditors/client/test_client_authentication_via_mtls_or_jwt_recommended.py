@@ -31,8 +31,11 @@ class TestClientAuthenticationViaMTLSOrJWTRecommended:
         "client_authenticator_type, should_alert",
         [
             ("client-secret", True),  # Using client-secret, should alert
-            ("jwt", False),  # Using JWT, should not alert
-            ("mtls", False),  # Using mTLS, should not alert
+            ("unknown-method", True),  # Unknown method, should alert
+            ("federated-jwt", False),  # Using Federated JWT, should not alert
+            ("client-jwt", False),  # Using signed JWT, should not alert
+            ("client-secret-jwt", False),  # Using client-secret JWT, should not alert
+            ("client-x509", False),  # Using mTLS (x509), should not alert
         ],
     )
     def test_client_does_not_use_mtls_or_jwt_auth(self, mock_client, auditor, client_authenticator_type, should_alert):
@@ -40,7 +43,7 @@ class TestClientAuthenticationViaMTLSOrJWTRecommended:
         assert auditor.client_does_not_use_mtls_or_jwt_auth(mock_client) == should_alert
 
     def test_audit_function_no_findings(self, confidential_client, auditor):
-        confidential_client.get_client_authenticator_type.return_value = "jwt"
+        confidential_client.get_client_authenticator_type.return_value = "federated-jwt"
         auditor._DB.get_all_clients.return_value = [confidential_client]
         results = list(auditor.audit())
         assert len(results) == 0
@@ -50,10 +53,16 @@ class TestClientAuthenticationViaMTLSOrJWTRecommended:
         auditor._DB.get_all_clients.return_value = [confidential_client]
         results = list(auditor.audit())
         assert len(results) == 1
-        confidential_client.get_client_authenticator_type.assert_called_with()
+        assert results[0].additional_details["client_authenticator_type"] == "client-secret"
 
     def test_audit_function_multiple_clients(self, confidential_client, auditor):
-        confidential_client.get_client_authenticator_type.side_effect = ["client-secret", "jwt", "mtls"]
+        # client-secret is returned twice: once for the check, once for additional_details in generate_finding
+        confidential_client.get_client_authenticator_type.side_effect = [
+            "client-secret",
+            "client-secret",
+            "federated-jwt",
+            "client-x509",
+        ]
         auditor._DB.get_all_clients.return_value = [confidential_client, confidential_client, confidential_client]
         results = list(auditor.audit())
         assert len(results) == 1  # Expect findings from one client
