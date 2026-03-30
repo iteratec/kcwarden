@@ -46,6 +46,10 @@ class Monitor(Auditor, ABC):
         if severity is None:
             severity = get_severity_by_name(matched_config.get("severity")) if "severity" in matched_config else None
 
+        note = matched_config.get("note")
+        if note and note != self.COMMON_CUSTOM_CONFIG_TEMPLATE["note"] and override_long_description is None:
+            override_long_description = note
+
         return self.generate_finding(
             dataclass_obj,
             additional_details,
