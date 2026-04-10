@@ -235,3 +235,18 @@ Invalid entries are silently ignored by Keycloak, which can lead to unexpected C
 
 The special Keycloak values `+` (inherit allowed origins from the configured redirect URIs) and `*` (allow all origins) are accepted without a finding.
 If no `webOrigins` are configured, the auditor produces no findings.
+
+## ClientSessionIdleTimeoutNotSetWhileSsoSessionIdleTimeoutTooLong
+
+This auditor flags OIDC clients that silently inherit a long SSO session idle timeout because no session idle timeout is configured at either the realm or client level.
+
+When the realm `ssoSessionIdleTimeout` exceeds 1 hour, client sessions remain active for that full duration unless constrained by a dedicated `clientSessionIdleTimeout` at the realm level, or a `client.session.idle.timeout` override on the individual client.
+If neither is configured, affected clients — and their associated refresh tokens — remain valid for the entire SSO session idle timeout period without any independent cap.
+
+This auditor triggers when all three conditions are true:
+
+- `ssoSessionIdleTimeout > 3600s` (1 hour)
+- No realm-level `clientSessionIdleTimeout` is set (value is `0`)
+- The client has no `client.session.idle.timeout` attribute override set (value is `0` or absent)
+
+The recommended remediation is either to configure a `clientSessionIdleTimeout` at the realm level (see [SsoSessionIdleTimeoutExceedsClientSessionIdleTimeout](./realm.md#SsoSessionIdleTimeoutExceedsClientSessionIdleTimeout)), or to set a client-specific `client.session.idle.timeout` override for this client directly.

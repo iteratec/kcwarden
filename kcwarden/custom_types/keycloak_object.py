@@ -57,6 +57,14 @@ class Realm(Dataclass):
         """Get access token lifespan in seconds."""
         return self._d["accessTokenLifespan"]
 
+    def get_sso_session_idle_timeout(self) -> int:
+        """Get SSO session idle timeout in seconds."""
+        return self._d["ssoSessionIdleTimeout"]
+
+    def get_client_session_idle_timeout(self) -> int:
+        """Get client session idle timeout in seconds. A value of 0 means it is not set (falls back to SSO session idle timeout)."""
+        return self._d.get("clientSessionIdleTimeout", 0)
+
     def is_offline_session_max_lifespan_enabled(self) -> bool:
         return self._d["offlineSessionMaxLifespanEnabled"]
 
@@ -677,6 +685,13 @@ class Client(Dataclass):
             return int(lifespan_str)
         except ValueError:
             return None
+
+    def get_client_session_idle_timeout_override(self) -> int:
+        """Get client-specific session idle timeout override in seconds. A value of 0 means not set (inherits from realm)."""
+        try:
+            return int(self.get_attributes().get("client.session.idle.timeout", 0))
+        except ValueError:
+            return 0
 
 
 class Group(Dataclass):
