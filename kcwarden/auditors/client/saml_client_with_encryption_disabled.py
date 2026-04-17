@@ -6,7 +6,9 @@ from kcwarden.custom_types.result import Severity
 class SamlClientWithEncryptionDisabled(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Medium
     SHORT_DESCRIPTION = "SAML Assertion encryption is disabled"
-    LONG_DESCRIPTION = "The SAML Assertion is sent in cleartext (Base64 encoded only). This allows intermediaries to read PII."
+    LONG_DESCRIPTION = (
+        "The SAML Assertion is sent in cleartext (Base64 encoded only). This allows intermediaries to read PII."
+    )
     REFERENCE = ""
 
     def should_consider_client(self, client: Client) -> bool:
