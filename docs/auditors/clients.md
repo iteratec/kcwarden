@@ -244,9 +244,7 @@ This configuration allows for Token Forgery or Signature Exclusion attacks. If t
 
 ## SamlClientWithEncryptionDisabled
 
-This auditor checks if the SAML client is configured to encrypt the SAML Assertion. When disabled, the SAML Assertion is transmitted as a standard Base64 encoded XML string, effectively in cleartext.
-
-The absence of encryption leads to Information Disclosure, as intermediaries can easily read Personally Identifiable Information (PII) contained in the assertion. Critically, sending assertions in cleartext significantly facilitates XML Signature Wrapping (XSW) attacks. Without encryption, an attacker can manipulate the XML structure without needing the Service Provider's private key to decrypt and re-encrypt the payload. It is highly recommended to enable saml.encrypt to ensure confidentiality and integrity.
+This auditor checks if the SAML client is configured to encrypt the SAML Assertion. When disabled, the SAML Assertion is transmitted as a standard Base64 encoded XML string, effectively in cleartext. The absence of encryption leads to Information Disclosure, as intermediaries can easily read Personally Identifiable Information (PII) contained in the assertion.
 
 ## SamlClientWithoutOneTimeUseCondition
 
