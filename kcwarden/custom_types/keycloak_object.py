@@ -571,6 +571,11 @@ class Client(Dataclass):
             self.get_realm().get_name() == "master" and self.get_name().endswith("-realm") and "protocol" not in self._d
         )
 
+    def is_system_client(self) -> bool:
+        # If "account" client does not exist, Keycloak can create a system client in the realm for certain internal operations
+        # See https://github.com/keycloak/keycloak/blob/main/server-spi-private/src/main/java/org/keycloak/models/utils/SystemClientUtil.java
+        return self.get_name() == "_system"
+
     def get_protocol(self) -> str:
         # Every client should have the "protocol" field set, but the "master-realm"
         # client in the "master" realm for some reason does not include this field.
@@ -578,9 +583,9 @@ class Client(Dataclass):
         try:
             return self._d["protocol"]
         except KeyError:
-            # If the client is a realm-specific client, it for some reason does not
+            # If the client is a realm-specific or system client, it for some reason does not
             # have a "protocol" set. Return openid-connect anyway.
-            if self.is_realm_specific_client():
+            if self.is_realm_specific_client() or self.is_system_client():
                 return "openid-connect"
             # This case should never happen, so instead of blindly returning something,
             # we'd like to know about it. Raise an exception.
@@ -616,6 +621,8 @@ class Client(Dataclass):
 
     def get_client_authenticator_type(self) -> str | None:
         if self.is_public():
+            return None
+        if self.is_system_client():
             return None
         return self._d["clientAuthenticatorType"]
 
