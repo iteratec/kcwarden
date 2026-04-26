@@ -96,6 +96,27 @@ class TestProtocolMapperWithConfigOnClientScope:
         assert mock_client.get_name() in details["used_by_clients"]
         assert details["scope_is_used_by_any_client"] is True
 
+    def test_audit_scope_match_used_via_optional_scope(self, monitor, mock_scope, mock_client, mock_protocol_mapper):
+        mock_scope.get_protocol_mappers.return_value = [mock_protocol_mapper]
+        mock_client.get_optional_client_scopes.return_value = [mock_scope.get_name()]
+        monitor._DB.get_all_scopes.return_value = [mock_scope]
+        monitor._DB.get_all_clients.return_value = [mock_client]
+        monitor.get_custom_config = Mock(
+            return_value=[
+                {
+                    "protocol-mapper-type": "oidc-usermodel-attribute-mapper",
+                    "matched-config": {"userinfo.token.claim": "true"},
+                    "allowed": [],
+                }
+            ]
+        )
+
+        results = list(monitor.audit())
+        assert len(results) == 1
+        details = results[0].to_dict()["additional_details"]
+        assert mock_client.get_name() in details["used_by_clients"]
+        assert details["scope_is_used_by_any_client"] is True
+
     def test_audit_allowed_scope(self, monitor, mock_scope, mock_protocol_mapper):
         mock_scope.get_protocol_mappers.return_value = [mock_protocol_mapper]
         monitor._DB.get_all_scopes.return_value = [mock_scope]
