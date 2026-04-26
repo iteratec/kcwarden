@@ -43,15 +43,8 @@ class ProtocolMapperWithConfigOnClientScope(Monitor):
                 return False
         return True
 
-    def _get_clients_using_scope(self, scope_name: str) -> list[str]:
-        return [
-            client.get_name()
-            for client in self._DB.get_all_clients()
-            if scope_name in client.get_default_client_scopes() or scope_name in client.get_optional_client_scopes()
-        ]
-
     def _generate_additional_details(self, scope: ClientScope, mapper: ProtocolMapper) -> dict:
-        clients_using_scope = self._get_clients_using_scope(scope.get_name())
+        clients_using_scope = [c.get_name() for c in helper.get_clients_with_scope(self._DB, scope)]
         return {
             "mapper": str(mapper),
             "mapper_config": mapper.get_config(),
