@@ -8,6 +8,8 @@ on:
 jobs:
   build-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       PIP_PROGRESS_BAR: "off"
       PIP_DISABLE_PIP_VERSION_CHECK: "on"
