@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-poetry-project
         with:
@@ -59,7 +59,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-poetry-project
         with:
@@ -81,12 +81,12 @@ jobs:
       - name: Create Docker network for running Testcontainers
         run: docker network create ${{ env.TESTCONTAINER_DOCKER_NETWORK }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: ./.github/actions/setup-poetry-project
         with:
