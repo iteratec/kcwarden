@@ -208,10 +208,7 @@ Adjusting the scope settings to disable _full scope allowed_ mitigates the risk 
 
 The auditor triggers if the list of allowed redirect URIs is unexpectedly empty.
 Using Keycloak's administration UI, this is not even possible to set (only via direct admin API calls). 
-The security of the OIDC standard flow and others rely on the allowed redirect URIs, and thus Keycloak has a fallback mechanism (involving e.g. the root URL). 
-This behavior is not emulated by kcwarden, and thus other auditors do not produce correct findings. 
-In addition, Keycloak's fallback mechanism might change over time and can lead to unexpected behavior. 
-It is highly recommended to explicitly set the redirect URIs for this client.
+Keycloak will throw an error when trying to authenticate with this client using the Standard or Implicit flows.
 
 ## ClientAccessTokenLifespanTooLong
 
