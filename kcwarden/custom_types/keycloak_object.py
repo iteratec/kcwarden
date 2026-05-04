@@ -782,11 +782,8 @@ class Group(Dataclass):
             return deepcopy(self._d["clientRoles"])
         parent_client_roles = self._parent.get_effective_client_roles()
         my_client_roles = self.get_client_roles()
-        for client in my_client_roles.keys():
-            if client in parent_client_roles:
-                parent_client_roles[client] += my_client_roles[client]
-            else:
-                parent_client_roles[client] = my_client_roles[client]
+        for client, roles in my_client_roles.items():
+            parent_client_roles.setdefault(client, []).extend(roles)
         return parent_client_roles
 
     def has_subgroups(self) -> bool:
