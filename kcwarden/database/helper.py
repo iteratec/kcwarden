@@ -203,7 +203,7 @@ def get_effective_roles(db: Database, role: RealmRole | ClientRole) -> dict:
     return rv
 
 
-def get_effective_roles_for_service_account(db: Database, saccount: ServiceAccount) -> dict:
+def get_effective_roles_for_service_account_direct_assignments(db: Database, saccount: ServiceAccount) -> dict:
     roles = {"realm": [], "client": {}}
 
     for role_name in saccount.get_realm_roles():
@@ -215,3 +215,30 @@ def get_effective_roles_for_service_account(db: Database, saccount: ServiceAccou
             role = db.get_client_role(role_name, client)
             roles = _merge_role_dict(roles, get_effective_roles(db, role))
     return roles
+
+
+def get_effective_roles_for_service_account_group_assignments(db: Database, saccount: ServiceAccount) -> dict:
+    roles = {"realm": [], "client": {}}
+    assigned_group_paths = set(saccount.get_groups())
+
+    for group in db.get_all_groups():
+        if group.get_path() not in assigned_group_paths:
+            continue
+
+        for role_name in group.get_effective_realm_roles():
+            role = db.get_realm_role(role_name)
+            roles = _merge_role_dict(roles, get_effective_roles(db, role))
+
+        effective_client_roles = group.get_effective_client_roles()
+        for client, role_names in effective_client_roles.items():
+            for role_name in role_names:
+                role = db.get_client_role(role_name, client)
+                roles = _merge_role_dict(roles, get_effective_roles(db, role))
+
+    return roles
+
+
+def get_effective_roles_for_service_account(db: Database, saccount: ServiceAccount) -> dict:
+    direct_roles = get_effective_roles_for_service_account_direct_assignments(db, saccount)
+    group_roles = get_effective_roles_for_service_account_group_assignments(db, saccount)
+    return _merge_role_dict(direct_roles, group_roles)
