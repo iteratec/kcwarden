@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from kcwarden.custom_types.keycloak_object import Client, Realm
+from kcwarden.custom_types.keycloak_object import Client, Group, Realm
 
 
 class TestClient:
@@ -69,3 +69,109 @@ class TestRealm:
         # Test getting iterations from password policy
         realm = Realm({})
         assert realm.get_password_hash_iterations() is None
+
+
+class TestGroup:
+    def test_get_effective_client_roles_does_not_mutate_intermediate_group(self):
+        realm = Mock()
+        grandparent_raw = {
+            "name": "grandparent",
+            "path": "/grandparent",
+            "attributes": {},
+            "realmRoles": [],
+            "clientRoles": {"client-a": ["gp-role"]},
+            "subGroups": [],
+        }
+        parent_raw = {
+            "name": "parent",
+            "path": "/grandparent/parent",
+            "attributes": {},
+            "realmRoles": [],
+            "clientRoles": {"client-b": ["parent-role"]},
+            "subGroups": [],
+        }
+        child_raw = {
+            "name": "child",
+            "path": "/grandparent/parent/child",
+            "attributes": {},
+            "realmRoles": [],
+            "clientRoles": {"client-b": ["child-role"]},
+            "subGroups": [],
+        }
+
+        grandparent_group = Group(grandparent_raw, realm)
+        parent_group = Group(parent_raw, realm, grandparent_group)
+        child_group = Group(child_raw, realm, parent_group)
+
+        effective_roles = child_group.get_effective_client_roles()
+
+        assert effective_roles == {
+            "client-a": ["gp-role"],
+            "client-b": ["parent-role", "child-role"],
+        }
+        assert parent_raw["clientRoles"] == {"client-b": ["parent-role"]}
+
+    def test_get_effective_client_roles_does_not_mutate_source_groups(self):
+        realm = Mock()
+        parent_raw = {
+            "name": "parent",
+            "path": "/parent",
+            "attributes": {},
+            "realmRoles": [],
+            "clientRoles": {"client-a": ["role-parent"]},
+            "subGroups": [],
+        }
+        child_raw = {
+            "name": "child",
+            "path": "/parent/child",
+            "attributes": {},
+            "realmRoles": [],
+            "clientRoles": {"client-a": ["role-child"], "client-b": ["role-child-only"]},
+            "subGroups": [],
+        }
+
+        parent_group = Group(parent_raw, realm)
+        child_group = Group(child_raw, realm, parent_group)
+
+        effective_roles = child_group.get_effective_client_roles()
+
+        assert effective_roles == {
+            "client-a": ["role-parent", "role-child"],
+            "client-b": ["role-child-only"],
+        }
+        assert parent_raw["clientRoles"] == {"client-a": ["role-parent"]}
+        assert child_raw["clientRoles"] == {
+            "client-a": ["role-child"],
+            "client-b": ["role-child-only"],
+        }
+
+    def test_get_effective_client_roles_is_stable_across_calls(self):
+        realm = Mock()
+        parent_group = Group(
+            {
+                "name": "parent",
+                "path": "/parent",
+                "attributes": {},
+                "realmRoles": [],
+                "clientRoles": {"client-a": ["role-parent"]},
+                "subGroups": [],
+            },
+            realm,
+        )
+        child_group = Group(
+            {
+                "name": "child",
+                "path": "/parent/child",
+                "attributes": {},
+                "realmRoles": [],
+                "clientRoles": {"client-a": ["role-child"]},
+                "subGroups": [],
+            },
+            realm,
+            parent_group,
+        )
+
+        first_result = child_group.get_effective_client_roles()
+        second_result = child_group.get_effective_client_roles()
+
+        assert first_result == second_result == {"client-a": ["role-parent", "role-child"]}
