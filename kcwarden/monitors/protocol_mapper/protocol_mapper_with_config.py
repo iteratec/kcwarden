@@ -68,9 +68,7 @@ class ProtocolMapperWithConfig(Monitor):
             additional_details["matched_scope"] = matched_scope
         if additional_details["client_has_service_account"]:
             saccount = self._DB.get_service_account(client.get_service_account_name())  # type: ignore
-            additional_details["client_service_account_realm_roles"] = saccount.get_realm_roles()
-            additional_details["client_service_account_client_roles"] = saccount.get_client_roles()
-            additional_details["client_service_account_resolved_composite_roles"] = (
+            additional_details["client_service_account_effective_roles"] = (
                 helper.get_effective_roles_for_service_account(self._DB, saccount)
             )
         return additional_details
