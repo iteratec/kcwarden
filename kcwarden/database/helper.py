@@ -221,10 +221,8 @@ def get_effective_roles_for_service_account_group_assignments(db: Database, sacc
     roles = {"realm": [], "client": {}}
     assigned_group_paths = set(saccount.get_groups())
 
-    for group in db.get_all_groups():
-        if group.get_path() not in assigned_group_paths:
-            continue
-
+    relevant_groups = [group for group in db.get_all_groups() if group.get_path() in assigned_group_paths]
+    for group in relevant_groups:
         for role_name in group.get_effective_realm_roles():
             role = db.get_realm_role(role_name)
             roles = _merge_role_dict(roles, get_effective_roles(db, role))
