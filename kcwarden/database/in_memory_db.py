@@ -36,7 +36,7 @@ class InMemoryDatabase(Database):
         self.SERVICE_ACCOUNTS[saccount.get_username()] = saccount
 
     def add_group(self, group: Group):
-        self.GROUPS[group.get_name()] = group
+        self.GROUPS[group.get_path()] = group
 
     def add_realm_role(self, role: RealmRole):
         self.REALM_ROLES[role.get_name()] = role
