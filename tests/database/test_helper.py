@@ -148,7 +148,9 @@ class TestGetEffectiveRolesForServiceAccountDirectAssignments:
 
     def test_expands_composite_realm_role(self, database, realm):
         database.add_realm_role(make_realm_role("child-role", realm))
-        database.add_realm_role(make_realm_role("composite-role", realm, composite=True, composites={"realm": ["child-role"]}))
+        database.add_realm_role(
+            make_realm_role("composite-role", realm, composite=True, composites={"realm": ["child-role"]})
+        )
         sa = make_service_account(realm, realm_roles=["composite-role"])
         database.add_service_account(sa)
         result = get_effective_roles_for_service_account_direct_assignments(database, sa)
@@ -190,7 +192,9 @@ class TestGetEffectiveRolesForServiceAccountGroupAssignments:
 
     def test_returns_client_role_from_assigned_group(self, database, realm):
         database.add_client_role(make_client_role("group-client-role", "my-client", realm))
-        database.add_group(make_group("test-group", "/test-group", realm, client_roles={"my-client": ["group-client-role"]}))
+        database.add_group(
+            make_group("test-group", "/test-group", realm, client_roles={"my-client": ["group-client-role"]})
+        )
         sa = make_service_account(realm, groups=["/test-group"])
         database.add_service_account(sa)
         result = get_effective_roles_for_service_account_group_assignments(database, sa)
