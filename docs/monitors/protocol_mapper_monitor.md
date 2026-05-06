@@ -13,7 +13,7 @@ But first, two important disclaimers:
 
 !!! warning
 
-    This monitor will only check protocol mappers that are assigned to a client (either directly or through a scope). If you have a mapper that is not assigned to a client (e.g., because it is assigned to a scope which is not assigned to any clients), this monitor will currently not find it. If you need to be able to detect these, please open an issue and describe your use case, ideally providing a configuration file that we can use to reproduce and test.
+    This monitor will only check protocol mappers that are assigned to a client (either directly or through a scope). If you have a mapper that is assigned to a scope which is not used by any client, this monitor will not find it. Use [ProtocolMapperWithConfigOnClientScope](#protocolmapperwithconfigonclientscope) if you want to monitor protocol mappers directly on client scopes, independently of client assignment.
 
 
 !!! warning
@@ -82,3 +82,29 @@ If a key specified in `matched-config` is not found, the entire protocol mapper 
 !!! info
 
     Right now, you cannot match based on the `name`, `protocol` and `consentRequired` fields of the config. If you have a use case for this, please open an issue on the repository and we'll add this functionality.
+
+## ProtocolMapperWithConfigOnClientScope
+
+This monitor is the counterpart to `ProtocolMapperWithConfig`, but operates directly on **client scopes** rather than on clients.
+
+While `ProtocolMapperWithConfig` iterates all clients and checks their protocol mappers (including those inherited from assigned scopes), this monitor focuses exclusively on what is configured on each client scope itself — independent of which clients use that scope.
+
+Use this monitor when you want to enforce rules about which protocol mappers may appear on client scopes, regardless of client assignment.
+
+The configuration works the same way as for `ProtocolMapperWithConfig`, but the `allowed` list contains scope names instead of client names:
+
+```yaml
+monitors:
+- monitor: ProtocolMapperWithConfigOnClientScope
+  config:
+  - protocol-mapper-type: "oidc-usermodel-attribute-mapper"
+    matched-config:
+      claim.name: user_id
+      user.attribute: (?!user_id).*
+    allowed: []
+    severity: Critical
+    note: The user_id claim on scopes should only be writable from the user_id user attribute
+```
+
+Both `protocol-mapper-type` and any value in `matched-config` support regular expressions.
+The `allowed` field accepts regular expressions and lists the scope names that are exempt from this rule.

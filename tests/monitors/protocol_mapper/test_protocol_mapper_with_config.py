@@ -12,41 +12,6 @@ class TestProtocolMapperWithConfig:
         monitor_instance._DB = Mock()
         return monitor_instance
 
-    def test_protocol_mapper_matches_config(self, monitor, mock_protocol_mapper):
-        # Test case where both type and config match
-        assert monitor._protocol_mapper_matches_config(
-            mock_protocol_mapper,
-            "oidc-usermodel-attribute-mapper",
-            {"userinfo.token.claim": "true", "user.attribute": "email"},
-        )
-
-        # Test case where type matches but config doesn't
-        assert not monitor._protocol_mapper_matches_config(
-            mock_protocol_mapper,
-            "oidc-usermodel-attribute-mapper",
-            {"userinfo.token.claim": "false", "user.attribute": "username"},
-        )
-
-        # Test case where type doesn't match
-        assert not monitor._protocol_mapper_matches_config(
-            mock_protocol_mapper, "oidc-audience-mapper", {"userinfo.token.claim": "true", "user.attribute": "email"}
-        )
-
-        # Test case with regex in type
-        assert monitor._protocol_mapper_matches_config(
-            mock_protocol_mapper, "oidc-.*-mapper", {"userinfo.token.claim": "true", "user.attribute": "email"}
-        )
-
-        # Test case with regex in config
-        assert monitor._protocol_mapper_matches_config(
-            mock_protocol_mapper,
-            "oidc-usermodel-attribute-mapper",
-            {"userinfo.token.claim": "tr.*", "user.attribute": "em.*"},
-        )
-
-        # Test case with empty config
-        assert monitor._protocol_mapper_matches_config(mock_protocol_mapper, "oidc-usermodel-attribute-mapper", {})
-
     @pytest.mark.parametrize(
         "ignore_disabled_clients, client_enabled, expected_result, is_client_object",
         [

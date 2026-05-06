@@ -4,6 +4,7 @@ from kcwarden.api import Monitor
 from kcwarden.custom_types.keycloak_object import ProtocolMapper, Client
 from kcwarden.custom_types.result import Severity
 from kcwarden.database import helper
+from kcwarden.monitors.subchecks.protocol_mapper import protocol_mapper_matches_config
 
 
 class ProtocolMapperWithConfig(Monitor):
@@ -32,26 +33,6 @@ class ProtocolMapperWithConfig(Monitor):
             "hint": "you can also leave this dictionary empty to match all mappers of the defined type",
         },
     }
-
-    @staticmethod
-    def _protocol_mapper_matches_config(
-        mapper: ProtocolMapper, target_mapper_type: str, target_mapper_config: dict[str, str]
-    ) -> bool:
-        # If the mapper type does not match, the whole thing isn't a match
-        if not helper.matches_as_string_or_regex(mapper.get_protocol_mapper(), target_mapper_type):
-            return False
-
-        # Next, we need to check if the provided configuration matches.
-        mapper_config = mapper.get_config()
-        for cfg_key, cfg_value in target_mapper_config.items():
-            # If the target config key is not defined for the mapper, it does not match
-            if cfg_key not in mapper_config:
-                return False
-            # If it is defined, the actual value must match the provided value from the config.
-            if not helper.matches_as_string_or_regex(mapper_config[cfg_key], cfg_value):
-                return False
-        # If we haven't returned False so far, all checks were successful and we can return True
-        return True
 
     def _generate_additional_details(
         self, client: Client, mapper: ProtocolMapper, matched_by: str, matched_scope: str | None = None
@@ -96,7 +77,7 @@ class ProtocolMapperWithConfig(Monitor):
                     continue
                 # First, find all directly defined ProtocolMappers
                 for mapper in client.get_protocol_mappers():
-                    if self._protocol_mapper_matches_config(mapper, monitored_mapper_type, matched_config):
+                    if protocol_mapper_matches_config(mapper, monitored_mapper_type, matched_config):
                         yield self.generate_finding_with_severity_from_config(
                             client,
                             monitor_definition,
@@ -108,7 +89,7 @@ class ProtocolMapperWithConfig(Monitor):
                 # Now, search all default and optional scopes
                 for scope_name in client.get_default_client_scopes():
                     for mapper in self._DB.get_scope(scope_name).get_protocol_mappers():
-                        if self._protocol_mapper_matches_config(mapper, monitored_mapper_type, matched_config):
+                        if protocol_mapper_matches_config(mapper, monitored_mapper_type, matched_config):
                             yield self.generate_finding_with_severity_from_config(
                                 client,
                                 monitor_definition,
@@ -118,7 +99,7 @@ class ProtocolMapperWithConfig(Monitor):
                             )
                 for scope_name in client.get_optional_client_scopes():
                     for mapper in self._DB.get_scope(scope_name).get_protocol_mappers():
-                        if self._protocol_mapper_matches_config(mapper, monitored_mapper_type, matched_config):
+                        if protocol_mapper_matches_config(mapper, monitored_mapper_type, matched_config):
                             yield self.generate_finding_with_severity_from_config(
                                 client,
                                 monitor_definition,
