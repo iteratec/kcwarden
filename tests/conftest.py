@@ -172,6 +172,7 @@ def mock_client(mock_realm):
     client.get_default_client_scopes.return_value = []
     client.get_optional_client_scopes.return_value = []
     client.is_oidc_client.return_value = True
+    client.is_system_client.return_value = False
     client.is_default_keycloak_client.return_value = False
     client.is_realm_specific_client.return_value = False
     client.get_protocol_mappers.return_value = []

@@ -95,27 +95,32 @@ class TestClientAccessTokenLifespanTooLong:
         client1.get_access_token_lifespan_override.return_value = None  # No override - OK
         client1.get_realm.return_value = mock_realm
         client1.is_oidc_client.return_value = True
+        client1.is_system_client.return_value = False
 
         client2 = Mock()
         client2.get_access_token_lifespan_override.return_value = 300  # 5 minutes - OK
         client2.get_realm.return_value = mock_realm
         client2.is_oidc_client.return_value = True
+        client2.is_system_client.return_value = False
 
         client3 = Mock()
         client3.get_access_token_lifespan_override.return_value = 1800  # 30 minutes - Too long
         client3.get_realm.return_value = mock_realm
         client3.is_oidc_client.return_value = True
+        client3.is_system_client.return_value = False
 
         client4 = Mock()
         client4.get_access_token_lifespan_override.return_value = 900  # 15 minutes - Too long
         client4.get_realm.return_value = mock_realm
         client4.is_oidc_client.return_value = True
+        client4.is_system_client.return_value = False
 
         # client5 is not an OIDC client - should be ignored
         client5 = Mock()
         client5.get_access_token_lifespan_override.return_value = 1800  # 30 minutes but ignored
         client5.get_realm.return_value = mock_realm
         client5.is_oidc_client.return_value = False
+        client5.is_system_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client1, client2, client3, client4, client5]
         results = list(auditor.audit())

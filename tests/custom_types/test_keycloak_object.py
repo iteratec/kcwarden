@@ -26,6 +26,49 @@ class TestClient:
         )
         assert client.use_refresh_tokens() == expected
 
+    @pytest.mark.parametrize(
+        ["client_id", "expected"],
+        [
+            ("_system", True),
+            ("some-other-client", False),
+        ],
+    )
+    def test_is_system_client(self, client_id: str, expected: bool):
+        client = Client(
+            {
+                "clientId": client_id,
+                "attributes": {},
+            },
+            [],
+            {},
+            realm=Mock(),
+        )
+        assert client.is_system_client() == expected
+
+    def test_get_protocol_returns_openid_connect_for_system_client(self):
+        client = Client(
+            {
+                "clientId": "_system",
+                "attributes": {},
+            },
+            [],
+            {},
+            realm=Mock(),
+        )
+        assert client.get_protocol() == "openid-connect"
+
+    def test_get_client_authenticator_type_returns_none_for_system_client(self):
+        client = Client(
+            {
+                "clientId": "_system",
+                "attributes": {},
+            },
+            [],
+            {},
+            realm=Mock(),
+        )
+        assert client.get_client_authenticator_type() is None
+
 
 class TestRealm:
     def test_extract_password_policy_empty(self):

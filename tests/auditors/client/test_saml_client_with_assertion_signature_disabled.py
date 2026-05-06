@@ -48,6 +48,7 @@ class TestSamlClientWithAssertionSignatureDisabled:
         client_secure.__str__ = Mock(return_value="secure-client")
         client_secure.is_saml_client.return_value = True
         client_secure.get_saml_assertion_signature.return_value = True
+        client_secure.is_system_client.return_value = False
 
         # 2. Vulnerable SAML Client
         client_vuln = Mock()
@@ -56,6 +57,7 @@ class TestSamlClientWithAssertionSignatureDisabled:
         client_vuln.__str__ = Mock(return_value="vuln-client")
         client_vuln.is_saml_client.return_value = True
         client_vuln.get_saml_assertion_signature.return_value = False
+        client_vuln.is_system_client.return_value = False
 
         # 3. OIDC Client
         client_oidc = Mock()
@@ -64,6 +66,7 @@ class TestSamlClientWithAssertionSignatureDisabled:
         client_oidc.__str__ = Mock(return_value="oidc-client")
         client_oidc.is_saml_client.return_value = False
         client_oidc.get_saml_assertion_signature.return_value = False
+        client_oidc.is_system_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_secure, client_vuln, client_oidc]
 

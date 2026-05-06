@@ -43,18 +43,21 @@ class TestSamlClientWithEncryptionDisabled:
         client_secure.__str__ = Mock(return_value="secure-saml")
         client_secure.is_saml_client.return_value = True
         client_secure.is_saml_encryption_enabled.return_value = True
+        client_secure.is_system_client.return_value = False
 
         client_vuln = Mock()
         client_vuln.name = "vuln-saml"
         client_vuln.__str__ = Mock(return_value="vuln-saml")
         client_vuln.is_saml_client.return_value = True
         client_vuln.is_saml_encryption_enabled.return_value = False
+        client_vuln.is_system_client.return_value = False
 
         client_oidc = Mock()
         client_oidc.name = "oidc-client"
         client_oidc.__str__ = Mock(return_value="oidc-client")
         client_oidc.is_saml_client.return_value = False
         client_oidc.is_saml_encryption_enabled.return_value = False
+        client_oidc.is_system_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_secure, client_vuln, client_oidc]
 

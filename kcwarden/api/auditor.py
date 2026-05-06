@@ -118,7 +118,7 @@ class ClientAuditor(Auditor, ABC):
     """
 
     def should_consider_client(self, client: Client) -> bool:
-        return self.is_not_ignored(client)
+        return self.is_not_ignored(client) and not client.is_system_client()
 
     def audit(self):
         for client in self._DB.get_all_clients():
