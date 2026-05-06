@@ -61,6 +61,7 @@ class TestClient:
         client = Client(
             {
                 "clientId": "_system",
+                "publicClient": False,
                 "attributes": {},
             },
             [],
