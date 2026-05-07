@@ -53,18 +53,21 @@ class TestSamlClientWithWeakSignatureAlgorithm:
         client_oidc.__str__ = Mock(return_value="oidc")
         client_oidc.is_saml_client.return_value = False
         client_oidc.get_saml_signature_algorithm.return_value = "RSA_SHA1"
+        client_oidc.is_system_client.return_value = False
 
         client_strong = Mock()
         client_strong.name = "strong"
         client_strong.__str__ = Mock(return_value="strong")
         client_strong.is_saml_client.return_value = True
         client_strong.get_saml_signature_algorithm.return_value = "RSA_SHA256"
+        client_strong.is_system_client.return_value = False
 
         client_weak = Mock()
         client_weak.name = "weak"
         client_weak.__str__ = Mock(return_value="weak")
         client_weak.is_saml_client.return_value = True
         client_weak.get_saml_signature_algorithm.return_value = "RSA_SHA1"
+        client_weak.is_system_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_oidc, client_strong, client_weak]
 

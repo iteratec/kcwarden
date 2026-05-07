@@ -61,6 +61,7 @@ class TestSamlClientHasErroneouslyConfiguredWildcardURI:
         client_safe.__str__ = Mock(return_value="safe-saml")
         client_safe.is_saml_client.return_value = True
         client_safe.get_resolved_redirect_uris.return_value = ["https://example.com/*"]
+        client_safe.is_system_client.return_value = False
 
         # Vulnerable SAML client — wildcard in domain
         client_vuln = Mock()
@@ -68,6 +69,7 @@ class TestSamlClientHasErroneouslyConfiguredWildcardURI:
         client_vuln.__str__ = Mock(return_value="vuln-saml")
         client_vuln.is_saml_client.return_value = True
         client_vuln.get_resolved_redirect_uris.return_value = ["https://example.com*"]
+        client_vuln.is_system_client.return_value = False
 
         # OIDC client — should be ignored regardless of URI
         client_oidc = Mock()
@@ -75,6 +77,7 @@ class TestSamlClientHasErroneouslyConfiguredWildcardURI:
         client_oidc.__str__ = Mock(return_value="oidc-client")
         client_oidc.is_saml_client.return_value = False
         client_oidc.get_resolved_redirect_uris.return_value = ["https://example.com*"]
+        client_oidc.is_system_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_safe, client_vuln, client_oidc]
 
@@ -89,6 +92,7 @@ class TestSamlClientHasErroneouslyConfiguredWildcardURI:
         client_multi.name = "multi-bad"
         client_multi.__str__ = Mock(return_value="multi-bad")
         client_multi.is_saml_client.return_value = True
+        client_multi.is_system_client.return_value = False
         client_multi.get_resolved_redirect_uris.return_value = [
             "https://ok.com/*",
             "https://bad.com*",

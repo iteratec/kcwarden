@@ -103,6 +103,7 @@ class TestUsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDang
     def test_audit_function_multiple_clients(self, auditor):
         # Create separate mock clients with distinct settings
         client1 = Mock()
+        client1.is_system_client.return_value = False
         realm1: Realm = Mock()
         realm1.get_unmanaged_attribute_policy.return_value = "ENABLED"
         client1.get_realm.return_value = realm1
@@ -112,6 +113,7 @@ class TestUsingNonDefaultUserAttributesInClientsWithoutUserProfilesFeatureIsDang
         client1.get_protocol_mappers.return_value = [mapper1]
 
         client2 = Mock()
+        client2.is_system_client.return_value = False
         realm2 = Mock()
         realm2.get_unmanaged_attribute_policy.return_value = "ADMIN_EDIT"
         client2.get_realm.return_value = realm2

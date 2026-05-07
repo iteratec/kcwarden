@@ -45,18 +45,21 @@ class TestSamlClientWithClientSignatureDisabled:
         client_oidc.__str__ = Mock(return_value="oidc-client")
         client_oidc.is_saml_client.return_value = False
         client_oidc.is_saml_client_signature_required.return_value = False
+        client_oidc.is_system_client.return_value = False
 
         client_secure = Mock()
         client_secure.name = "secure-saml"
         client_secure.__str__ = Mock(return_value="secure-saml")
         client_secure.is_saml_client.return_value = True
         client_secure.is_saml_client_signature_required.return_value = True
+        client_secure.is_system_client.return_value = False
 
         client_vuln = Mock()
         client_vuln.name = "vuln-saml"
         client_vuln.__str__ = Mock(return_value="vuln-saml")
         client_vuln.is_saml_client.return_value = True
         client_vuln.is_saml_client_signature_required.return_value = False
+        client_vuln.is_system_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_oidc, client_secure, client_vuln]
 
