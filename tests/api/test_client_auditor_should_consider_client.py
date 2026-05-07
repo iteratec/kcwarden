@@ -20,7 +20,6 @@ class TestClientAuditorShouldConsiderClient:
     @pytest.fixture
     def auditor(self, database, default_config):
         auditor_instance = ConcreteClientAuditor(database, default_config)
-        auditor_instance._DB = Mock()
         auditor_instance.is_not_ignored = Mock(return_value=True)
         return auditor_instance
 
