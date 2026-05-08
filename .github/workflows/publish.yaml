@@ -13,22 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    env:
-      PIP_PROGRESS_BAR: "off"
-      PIP_DISABLE_PIP_VERSION_CHECK: "on"
-      POETRY_NO_INTERACTION: 1
-      POETRY_VIRTUALENVS_IN_PROJECT: true
-
-    container:
-      image: python:3.13-alpine
 
     outputs:
       version: ${{ steps.version.outputs.version }}
 
     steps:
-      - name: Install git
-        run: apk add git
-
       - name: Checkout Repository
         uses: actions/checkout@v6
         with:
@@ -38,15 +27,17 @@ jobs:
       - name: Fix directory permissions
         run: chown -R root:root .
 
-      - uses: ./.github/actions/setup-poetry-project
-        with:
-          install_plugin: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Set up Python
+        run: uv python install
 
       - name: Run Pytest
-        run: poetry run pytest
+        run: uv run pytest
 
       - name: Build Package
-        run: poetry build
+        run: uv build
 
       - name: Archive Production Artifacts
         uses: actions/upload-artifact@v7
@@ -57,8 +48,9 @@ jobs:
 
       - name: Store version
         id: version
+        # Using hatch as workaround since uv version cannot handle the dynamic version
         run: |
-          echo "version=$(poetry version --short)" >> $GITHUB_OUTPUT
+          echo "version=$(uvx hatch version)" >> $GITHUB_OUTPUT
 
   publish-to-pypi:
     needs: test-and-build
@@ -78,9 +70,11 @@ jobs:
           name: dist
           path: dist
 
-      - name: Display structure of downloaded files
-        run: ls -R
-
+      # uv publish (as of 0.11) only uploads pre-existing attestations; it does
+      # not generate them (see astral-sh/uv#15618).
+      # We keep using the official PyPA action, which generates PEP 740
+      # PyPI Publish Attestations via Sigstore and uploads them alongside the
+      # distributions.
       - name: Publish Package Distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
@@ -101,13 +95,13 @@ jobs:
 
     steps:
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@v4.0.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v4.0.0
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.1.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -115,7 +109,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@v6.0.0
         with:
           tags: |
             type=pep440,pattern={{version}}
@@ -123,7 +117,7 @@ jobs:
 
       - name: Build and Push Container Image
         id: push
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v7.1.0
         with:
           context: "{{defaultContext}}"
           file: Docker/release.Dockerfile
@@ -135,7 +129,7 @@ jobs:
             KCWARDEN_VERSION=${{ needs.test-and-build.outputs.version }}
 
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@v4.1.0
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}

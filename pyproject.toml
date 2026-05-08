@@ -1,49 +1,64 @@
-[tool.poetry]
+[project]
 name = "kcwarden"
-version = "0.0.0"
+dynamic = ["version"]
 description = "Keycloak auditor"
-authors = ["Max Maass <max.maass@iteratec.com>", "Tim Walter <tim.walter@iteratec.com>"]
+authors = [
+    { name = "Max Maass", email = "max.maass@iteratec.com" },
+    { name = "Tim Walter", email = "tim.walter@iteratec.com" },
+]
+requires-python = ">=3.11,<4"
 readme = "README.md"
 license = "Apache-2.0"
-homepage = "https://iteratec.github.io/kcwarden/"
-repository = "https://github.com/iteratec/kcwarden"
-documentation = "https://iteratec.github.io/kcwarden/"
-keywords = ["keycloak", "security-scanner", "oauth2", "oidc"]
-classifiers = ["License :: OSI Approved :: Apache Software License", "Topic :: Security", "Topic :: Software Development :: Testing", "Operating System :: OS Independent"]
+keywords = [
+    "keycloak",
+    "security-scanner",
+    "oauth2",
+    "oidc",
+]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Security",
+    "Topic :: Software Development :: Testing",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2.32.3,<3",
+    "pyyaml>=6.0.2,<7",
+    "rich>=14,<16",
+]
 
-[tool.poetry.urls]
+[project.urls]
+Homepage = "https://iteratec.github.io/kcwarden/"
+Repository = "https://github.com/iteratec/kcwarden"
+Documentation = "https://iteratec.github.io/kcwarden/"
 "Bug Tracker" = "https://github.com/iteratec/kcwarden/issues"
-"Sponsor" = "https://www.iteratec.com/"
+Sponsor = "https://www.iteratec.com/"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-requests = "^2.32.3"
-pyyaml = "^6.0.2"
-rich = ">=14,<16"
+[project.scripts]
+kcwarden = "kcwarden.cli:main"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^9.0.0"
-testcontainers = { extras = ["keycloak"], version = "^4.9.2" }
-python-keycloak = ">=5.5,<8.0"
-ruff = ">=0.11.10,<0.16.0"
-pre-commit = "^4.2.0"
+[dependency-groups]
+dev = [
+    "pytest>=9.0.0",
+    "testcontainers[keycloak]>=4.9.2",
+    "python-keycloak>=5.5",
+    "ruff>=0.15.0",
+    "pre-commit>=4.2.0",
+]
+docs = ["mkdocs>=1.6.1,<2"]
 
-[tool.poetry.group.docs]
-optional = true
+[tool.uv]
+exclude-newer = "3 days"
 
-[tool.poetry.group.docs.dependencies]
-mkdocs = "^1.6.1"
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
+[tool.uv-dynamic-versioning]
+fallback-version = "0.0.1"
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
-
-[tool.poetry.scripts]
-kcwarden = "kcwarden.cli:main"
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
 
 [tool.pytest]
 testpaths = [
