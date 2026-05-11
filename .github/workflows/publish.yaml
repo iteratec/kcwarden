@@ -56,8 +56,6 @@ jobs:
     permissions:
       # IMPORTANT: this permission is mandatory for PyPI trusted publishing
       id-token: write
-      # For uploading the container image attestation
-      artifact-metadata: write
 
     steps:
       - name: Download a single artifact
@@ -88,6 +86,8 @@ jobs:
       packages: write
       attestations: write
       id-token: write
+      # For uploading the container image attestation
+      artifact-metadata: write
 
     steps:
       - name: Set up QEMU
