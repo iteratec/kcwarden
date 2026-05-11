@@ -14,7 +14,7 @@ If the package is built, the version is determined by the git tag using [uv-dyna
 ## Linting and Formatting
 
 `ruff` is used as linter and code formatter.
-It can be executed using `uv run ruff . --fix` for linting with automatic fixes and `uv run ruff format .` for formatting.
+It can be executed using `uv run ruff check . --fix` for linting with automatic fixes and `uv run ruff format .` for formatting.
 
 The pipeline only succeeds if the code is formatted and there are no linting issues.
 
