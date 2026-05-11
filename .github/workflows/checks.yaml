@@ -28,48 +28,53 @@ on:
 env:
   PIP_PROGRESS_BAR: "off"
   PIP_DISABLE_PIP_VERSION_CHECK: "on"
-  POETRY_NO_INTERACTION: 1
-  POETRY_VIRTUALENVS_IN_PROJECT: true
 
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ '3.11', '3.12', '3.13' ] # Define Python versions here
-
-    container:
-      image: python:${{ matrix.python-version }}-alpine # Use Python Docker images
+        python-version: [ '3.12', '3.13', '3.14' ] # Define Python versions here
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-poetry-project
+      - name: Install uv and set the Python version
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
-          install_plugin: false
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
 
       - name: Run Pytest
         run: |
-          poetry run pytest
+          uv run pytest
   lint:
     runs-on: ubuntu-latest
-    container:
-      image: python:3.13-alpine
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-poetry-project
-        with:
-          install_plugin: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
 
       - name: Run ruff check
-        run: poetry run ruff check
+        run: uv run ruff check
 
       - name: Run ruff format check
-        run: poetry run ruff format --check .
+        run: uv run ruff format --check .
 
   integration-tests:
     runs-on: ubuntu-latest
@@ -81,16 +86,17 @@ jobs:
       - name: Create Docker network for running Testcontainers
         run: docker network create ${{ env.TESTCONTAINER_DOCKER_NETWORK }}
 
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
-
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-poetry-project
-        with:
-          install_plugin: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
 
       - name: Run integration tests
-        run: poetry run pytest --integration
+        run: uv run pytest --integration

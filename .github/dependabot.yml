@@ -23,3 +23,9 @@ updates:
     groups:
       all-actions:
         patterns: [ "*" ]
+  - package-ecosystem: "docker"
+    directory: "/Docker"
+    cooldown:
+      default-days: 3
+    schedule:
+      interval: "weekly"
