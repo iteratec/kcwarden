@@ -51,14 +51,13 @@ jobs:
 
   publish-to-pypi:
     needs: test-and-build
-
     runs-on: ubuntu-latest
-
     environment: release
-
     permissions:
       # IMPORTANT: this permission is mandatory for PyPI trusted publishing
       id-token: write
+      # For uploading the container image attestation
+      artifact-metadata: write
 
     steps:
       - name: Download a single artifact
