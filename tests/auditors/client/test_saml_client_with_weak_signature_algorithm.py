@@ -47,32 +47,19 @@ class TestSamlClientWithWeakSignatureAlgorithm:
         if expected_findings > 0:
             assert results[0].additional_details["detected_algorithm"] == algorithm
 
-    def test_audit_mixed_clients(self, auditor):
-        client_oidc = Mock()
-        client_oidc.name = "oidc"
-        client_oidc.__str__ = Mock(return_value="oidc")
-        client_oidc.is_saml_client.return_value = False
-        client_oidc.get_saml_signature_algorithm.return_value = "RSA_SHA1"
-        client_oidc.is_system_client.return_value = False
+    def test_audit_mixed_clients(self, auditor, create_mock_client):
+        client_oidc = create_mock_client(name="oidc", is_saml_client=False)
 
-        client_strong = Mock()
-        client_strong.name = "strong"
-        client_strong.__str__ = Mock(return_value="strong")
-        client_strong.is_saml_client.return_value = True
+        client_strong = create_mock_client(name="strong", is_saml_client=True)
         client_strong.get_saml_signature_algorithm.return_value = "RSA_SHA256"
-        client_strong.is_system_client.return_value = False
 
-        client_weak = Mock()
-        client_weak.name = "weak"
-        client_weak.__str__ = Mock(return_value="weak")
-        client_weak.is_saml_client.return_value = True
+        client_weak = create_mock_client(name="weak", is_saml_client=True)
         client_weak.get_saml_signature_algorithm.return_value = "RSA_SHA1"
-        client_weak.is_system_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client_oidc, client_strong, client_weak]
 
         results = list(auditor.audit())
 
         assert len(results) == 1
-        assert results[0]._offending_object.name == "weak"
+        assert results[0]._offending_object.get_name() == "weak"
         assert results[0].additional_details["detected_algorithm"] == "RSA_SHA1"
