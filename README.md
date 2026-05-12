@@ -1,6 +1,5 @@
 # kcwarden - Keycloak Configuration Auditor
 
-![Python](https://img.shields.io/pypi/pyversions/kcwarden.svg)
 [![PyPI version](https://img.shields.io/pypi/v/kcwarden.svg)](https://pypi.python.org/pypi/kcwarden)
 [![Mkdocs](https://img.shields.io/badge/doc-mkdocs-845ed7.svg)](https://iteratec.github.io/kcwarden)
 [![GitHub discussions](https://img.shields.io/badge/discuss-online-845ef7)](https://github.com/iteratec/kcwarden/discussions)
