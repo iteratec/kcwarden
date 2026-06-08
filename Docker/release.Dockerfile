@@ -1,4 +1,4 @@
-FROM docker.io/library/python:3.14-alpine
+FROM docker.io/library/python:3.14.5-alpine
 
 ARG KCWARDEN_VERSION
 

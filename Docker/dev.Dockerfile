@@ -20,7 +20,7 @@ RUN uv build
 
 
 # Actual image
-FROM docker.io/library/python:3.14-alpine
+FROM docker.io/library/python:3.14.5-alpine
 
 # Update packages and switch to non-root
 RUN apk upgrade -U && adduser -D --u 65532 nonroot
