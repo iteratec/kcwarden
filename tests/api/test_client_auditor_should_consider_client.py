@@ -24,17 +24,17 @@ class TestClientAuditorShouldConsiderClient:
         return auditor_instance
 
     def test_should_consider_normal_client(self, mock_client, auditor):
-        mock_client.is_system_client.return_value = False
+        mock_client.is_keycloak_internal_client.return_value = False
         assert auditor.should_consider_client(mock_client) is True
 
     def test_should_consider_system_client_returns_false(self, mock_client, auditor):
         # Keycloak internal _system client should always be skipped
-        mock_client.is_system_client.return_value = True
+        mock_client.is_keycloak_internal_client.return_value = True
         assert auditor.should_consider_client(mock_client) is False
 
     def test_should_consider_ignored_client_returns_false(self, mock_client, auditor):
         auditor.is_not_ignored.return_value = False
-        mock_client.is_system_client.return_value = False
+        mock_client.is_keycloak_internal_client.return_value = False
         assert auditor.should_consider_client(mock_client) is False
 
 

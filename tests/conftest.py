@@ -168,7 +168,7 @@ def create_mock_client(mock_realm):
     def _create_mock_client(
         name="mock-test-client",
         is_saml_client=False,
-        is_system_client=False,
+        is_keycloak_internal_client=False,
     ):
         client = unittest.mock.create_autospec(spec=Client, instance=True)
         client.get_name.return_value = name
@@ -179,7 +179,7 @@ def create_mock_client(mock_realm):
         client.get_optional_client_scopes.return_value = []
         client.is_oidc_client.return_value = not is_saml_client
         client.is_saml_client.return_value = is_saml_client
-        client.is_system_client.return_value = is_system_client
+        client.is_keycloak_internal_client.return_value = is_keycloak_internal_client
         client.is_default_keycloak_client.return_value = False
         client.is_realm_specific_client.return_value = False
         client.get_protocol_mappers.return_value = []
