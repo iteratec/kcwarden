@@ -80,7 +80,7 @@ class TestClientWithDefaultOfflineAccessScope:
         client1.use_refresh_tokens.return_value = True
         client1.is_public.return_value = False
         client1.is_realm_specific_client.return_value = False
-        client1.is_system_client.return_value = False
+        client1.is_keycloak_internal_client.return_value = False
 
         client2 = Mock()
         client2.get_default_client_scopes.return_value = []
@@ -92,7 +92,7 @@ class TestClientWithDefaultOfflineAccessScope:
         client2.is_public.return_value = True
         client2.allows_user_authentication.return_value = True
         client2.is_realm_specific_client.return_value = False
-        client2.is_system_client.return_value = False
+        client2.is_keycloak_internal_client.return_value = False
 
         client3 = Mock()
         client3.get_default_client_scopes.return_value = ["offline_access"]
@@ -104,7 +104,7 @@ class TestClientWithDefaultOfflineAccessScope:
         client3.is_public.return_value = False
         client3.allows_user_authentication.return_value = True
         client3.is_realm_specific_client.return_value = False
-        client3.is_system_client.return_value = False
+        client3.is_keycloak_internal_client.return_value = False
 
         auditor._DB.get_all_clients.return_value = [client1, client2, client3]
         results = list(auditor.audit())

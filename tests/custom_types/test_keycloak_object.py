@@ -30,10 +30,11 @@ class TestClient:
         ["client_id", "expected"],
         [
             ("_system", True),
+            ("admin-permissions", True),
             ("some-other-client", False),
         ],
     )
-    def test_is_system_client(self, client_id: str, expected: bool):
+    def test_is_keycloak_internal_client(self, client_id: str, expected: bool):
         client = Client(
             {
                 "clientId": client_id,
@@ -43,7 +44,7 @@ class TestClient:
             {},
             realm=Mock(),
         )
-        assert client.is_system_client() == expected
+        assert client.is_keycloak_internal_client() == expected
 
     def test_get_protocol_returns_openid_connect_for_system_client(self):
         client = Client(
