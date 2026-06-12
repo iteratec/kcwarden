@@ -6,15 +6,11 @@ from kcwarden.custom_types.result import Severity
 class ClientWithFullScopeAllowed(ClientAuditor):
     DEFAULT_SEVERITY = Severity.Info
     SHORT_DESCRIPTION = "Client has 'full scope allowed' set"
-    LONG_DESCRIPTION = "Keycloak scopes control what information and roles are added to an access token. Generally, access tokens should be 'least privilege', meaning that they only contain the roles and information that are actually required to achieve the task. If the 'Full scope allowed' option is set on a client, it ignores the configured scopes, and simply adds all roles that the user has to the token, as if all scopes were selected. This leads to overprivileged tokens."
+    LONG_DESCRIPTION = "Keycloak scopes control what information and roles are added to an access token. Generally, access tokens should be 'least privilege', meaning that they only contain the roles and information that are actually required to achieve the task. If the 'Full scope allowed' option is set on a client, it ignores the configured scopes, and simply adds all roles that the user or service account has to the token, as if all scopes were selected. This leads to overprivileged tokens."
     REFERENCE = ""
 
     def should_consider_client(self, client) -> bool:
-        return (
-            super().should_consider_client(client)
-            and client.allows_user_authentication()
-            and not client.is_realm_specific_client()
-        )
+        return super().should_consider_client(client) and not client.is_realm_specific_client()
 
     @staticmethod
     def client_has_full_scope_allowed(client) -> bool:

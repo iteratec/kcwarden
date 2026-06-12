@@ -12,14 +12,14 @@ class TestClientWithFullScopeAllowed:
         return auditor_instance
 
     @pytest.mark.parametrize(
-        "allows_user_auth, expected",
+        "is_realm_specific_client, expected",
         [
-            (True, True),  # User auth allowed
-            (False, False),  # User auth not allowed
+            (True, False),  # Realm-specific client
+            (False, True),  # other type of client
         ],
     )
-    def test_should_consider_client(self, mock_client, auditor, allows_user_auth, expected):
-        mock_client.allows_user_authentication.return_value = allows_user_auth
+    def test_should_consider_client(self, mock_client, auditor, is_realm_specific_client, expected):
+        mock_client.is_realm_specific_client.return_value = is_realm_specific_client
         assert auditor.should_consider_client(mock_client) == expected
 
     @pytest.mark.parametrize(
