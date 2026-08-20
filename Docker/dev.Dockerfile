@@ -1,5 +1,5 @@
 # Build image
-FROM ghcr.io/astral-sh/uv:0.12.3-alpine AS builder
+FROM ghcr.io/astral-sh/uv:0.12.5-alpine AS builder
 
 # Switch to non-root (a group with gid=uid is automatically created)
 RUN adduser -D -u 65532 nonroot
