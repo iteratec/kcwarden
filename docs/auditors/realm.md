@@ -122,6 +122,25 @@ Since an access token is stateless, it cannot be revoked.
 The worst case is a configured lifespan of `0` since that leads to unlimited validity of the tokens.
 A recommended lifespan is 1 to 5 minutes, or 10 minutes at maximum.
 
+## SsoSessionIdleTimeoutExceedsClientSessionIdleTimeout
+
+This auditor checks that long SSO session idle timeouts are paired with an appropriate client session idle timeout.
+
+When `ssoSessionIdleTimeout` is set to more than 1 hour (3600 seconds), Keycloak will keep SSO sessions — and by extension all client sessions that inherit from them — alive for an extended period of inactivity.
+If no dedicated `clientSessionIdleTimeout` is configured (value is `0`), or if the configured value is greater than or equal to `ssoSessionIdleTimeout`, the client sessions effectively inherit the long SSO timeout without any independent cap.
+
+This matters because the idle timeout also controls the lifetime of refresh tokens: a long idle timeout means refresh tokens remain valid for that same extended period, increasing the window of opportunity in case of token compromise.
+
+The recommended mitigation is to set `clientSessionIdleTimeout` to a value that is both non-zero and strictly shorter than `ssoSessionIdleTimeout`, giving client sessions and their associated refresh tokens a tighter expiry independent of the SSO session.
+
+The severity of findings scales with the configured `ssoSessionIdleTimeout`:
+
+| `ssoSessionIdleTimeout` | Severity |
+|---|---|
+| > 3600s (1 hour) | Medium |
+| ≥ 28800s (8 hours) | High |
+| ≥ 86400s (24 hours) | Critical |
+
 ## OfflineSessionMaxLifespanDisabled
 
 This auditor flags realms where the maximum lifespan for offline sessions is not enforced.
