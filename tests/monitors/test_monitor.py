@@ -35,3 +35,40 @@ class TestMonitorNoteField:
             mock_client, matched_config, override_long_description="Explicit override"
         )
         assert result.long_description == "Explicit override"
+
+
+class TestMonitorReferenceField:
+    """Tests for the reference field behavior in generate_finding_with_severity_from_config."""
+
+    @pytest.fixture
+    def monitor(self, mock_database, default_config):
+        return ClientWithSensitiveScope(mock_database, default_config)
+
+    @pytest.fixture
+    def matched_config(self):
+        return {"scope": "sensitive-scope", "allowed": []}
+
+    def test_reference_replaces_default_reference(self, monitor, mock_client, matched_config):
+        matched_config["reference"] = "https://wiki.example.com/iam/sensitive-scope"
+        result = monitor.generate_finding_with_severity_from_config(mock_client, matched_config)
+        assert result.reference == "https://wiki.example.com/iam/sensitive-scope"
+
+    def test_no_reference_uses_default_reference(self, monitor, mock_client, matched_config):
+        result = monitor.generate_finding_with_severity_from_config(mock_client, matched_config)
+        assert result.reference == ClientWithSensitiveScope.REFERENCE
+
+    def test_placeholder_reference_uses_default_reference(self, monitor, mock_client, matched_config):
+        matched_config["reference"] = Monitor.COMMON_CUSTOM_CONFIG_TEMPLATE["reference"]
+        result = monitor.generate_finding_with_severity_from_config(mock_client, matched_config)
+        assert result.reference == ClientWithSensitiveScope.REFERENCE
+
+    def test_override_reference_takes_precedence_over_config_reference(self, monitor, mock_client, matched_config):
+        matched_config["reference"] = "https://wiki.example.com/iam/sensitive-scope"
+        result = monitor.generate_finding_with_severity_from_config(
+            mock_client, matched_config, override_reference="https://explicit.example.com"
+        )
+        assert result.reference == "https://explicit.example.com"
+
+    def test_reference_is_part_of_config_template(self):
+        template = ClientWithSensitiveScope.get_custom_config_template()
+        assert template[0]["reference"] == Monitor.COMMON_CUSTOM_CONFIG_TEMPLATE["reference"]
