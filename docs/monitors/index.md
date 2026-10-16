@@ -57,6 +57,7 @@ monitors:
     allowed:
       - /OrgAdm
     note: org_admin controls access to org management. Only the group /OrgAdm should have it.
+    reference: https://wiki.example.com/iam/org-admin-policy
   - role: "site_admin"
     severity: Critical
     role-client: realm
@@ -65,7 +66,7 @@ monitors:
     note: site_admin controls access to overall admin functionality. Only the group /Staff should have it.
 ```
 
-Part of the configuration options for each monitor are specific to that monitor, but two are generic: `severity` and `note`.
+Part of the configuration options for each monitor are specific to that monitor, but three are generic: `severity`, `note`, and `reference`.
 
 ### Severity
 
@@ -79,3 +80,9 @@ You can also filter the results using the `--min-severity` switch.
 The note is a human-readable description of the semantics of the configuration.
 It can contain arbitrary text, and will be returned as part of the output of the auditor when it has a finding.
 Use it to remind yourself why you set up this rule, and what the consequences of violating it are.
+
+### Reference
+
+The reference is optional and can point to further documentation about the configuration, like a link to an internal wiki page or policy document.
+It will be returned as the reference of the finding when the monitor has a finding.
+If it is not set, the finding has no reference.
