@@ -10,6 +10,7 @@ class Monitor(Auditor, ABC):
     COMMON_CUSTOM_CONFIG_TEMPLATE: dict = {
         "allowed": ["allowed-entity-name", "allowed-entity-regex.*"],
         "note": "A note on why a match is interesting. Will be part of the output on matches.",
+        "reference": "A reference (e.g., a link) to further documentation. Will be part of the output on matches.",
         "severity": "Placeholder, will be replaced in get_custom_config_template",
     }
 
@@ -49,6 +50,10 @@ class Monitor(Auditor, ABC):
         note = matched_config.get("note")
         if note and note != self.COMMON_CUSTOM_CONFIG_TEMPLATE["note"] and override_long_description is None:
             override_long_description = note
+
+        reference = matched_config.get("reference")
+        if reference and reference != self.COMMON_CUSTOM_CONFIG_TEMPLATE["reference"] and override_reference is None:
+            override_reference = reference
 
         return self.generate_finding(
             dataclass_obj,
