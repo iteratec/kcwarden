@@ -27,6 +27,27 @@ class TestClient:
         assert client.use_refresh_tokens() == expected
 
     @pytest.mark.parametrize(
+        ["attributes", "expected"],
+        [
+            ({}, 0),
+            ({"client.session.idle.timeout": "1800"}, 1800),
+            ({"client.session.idle.timeout": "0"}, 0),
+            ({"client.session.idle.timeout": ""}, 0),
+        ],
+    )
+    def test_get_client_session_idle_timeout_override(self, attributes: dict, expected: int):
+        client = Client(
+            {
+                "clientId": "TEST_CLIENT_ID",
+                "attributes": attributes,
+            },
+            [],
+            {},
+            realm=Mock(),
+        )
+        assert client.get_client_session_idle_timeout_override() == expected
+
+    @pytest.mark.parametrize(
         ["client_id", "expected"],
         [
             ("_system", True),
