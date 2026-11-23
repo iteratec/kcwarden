@@ -136,6 +136,42 @@ class TestRealm:
         realm = Realm({})
         assert realm.get_password_hash_iterations() is None
 
+    def test_events_disabled_by_default(self):
+        realm = Realm({})
+        assert realm.is_user_events_enabled() is False
+        assert realm.is_admin_events_enabled() is False
+
+    def test_events_enabled(self):
+        realm = Realm({"eventsEnabled": True, "adminEventsEnabled": True})
+        assert realm.is_user_events_enabled() is True
+        assert realm.is_admin_events_enabled() is True
+
+    @pytest.mark.parametrize(
+        "raw, expected",
+        [
+            ({}, 0),  # Keycloak omits the field if no expiration is set
+            ({"eventsExpiration": None}, 0),
+            ({"eventsExpiration": 0}, 0),
+            ({"eventsExpiration": 86400}, 86400),
+        ],
+    )
+    def test_get_user_events_expiration(self, raw, expected):
+        assert Realm(raw).get_user_events_expiration() == expected
+
+    @pytest.mark.parametrize(
+        "raw, expected",
+        [
+            ({}, 0),
+            ({"attributes": {}}, 0),
+            ({"attributes": {"adminEventsExpiration": ""}}, 0),
+            ({"attributes": {"adminEventsExpiration": " "}}, 0),
+            ({"attributes": {"adminEventsExpiration": "0"}}, 0),
+            ({"attributes": {"adminEventsExpiration": "86400"}}, 86400),
+        ],
+    )
+    def test_get_admin_events_expiration(self, raw, expected):
+        assert Realm(raw).get_admin_events_expiration() == expected
+
 
 class TestGroup:
     def test_get_effective_client_roles_does_not_mutate_intermediate_group(self):
