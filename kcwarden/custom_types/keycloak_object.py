@@ -68,6 +68,29 @@ class Realm(Dataclass):
     def is_offline_session_max_lifespan_enabled(self) -> bool:
         return self._d["offlineSessionMaxLifespanEnabled"]
 
+    # Event Storage
+    def is_user_events_enabled(self) -> bool:
+        return self._d.get("eventsEnabled", False)
+
+    def get_user_events_expiration(self) -> int:
+        """Get user events expiration in seconds. A value of 0 means that no expiration is set."""
+        return self._parse_expiration(self._d.get("eventsExpiration"))
+
+    def is_admin_events_enabled(self) -> bool:
+        return self._d.get("adminEventsEnabled", False)
+
+    def get_admin_events_expiration(self) -> int:
+        """Get admin events expiration in seconds. A value of 0 means that no expiration is set."""
+        return self._parse_expiration(self._d.get("attributes", {}).get("adminEventsExpiration"))
+
+    @staticmethod
+    def _parse_expiration(value: int | str | None) -> int:
+        # Keycloak omits eventsExpiration if unset, while adminEventsExpiration is a string realm attribute
+        # that may be missing or empty.
+        if value is None or str(value).strip() == "":
+            return 0
+        return int(value)
+
     def get_unmanaged_attribute_policy(self) -> str | None:
         try:
             attribute_config = json.loads(

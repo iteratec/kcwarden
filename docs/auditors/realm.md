@@ -146,3 +146,21 @@ The severity of findings scales with the configured `ssoSessionIdleTimeout`:
 This auditor flags realms where the maximum lifespan for offline sessions is not enforced.
 When this setting is disabled (which is the Keycloak default), offline tokens can be renewed indefinitely as long as they are used within the idle timeout, effectively granting permanent access.
 In environments with upstream identity providers or strict session governance requirements, this undermines token revocation and session expiry controls.
+
+## UserEventsStoredWithoutExpiration
+
+This auditor flags realms that store user events (`eventsEnabled`) without an expiration (`eventsExpiration` missing, empty or `0`).
+In this case, Keycloak keeps all user events forever, which lets the event table grow indefinitely.
+This costs disk space, can degrade the performance of event queries, and slows down database dumps and restores.
+Additionally, user events contain PII (such as IP addresses, user IDs, usernames or email addresses), which is then retained indefinitely and may violate data protection regulations like the GDPR.
+
+Configure an expiration for user events in the realm's event settings.
+If events need to be retained permanently, e.g. for auditing or compliance reasons, they should be forwarded to and stored in an external third-party system (such as a SIEM or log management system) instead of the Keycloak database.
+
+## AdminEventsStoredWithoutExpiration
+
+This auditor flags realms that store admin events (`adminEventsEnabled`) without an expiration (realm attribute `adminEventsExpiration` missing, empty or `0`).
+The same concerns as for `UserEventsStoredWithoutExpiration` apply: the admin event table grows indefinitely, and PII contained in the events (such as IP addresses, user IDs and, if representations are included, user details) is retained indefinitely.
+
+Configure an expiration for admin events in the realm's event settings.
+If events need to be retained permanently, e.g. for auditing or compliance reasons, they should be forwarded to and stored in an external third-party system (such as a SIEM or log management system) instead of the Keycloak database.
